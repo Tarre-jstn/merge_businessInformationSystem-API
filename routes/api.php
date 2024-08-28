@@ -24,6 +24,7 @@ Route::get('/all-business', function(){
     return Business::all();
 });
 
+
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);
 Route::put('/products/{id}', [ProductController::class, 'update']);

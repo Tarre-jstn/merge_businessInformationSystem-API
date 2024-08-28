@@ -1,18 +1,21 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import { Inertia } from '@inertiajs/inertia';
+import { route } from 'ziggy-js';
+
+function goToEditWebsite1(){
+    Inertia.visit(route('editWebsite1'));
+}
 </script>
 
 <template>
     <Head title="Website" />
 
     <AuthenticatedLayout>
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">Welcome to the Website Page!</div>
-                </div>
-            </div>
+        <div class="fixed bottom-0 left-0 right-0 flex justify-center mb-20">
+            <button class="px-6 py-4 bg-black text-white mr-2">Preview Website</button>
+            <button class="px-6 py-4 bg-black text-white" @click="goToEditWebsite1">Edit Website</button>
         </div>
     </AuthenticatedLayout>
 </template>

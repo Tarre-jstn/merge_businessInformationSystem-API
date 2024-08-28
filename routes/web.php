@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EditWebsiteController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -48,9 +49,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Settings');
     })->name('settings');
 
+    Route::get('/editWebsite1', function () {
+        return Inertia::render('EditWebsite1');
+    })->name('editWebsite1');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+   
 });
 
 require __DIR__.'/auth.php';
