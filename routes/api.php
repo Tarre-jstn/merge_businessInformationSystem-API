@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\Business;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\csrfController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +27,7 @@ Route::get('/all-business', function(){
 Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 
 Route::post('/website', [WebsiteController::class, 'store']);
+Route::get('/website', [WebsiteController::class, 'info']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);

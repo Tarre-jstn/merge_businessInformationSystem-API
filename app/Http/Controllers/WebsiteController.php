@@ -24,9 +24,16 @@ class WebsiteController extends Controller
                 'about_us3'=>'nullable|string|max:255'
             ]);
     
+            $website=Website::create($request->all());
+            return response()->json($website, 201);
             }
             catch(Exception $e){
                 return response()->json(['error' => $e->getMessage()], 500);
             }
         }
+    public function info(Request $request){
+        $business_id = $request->query('business_id');
+        $website = Website::where('business_id', $business_id)->first();
+        return response()->json($website);
+    }
 }

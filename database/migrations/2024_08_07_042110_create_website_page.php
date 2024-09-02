@@ -19,12 +19,12 @@ return new class extends Migration
             // $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreignId('business_id')->references('business_id')->on('businesses')->onDelete('cascade');
             $table->foreignId('product_id')->nullable()->references('id')->on('products')->onDelete('cascade');
-            $table->string('website_description');
-            $table->string('website_details');
-            $table->string('website_image');
-            $table->string('about_us1');
-            $table->string('about_us2');
-            $table->string('about_us3');
+            $table->string('website_description')->nullable();
+            $table->string('website_details')->nullable();
+            $table->string('website_image')->nullable();
+            $table->string('about_us1')->nullable();
+            $table->string('about_us2')->nullable();
+            $table->string('about_us3')->nullable();
             $table->timestamps();
     
         });

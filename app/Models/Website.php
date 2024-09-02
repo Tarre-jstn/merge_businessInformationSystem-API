@@ -10,6 +10,8 @@ class Website extends Model
     use HasFactory;
 
     protected $fillable = [
+        'business_id',
+        'product_id',
         'website_description',
         'website_details',
         'website_image',

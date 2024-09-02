@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
+use Exception;
 
 class RegisteredUserController extends Controller
 {
@@ -43,7 +44,7 @@ class RegisteredUserController extends Controller
             'contact_number' => 'nullable|string|max:255',
             'user_type'=> 'nullable|in:customer,owner'
         ]);
-
+        Log::info('Validation passed.');
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -52,7 +53,7 @@ class RegisteredUserController extends Controller
             'contact_number' => $request->contact_number,
             'user_type'=> $request->user_type
         ]);
-        
+        Log::info('User created: ', ['user' => $user]);
 
 
         event(new Registered($user));
@@ -61,7 +62,7 @@ class RegisteredUserController extends Controller
 
 
         return redirect(route('dashboard', absolute: false));
-    }catch (\Exception $e) {
+    }catch (Exception $e) {
             Log::error('Registration Error: ', ['error' => $e->getMessage()]);
             return back()->withErrors('Registration failed, please try again.');
         }

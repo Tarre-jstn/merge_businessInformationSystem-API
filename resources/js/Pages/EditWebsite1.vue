@@ -12,6 +12,7 @@ import { Inertia } from '@inertiajs/inertia';
 //     homePageImage: ref('https://picsum.photos/200')
 // }
 const textAreas = {
+    businessImage: ref(null),
     businessName: ref(null),
     businessDescription: ref(null),
     businessDetails: ref(null),
@@ -43,17 +44,27 @@ async function getWebsiteInfo(){
     try{
         const response_userId = await axios.get('/user-id');
         const userId = response_userId.data.user_id;
+        console.log(userId);
 
-        const response_businessId = await axios.get('/business-id');
-        const businessId = response_businessId.data.business_id
-        console.log(businessId);
+        // const response_businessId = await axios.get('/business-id');
+        // const businessId = response_businessId.data.business_id
+        // console.log(businessId);
 
-        const getBusinessName = await axios.get('/api/business_info', {
+        const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: userId}
         });
+        console.log(getBusinessInfo.data);
 
+        const businessId = getBusinessInfo.data.business_id;
+        const getWebsiteInfo = await axios.get('/api/website', {
+            params: {business_id: businessId}
+        });
+        console.log(getWebsiteInfo.data);
 
-        textAreas.businessName.value = getBusinessName.data.business_Name;
+        textAreas.businessImage.value = getBusinessInfo.data.business_image;
+        textAreas.businessName.value = getBusinessInfo.data.business_Name;
+        textAreas.businessDescription.value = getWebsiteInfo.data.website_description;
+        textAreas.businessDetails.value = getWebsiteInfo.data.website_details;
 
     }catch(error){
         console.error('There was an error fetching the data:', error);

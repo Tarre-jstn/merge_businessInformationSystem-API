@@ -65,43 +65,6 @@ class BusinessController extends Controller
     }catch(Exception $e){
         return response()->json(['error' => $e->getMessage()], 500);
     }
-    // $request->validate([
-    //     'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    //     'user_id' => 'required|integer',
-    //     'business_Name' => 'required|string|max:255',
-    //     'business_Address' => 'required|string|max:255',
-    //     'business_Contact_Number' => 'required|integer',
-    //     'business_Email' => 'required|string|max:255',
-    //     'business_SocialMedia' => 'required|string|max:255'
-    // ]);
-
-    // $data = $request->all();
-    
-    // if ($request->hasFile('business_image')) {
-    //     $image = $request->file('business_image');
-    //     $path = $image->store('public/business_logos');
-    //     $data['business_image'] = basename($path);
-    // }
-
-    
-    // $business_info = new Business($data);
-
-    // $business_info->user_id = $data['user_id'];
-    // $business_info->business_Name = $data['business_image'];
-    // $business_info->business_Address = $data['business_Address'];
-    // $business_info->business_Contact_Number = $data['business_Contact_Number'];
-    // $business_info->business_Email = $data['business_Email'];
-    // $business_info->business_SocialMedia = $data['business_SocialMedia'];
-
-    // return [
-    //     'success' => (bool) $business_info->save()
-    // ];
-    // // try{
-    // //     $business = Business::create($data);
-    // //     return response()->json(['sucess'=>true, 'data'=>($business)]);
-    // // }catch(Exception $e){
-    // //     return response()->json(['error'=>$e->getMessage(), 500]);
-    // // }
 }
 
 
