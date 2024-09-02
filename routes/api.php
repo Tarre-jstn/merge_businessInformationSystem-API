@@ -28,6 +28,7 @@ Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 
 Route::post('/website', [WebsiteController::class, 'store']);
 Route::get('/website', [WebsiteController::class, 'info']);
+Route::post('/website-update', [WebsiteController::class, 'update']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);

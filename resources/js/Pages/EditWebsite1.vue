@@ -12,11 +12,11 @@ import { Inertia } from '@inertiajs/inertia';
 //     homePageImage: ref('https://picsum.photos/200')
 // }
 const textAreas = {
-    businessImage: ref(null),
-    businessName: ref(null),
-    businessDescription: ref(null),
-    businessDetails: ref(null),
-    homePageImage: ref(null)
+    businessImage: ref(''),
+    businessName: ref(''),
+    businessDescription: ref(''),
+    businessDetails: ref(''),
+    homePageImage: ref('')
 }
 
 onMounted(()=>{
@@ -36,6 +36,7 @@ onMounted(()=>{
     if(paragraph){
         insertBreakLines(paragraph);
     }
+    getWebsiteInfo();
 });
 
 //store default / to be changed data:
@@ -54,8 +55,8 @@ async function getWebsiteInfo(){
             params: {user_id: userId}
         });
         console.log(getBusinessInfo.data);
-
         const businessId = getBusinessInfo.data.business_id;
+
         const getWebsiteInfo = await axios.get('/api/website', {
             params: {business_id: businessId}
         });
@@ -77,8 +78,38 @@ function edit(area){
     editButton.value = area;
 }
 
-function save(){
+async function save(){
     editButton.value = false;
+
+    const response_userId = await axios.get('/user-id');
+        const userId = response_userId.data.user_id;
+        console.log("Save function called");
+    const getBusinessInfo = await axios.get('/api/business_info', {
+            params: {user_id: userId}
+        });
+        console.log(getBusinessInfo.data);
+        const businessId = getBusinessInfo.data.business_id;
+
+        const formData = new FormData();
+        formData.append('business_id', businessId);
+        formData.append('website_description', textAreas.businessDescription.value);
+        formData.append('website_details', textAreas.businessDetails.value);
+
+        if (textAreas.homePageImage.value) {
+            formData.append('website_image', textAreas.homePageImage.value);
+        }
+
+    const saveBusinessDesc = await axios.post('/api/website-update', formData, {
+        headers:{
+            'Content-Type': 'multipart/form-data'
+        }
+        // business_id: businessId,
+        // website_description: textAreas.businessDescription.value,
+        // website_details: textAreas.businessDetails.value,
+        // website_image: textAreas.homePageImage.value
+    });
+    console.log('Save response:', saveBusinessDesc.data);
+    
 }
 
 function imageUpload(event){
@@ -102,12 +133,13 @@ function imageUpload(event){
         <div>
             <button @click="getWebsiteInfo">Show</button>
         </div>
+     
         <div class="bg-gray-300 flex items-center p-2">
             <p class="flex-grow text-center mr-3">You are currently using the edit mode.</p>
                 <button class="px-6 py-1 bg-gray-600 ml-auto">Save</button>
         </div>
 
-        <!-- header of business editable template -->
+        <!-- header of business editable template-->
         <div class="ml-1 bg-business-website-header flex items-center p-2">
             <div class="ml-6 w-10 h-10">
                 <img src="https://picsum.photos/200" class="w-full h-full object-cover rounded-full"/>
@@ -124,13 +156,13 @@ function imageUpload(event){
         </div>
 
         <div class="ml-1 bg-website-main flex min-h-screen">
-            <!-- edit business info -->
+            <!-- edit business info wag to iedit kasi business name ito-->
             <div class="mt-40 ml-8 flex-col h-1/2">
                 <div>
                     <button @click="edit('businessName')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="text-white text-xl font-bold">{{textAreas.businessName}}</p>
+                    <p class="text-white text-xl font-bold">{{textAreas.businessName.value}}</p>
                 <div v-if="editButton==='businessName'">
-                    <textarea v-model="textAreas.businessName" class="rows-2 cols-50 border boder-black"></textarea>
+                    <textarea v-model="textAreas.businessName.value" class="rows-2 cols-50 border boder-black"></textarea>
                     <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                 </div>
 
@@ -139,7 +171,7 @@ function imageUpload(event){
                     <button @click="edit('businessDescription')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <p class="font-bold text-xl text-white">{{ textAreas.businessDescription }}</p>
                     <div v-if="editButton==='businessDescription'">
-                        <textarea v-model="textAreas.businessDescription" class="rows-2 cols-50 border boder-black"></textarea>
+                        <textarea v-model="textAreas.businessDescription.value" class="rows-2 cols-50 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
@@ -147,7 +179,7 @@ function imageUpload(event){
                     <button @click="edit('businessDetails')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <p id="business-details" class="text-white">{{ textAreas.businessDetails }} </p>
                     <div v-if="editButton==='businessDetails'">
-                        <textarea v-model="textAreas.businessDetails" class="rows-2 cols-100 border boder-black"></textarea>
+                        <textarea v-model="textAreas.businessDetails.value" class="rows-2 cols-100 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
