@@ -32,13 +32,16 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        try{
+            Log::info('Store method is being called.');
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'address' => 'nullable|string|max:255',
             'contact_number' => 'nullable|string|max:255',
-            'user_type'=> 'required|in:customer,owner'
+            'user_type'=> 'nullable|in:customer,owner'
         ]);
 
         $user = User::create([
@@ -53,13 +56,14 @@ class RegisteredUserController extends Controller
 
 
         event(new Registered($user));
-        if($request->user_type==='owner'){
-            //redirect sa dashboard if not sa user side
-        }
 
         Auth::login($user);
 
-    
+
         return redirect(route('dashboard', absolute: false));
+    }catch (\Exception $e) {
+            Log::error('Registration Error: ', ['error' => $e->getMessage()]);
+            return back()->withErrors('Registration failed, please try again.');
+        }
     }
 }

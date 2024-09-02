@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
@@ -103,14 +104,33 @@ class BusinessController extends Controller
     // // }
 }
 
+
+
+public function showBusiness(Request $request){
+    $user_id = $request->query('user_id');
+    $business = Business::where('user_id', $user_id)->first();
+    if (!$business) {
+        return response()->json(['error' => 'Business record not found'], 404);
+    }
+    return response()->json($business);
+}
+
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Business $business_info)
-    {
-        return $business_info->paginate(10);
-    }
+    // public function show(Request $request, Business $business_info)
+    // {
+    //     return $business_info->paginate(10);
+        
+    // }
 
+    // public function businessName(Request $request){
+    //     $user = User::find($request->user_id);
+    //     if($user->user_type='owner'){
+    //         return $request->business_Name;
+    //     }
+
+    // }
     /**
      * Update the specified resource in storage.
      */

@@ -3,6 +3,9 @@
 use App\Http\Controllers\EditWebsiteController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\GetIdController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -52,6 +55,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');
     })->name('editWebsite1');
+
+    Route::get('/user-id', [GetIdController::class, 'getUserId']);
+    Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -11,17 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('website_page', function (Blueprint $table) {
+        Schema::create('websites', function (Blueprint $table) {
             $table->increments('website_ID');
             // $table->unsignedBigInteger('business_id');
             // $table->unsignedBigInteger('product_id');
             // $table->foreign('business_id')->references('business_id')->on('business')->onDelete('cascade');
             // $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreignId('business_id')->references('business_id')->on('businesses')->onDelete('cascade');
-            $table->foreignId('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreignId('product_id')->nullable()->references('id')->on('products')->onDelete('cascade');
             $table->string('website_description');
+            $table->string('website_details');
             $table->string('website_image');
-            $table->string('about_us');
+            $table->string('about_us1');
+            $table->string('about_us2');
+            $table->string('about_us3');
             $table->timestamps();
     
         });

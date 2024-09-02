@@ -1,7 +1,22 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { App } from '@inertiajs/inertia-vue3';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
+import { Inertia } from '@inertiajs/inertia';
+
+// const textAreas = {
+//     businessName: ref('BUSINESS NAME'),
+//     businessDescription: ref('CHEAP AND QUALITY FOOD'),
+//     businessDetails: ref("Our food service system is designed to meet the specific needs of our customers. We ensure to avail you the cheapest high quality product in the market."),
+//     homePageImage: ref('https://picsum.photos/200')
+// }
+const textAreas = {
+    businessName: ref(null),
+    businessDescription: ref(null),
+    businessDetails: ref(null),
+    homePageImage: ref(null)
+}
 
 onMounted(()=>{
     function insertBreakLines(businessDetails){
@@ -24,12 +39,27 @@ onMounted(()=>{
 
 //store default / to be changed data:
 
-const textAreas = {
-    businessName: ref('BUSINESS NAME'),
-    businessDescription: ref('CHEAP AND QUALITY FOOD'),
-    businessDetails: ref("Our food service system is designed to meet the specific needs of our customers. We ensure to avail you the cheapest high quality product in the market."),
-    homePageImage: ref('https://picsum.photos/200')
+async function getWebsiteInfo(){
+    try{
+        const response_userId = await axios.get('/user-id');
+        const userId = response_userId.data.user_id;
+
+        const response_businessId = await axios.get('/business-id');
+        const businessId = response_businessId.data.business_id
+        console.log(businessId);
+
+        const getBusinessName = await axios.get('/api/business_info', {
+            params: {user_id: userId}
+        });
+
+
+        textAreas.businessName.value = getBusinessName.data.business_Name;
+
+    }catch(error){
+        console.error('There was an error fetching the data:', error);
+    }
 }
+
 
 const editButton=ref(null);
 function edit(area){
@@ -58,6 +88,9 @@ function imageUpload(event){
     <AuthenticatedLayout>
         <!-- header of edit website to save changes -->
     
+        <div>
+            <button @click="getWebsiteInfo">Show</button>
+        </div>
         <div class="bg-gray-300 flex items-center p-2">
             <p class="flex-grow text-center mr-3">You are currently using the edit mode.</p>
                 <button class="px-6 py-1 bg-gray-600 ml-auto">Save</button>
