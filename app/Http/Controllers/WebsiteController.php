@@ -59,6 +59,7 @@ class WebsiteController extends Controller
             $image = $request->file('website_image');
             $path = $image->store('images','public');
             $website->website_image = $path;
+            Log::info('Received the file!');
         }
 
         $website->save();
