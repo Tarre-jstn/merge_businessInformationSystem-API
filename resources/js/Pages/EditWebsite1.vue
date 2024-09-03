@@ -129,6 +129,9 @@ async function imageUpload(event){
         reader.readAsDataURL(file);
     }
 }
+function goToEditWebsite2(){
+    Inertia.visit(route('editWebsite2'));
+}
 </script>
 
 <template>
@@ -194,10 +197,10 @@ async function imageUpload(event){
             </div>
 
             <!-- image -->
-            <div class="mt-3 ml-auto flex-grow-0 w-1/2 max-w-md">
+            <div class="mt-[50px] ml-auto flex-grow-0 w-1/2 max-w-md">
                 <div class="mt-2 flex flex-col items-center">
                 <button @click="edit('image')" class="bg-white border border-white rounded-xl p-1">Edit Photo</button>
-                <img :src='textAreas.homePageImage.value' class ="mt-8 w-full h-auto object-cover rounded-tl-[30px]"/>
+                <img :src='textAreas.homePageImage.value' class ="mt-8 w-full h-[300px] object-cover rounded-tl-[30px]"/>
                 <div v-if="editButton==='image'" class="flex flex-col items-center">
                     <input class="p6 bg-white" type="file" @change="imageUpload"/>
                     <button @click="save()" class="mt-5 bg-gray-300 rounded-xl p-1 w-25">Save</button>
@@ -208,7 +211,7 @@ async function imageUpload(event){
 
         <!-- button to next section of homepage -->
         <div class="ml-auto z-50 fixed bottom-4 right-4">
-                    <button class="bg-white border border-black rounded-2xl p-8">
+                    <button @click="goToEditWebsite2" class="bg-white border border-black rounded-2xl p-8">
                         <i class="fa fa-arrow-down "></i>
                     </button>
                 </div>

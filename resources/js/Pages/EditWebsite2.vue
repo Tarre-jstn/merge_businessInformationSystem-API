@@ -5,51 +5,39 @@ import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
 
-// const textAreas = {
-//     businessName: ref('BUSINESS NAME'),
-//     businessDescription: ref('CHEAP AND QUALITY FOOD'),
-//     businessDetails: ref("Our food service system is designed to meet the specific needs of our customers. We ensure to avail you the cheapest high quality product in the market."),
-//     homePageImage: ref('https://picsum.photos/200')
-// }
 const textAreas = {
-    businessImage: ref(''),
-    businessName: ref(''),
-    businessDescription: ref(''),
-    businessDetails: ref(''),
-    homePageImage: ref('')
+    about_us1: ref(''),
+    about_us2: ref(''),
+    about_us3: ref('')
 }
 
-onMounted(()=>{
-    function insertBreakLines(businessDetails){
-        let words = businessDetails.textContent.split(' ');
-        let formattedParagraph = '';
+// onMounted(()=>{
+//     function insertBreakLines(businessDetails){
+//         let words = businessDetails.textContent.split(' ');
+//         let formattedParagraph = '';
 
-        for(let i=0; i<=words.length;i++){
-            formattedParagraph+=" " +words[i];
-            if((i+1)%11===0){
-                formattedParagraph+='<br>';
-            }
-        }
-        businessDetails.innerHTML=formattedParagraph.trim();
-    }
-    const paragraph = document.getElementById('business-details');
-    if(paragraph){
-        insertBreakLines(paragraph);
-    }
-    getWebsiteInfo();
-});
+//         for(let i=0; i<=words.length;i++){
+//             formattedParagraph+=" " +words[i];
+//             if((i+1)%11===0){
+//                 formattedParagraph+='<br>';
+//             }
+//         }
+//         businessDetails.innerHTML=formattedParagraph.trim();
+//     }
+//     const paragraph = document.getElementById('business-details');
+//     if(paragraph){
+//         insertBreakLines(paragraph);
+//     }
+//     getWebsiteInfo();
+// });
 
-//store default / to be changed data:
+// //store default / to be changed data:
 
 async function getWebsiteInfo(){
     try{
         const response_userId = await axios.get('/user-id');
         const userId = response_userId.data.user_id;
         console.log(userId);
-
-        // const response_businessId = await axios.get('/business-id');
-        // const businessId = response_businessId.data.business_id
-        // console.log(businessId);
 
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: userId}
@@ -62,13 +50,10 @@ async function getWebsiteInfo(){
         });
         console.log(getWebsiteInfo.data);
 
-        textAreas.businessImage.value = getBusinessInfo.data.business_image;
-        textAreas.businessName.value = getBusinessInfo.data.business_Name;
-        textAreas.businessDescription.value = getWebsiteInfo.data.website_description;
-        textAreas.businessDetails.value = getWebsiteInfo.data.website_details;
-        const imgUrl = `/storage/${getWebsiteInfo.data.website_image}`;
-        // storage/app/public//app/public/images
-        textAreas.homePageImage.value=imgUrl;
+        textAreas.about_us1.value = getWebsiteInfo.data.about_us1;
+        textAreas.about_us2.value = getWebsiteInfo.data.about_us2;
+        textAreas.about_us3.value = getWebsiteInfo.data.about_us3;
+
     }catch(error){
         console.error('There was an error fetching the data:', error);
     }
@@ -117,18 +102,9 @@ async function save(){
     
 }
 
-let uploadedFile = null;
-async function imageUpload(event){
-    const file = event.target.files[0];
-    if (file){
-        uploadedFile=file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            textAreas.homePageImage.value = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-}
+// function goToEditWebsite2(){
+//     Inertia.visit(route('editWebsite2'));
+// }
 </script>
 
 <template>
@@ -147,7 +123,7 @@ async function imageUpload(event){
         </div>
 
         <!-- header of business editable template-->
-        <div class="ml-1 bg-business-website-header flex items-center p-2">
+        <!-- <div class="ml-1 bg-business-website-header flex items-center p-2">
             <div class="ml-6 w-10 h-10">
                 <img src="https://picsum.photos/200" class="w-full h-full object-cover rounded-full"/>
             </div>
@@ -160,55 +136,45 @@ async function imageUpload(event){
                     <a class="text-white">Register</a>
                     <a class="bg-white border border-white rounded-sm py-1 px-3">Log In</a>
                 </div>
-        </div>
+        </div> -->
 
-        <div class="ml-1 bg-website-main flex min-h-screen">
+        <div class="ml-1 bg-website-main1 flex min-h-screen">
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mt-40 ml-8 flex-col h-1/2">
-                <div>
-                    <button @click="edit('businessName')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="text-white text-xl font-bold">{{textAreas.businessName.value}}</p>
-                <div v-if="editButton==='businessName'">
-                    <textarea v-model="textAreas.businessName.value" class="rows-2 cols-50 border boder-black"></textarea>
+            <div class="mt-40 ml-8 flex flex-row items-center justify-between w-full max-w-screen-lg">
+                <div class="flex flex-col">
+                    <button @click="edit('about_us1')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
+                    <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
+                <div v-if="editButton==='about_us1'">
+                    <textarea v-model="textAreas.about_us1.value" class="rows-2 cols-50 border boder-black"></textarea>
                     <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                 </div>
 
                 </div>
-                <div class="mt-5">
-                    <button @click="edit('businessDescription')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="font-bold text-xl text-white">{{ textAreas.businessDescription }}</p>
-                    <div v-if="editButton==='businessDescription'">
-                        <textarea v-model="textAreas.businessDescription.value" class="rows-2 cols-50 border boder-black"></textarea>
+                <div class="mt-5 flex flex-col">
+                    <button @click="edit('about_us2')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
+                    <p class="font-bold text-xl text-white">{{ textAreas.about_us2 }}</p>
+                    <div v-if="editButton==='about_us2'">
+                        <textarea v-model="textAreas.about_us2.value" class="rows-2 cols-50 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
-                <div class="mt-5" >
-                    <button @click="edit('businessDetails')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p id="business-details" class="text-white">{{ textAreas.businessDetails }} </p>
-                    <div v-if="editButton==='businessDetails'">
-                        <textarea v-model="textAreas.businessDetails.value" class="rows-2 cols-100 border boder-black"></textarea>
+                <div class="mt-5 flex flex-col" >
+                    <button @click="edit('about_us3')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
+                    <p id="business-details" class="text-white">{{ textAreas.about_us3 }} </p>
+                    <div v-if="editButton==='about_us3'">
+                        <textarea v-model="textAreas.about_us3.value" class="rows-2 cols-100 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
             
             </div>
 
-            <!-- image -->
-            <div class="mt-3 ml-auto flex-grow-0 w-1/2 max-w-md">
-                <div class="mt-2 flex flex-col items-center">
-                <button @click="edit('image')" class="bg-white border border-white rounded-xl p-1">Edit Photo</button>
-                <img :src='textAreas.homePageImage.value' class ="mt-8 w-full h-auto object-cover rounded-tl-[30px]"/>
-                <div v-if="editButton==='image'" class="flex flex-col items-center">
-                    <input class="p6 bg-white" type="file" @change="imageUpload"/>
-                    <button @click="save()" class="mt-5 bg-gray-300 rounded-xl p-1 w-25">Save</button>
-                </div>
-            </div>
-            </div>
+            
         </div>
 
         <!-- button to next section of homepage -->
         <div class="ml-auto z-50 fixed bottom-4 right-4">
-                    <button class="bg-white border border-black rounded-2xl p-8">
+                    <button @click="goToEditWebsite2()" class="bg-white border border-black rounded-2xl p-8">
                         <i class="fa fa-arrow-down "></i>
                     </button>
                 </div>

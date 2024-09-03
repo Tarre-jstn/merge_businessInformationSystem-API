@@ -56,6 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('EditWebsite1');
     })->name('editWebsite1');
 
+    Route::get('/editWebsite2', function () {
+        return Inertia::render('EditWebsite2');
+    })->name('editWebsite2');
+
     Route::get('/user-id', [GetIdController::class, 'getUserId']);
     Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
 
