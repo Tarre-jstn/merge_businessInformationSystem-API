@@ -18,7 +18,9 @@ class Product extends Model
         'stock',
         'sold',
         'status',
+        'description',
         'expDate',
-        'image'
+        'image',
+        'seniorPWD_discountable',
     ];
 }

@@ -24,8 +24,10 @@ class ProductController extends Controller
             'stock' => 'required|integer',
             'sold' => 'required|integer',
             'status' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
             'expDate' => 'required|date',
             'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048', // Validate the file input
+            'seniorPWD_discountable' => 'nullable|in:yes,no',
         ]);
 
         $product = new Product($request->except('image'));
@@ -50,8 +52,10 @@ class ProductController extends Controller
             'stock' => 'required|integer',
             'sold' => 'required|integer',
             'status' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
             'expDate' => 'required|date',
             'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'seniorPWD_discountable' => 'nullable|in:yes,no',
         ]);
 
         $product = Product::findOrFail($id);
