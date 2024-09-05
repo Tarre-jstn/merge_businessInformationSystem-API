@@ -11,25 +11,10 @@ const textAreas = {
     about_us3: ref('')
 }
 
-// onMounted(()=>{
-//     function insertBreakLines(businessDetails){
-//         let words = businessDetails.textContent.split(' ');
-//         let formattedParagraph = '';
+onMounted(()=>{
 
-//         for(let i=0; i<=words.length;i++){
-//             formattedParagraph+=" " +words[i];
-//             if((i+1)%11===0){
-//                 formattedParagraph+='<br>';
-//             }
-//         }
-//         businessDetails.innerHTML=formattedParagraph.trim();
-//     }
-//     const paragraph = document.getElementById('business-details');
-//     if(paragraph){
-//         insertBreakLines(paragraph);
-//     }
-//     getWebsiteInfo();
-// });
+    getWebsiteInfo();
+});
 
 // //store default / to be changed data:
 
@@ -78,21 +63,10 @@ async function save(){
 
         const formData = new FormData();
         formData.append('business_id', businessId);
-        formData.append('website_description', textAreas.businessDescription.value);
-        formData.append('website_details', textAreas.businessDetails.value);
+        formData.append('about_us1', textAreas.about_us1.value);
+        formData.append('about_us2', textAreas.about_us2.value);
+        formData.append('about_us3', textAreas.about_us3.value);
 
-
-        if(uploadedFile){
-            const imgFormData = new FormData();
-            imgFormData.append('business_id', businessId);
-            imgFormData.append('website_image', uploadedFile);
-
-            await axios.post('/api/website-update', imgFormData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        }
     const saveBusinessDesc = await axios.post('/api/website-update', formData, {
         headers:{
             'Content-Type': 'multipart/form-data'
@@ -102,9 +76,9 @@ async function save(){
     
 }
 
-// function goToEditWebsite2(){
-//     Inertia.visit(route('editWebsite2'));
-// }
+function goToEditWebsite3(){
+    Inertia.visit(route('editWebsite3'));
+}
 </script>
 
 <template>
@@ -138,31 +112,38 @@ async function save(){
                 </div>
         </div> -->
 
-        <div class="ml-1 bg-website-main1 flex min-h-screen">
+        
+        <div class="ml-1 bg-website-main1 flex min-h-screen relative">
+
+            <div class="flex items-center p-3 absolute top-[5px] left-0 right-0 bottom-[500px] m-auto">
+                <p class="mt-[10px] text-[50px]  text-white font-bold flex-grow text-center">About Us</p>
+            </div>
+
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mt-40 ml-8 flex flex-row items-center justify-between w-full max-w-screen-lg">
-                <div class="flex flex-col">
+            <div class="ml-[120px] flex flex-row items-center justify-between w-full max-w-screen-lg">
+                
+                <div class="flex flex-col -mt-20">
                     <button @click="edit('about_us1')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
+                    <p class="text-white">{{textAreas.about_us1}}</p>
                 <div v-if="editButton==='about_us1'">
-                    <textarea v-model="textAreas.about_us1.value" class="rows-2 cols-50 border boder-black"></textarea>
+                    <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
                     <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                 </div>
 
                 </div>
-                <div class="mt-5 flex flex-col">
+                <div class="flex flex-col -mt-20">
                     <button @click="edit('about_us2')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="font-bold text-xl text-white">{{ textAreas.about_us2 }}</p>
+                    <p class="text-white">{{ textAreas.about_us2 }}</p>
                     <div v-if="editButton==='about_us2'">
-                        <textarea v-model="textAreas.about_us2.value" class="rows-2 cols-50 border boder-black"></textarea>
+                        <textarea v-model="textAreas.about_us2.value" class="w-full h-40 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
-                <div class="mt-5 flex flex-col" >
+                <div class="flex flex-col -mt-20" >
                     <button @click="edit('about_us3')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <p id="business-details" class="text-white">{{ textAreas.about_us3 }} </p>
                     <div v-if="editButton==='about_us3'">
-                        <textarea v-model="textAreas.about_us3.value" class="rows-2 cols-100 border boder-black"></textarea>
+                        <textarea v-model="textAreas.about_us3.value" class="w-full h-40 rows-2 cols-100 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
@@ -174,7 +155,7 @@ async function save(){
 
         <!-- button to next section of homepage -->
         <div class="ml-auto z-50 fixed bottom-4 right-4">
-                    <button @click="goToEditWebsite2()" class="bg-white border border-black rounded-2xl p-8">
+                    <button @click="goToEditWebsite3()" class="bg-white border border-black rounded-2xl p-8">
                         <i class="fa fa-arrow-down "></i>
                     </button>
                 </div>

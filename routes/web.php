@@ -60,6 +60,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('EditWebsite2');
     })->name('editWebsite2');
 
+    Route::get('/editWebsite3', function () {
+        return Inertia::render('EditWebsite3');
+    })->name('editWebsite3');
+
+    Route::get('/editWebsite4', function () {
+        return Inertia::render('EditWebsite4');
+    })->name('editWebsite4');
+
     Route::get('/user-id', [GetIdController::class, 'getUserId']);
     Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
 

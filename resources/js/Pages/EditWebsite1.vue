@@ -47,10 +47,6 @@ async function getWebsiteInfo(){
         const userId = response_userId.data.user_id;
         console.log(userId);
 
-        // const response_businessId = await axios.get('/business-id');
-        // const businessId = response_businessId.data.business_id
-        // console.log(businessId);
-
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: userId}
         });
@@ -179,7 +175,7 @@ function goToEditWebsite2(){
                 </div>
                 <div class="mt-5">
                     <button @click="edit('businessDescription')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="font-bold text-xl text-white">{{ textAreas.businessDescription }}</p>
+                    <p class="font-bold text-xl text-white">{{ textAreas.businessDescription.value }}</p>
                     <div v-if="editButton==='businessDescription'">
                         <textarea v-model="textAreas.businessDescription.value" class="rows-2 cols-50 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
@@ -187,7 +183,7 @@ function goToEditWebsite2(){
                 </div>
                 <div class="mt-5" >
                     <button @click="edit('businessDetails')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p id="business-details" class="text-white">{{ textAreas.businessDetails }} </p>
+                    <p id="business-details" class="text-white">{{ textAreas.businessDetails.value }} </p>
                     <div v-if="editButton==='businessDetails'">
                         <textarea v-model="textAreas.businessDetails.value" class="rows-2 cols-100 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>

@@ -22,7 +22,8 @@ class Website extends Model
         'website_image',
         'about_us1',
         'about_us2',
-        'about_us3'
+        'about_us3',
+        'website_footNote'
         
     ];
 
