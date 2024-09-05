@@ -1,8 +1,3 @@
-<script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
-</script>
-
 <template>
     <Head title="Home" />
 
@@ -14,5 +9,33 @@ import { Head } from '@inertiajs/vue3';
                 </div>
             </div>
         </div>
+        <div>
+        <BarChart />
+    </div>
+    <div>
+        <vue-cal hide-view-selector :time="false" active-view="month" xsmall>
+            <template #arrow-prev>
+                <i class="icon material-icons">arrow_back</i>
+            </template>
+            <template #arrow-next>
+                <i class="icon material-icons">arrow_forward</i>
+            </template>
+        </vue-cal>
+    </div>
     </AuthenticatedLayout>
+
+
+
 </template>
+<script>
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import { Head } from '@inertiajs/vue3';
+import BarChart from '@/Components/BarChart.vue';
+import VueCal from 'vue-cal';
+import 'vue-cal/dist/vuecal.css';
+
+export default {
+    name: 'App',
+    components: { BarChart, AuthenticatedLayout , VueCal}
+  }
+</script>

@@ -41,5 +41,6 @@ export default {
 .chart-container {
   width: 50%; /* or specify a fixed width like 400px */
   height: 400px; /* or any height you need */
+  border: 1px solid #000000;
 }
 </style>
