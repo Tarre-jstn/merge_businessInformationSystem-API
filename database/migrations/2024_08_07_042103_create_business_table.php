@@ -20,7 +20,10 @@ return new class extends Migration
             $table->string('business_Address');
             $table->string('business_Contact_Number');
             $table->string('business_Email');
-            $table->string('business_SocialMedia')->nullable();
+            $table->string('business_Facebook')->nullable();
+            $table->string('business_X')->nullable();
+            $table->string('business_Instagram')->nullable();
+            $table->string('business_Tiktok')->nullable();
             $table->timestamps();
         });
     }

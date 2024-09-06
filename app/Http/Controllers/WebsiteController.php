@@ -19,6 +19,7 @@ class WebsiteController extends Controller
     public function store (Request $request){
         try{
             $request->validate([
+                'business_id' => 'required|numeric|exists:businesses,business_id',
                 'website_description'=>'nullable|string|max:255',
                 'website_details' => 'nullable|string|max:255',
                 'website_image'=>'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -70,7 +71,7 @@ class WebsiteController extends Controller
             Log::info('Received the file!');
         }
 
-        // $website->save();
+        $website->save();
 
         return response()->json(['message' => 'Website updated successfully'], 200);
         }

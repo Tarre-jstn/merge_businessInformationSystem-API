@@ -113,7 +113,7 @@ function goToEditWebsite4(){
         </div>
 
         
-        <div class="ml-1 bg-website-main1 flex min-h-screen relative">
+        <div class="ml-1 bg-website-main flex min-h-screen relative">
 
             <div class="flex flex-col items-center p-3 absolute top-[5px] left-0 right-0 bottom-[500px] m-auto">
                 <p class="mt-[10px] text-[30px]  text-white font-bold  text-center">Featured Products</p>
@@ -124,79 +124,38 @@ function goToEditWebsite4(){
             </div>
 
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mx-auto my-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ml-[120px] gap-4 w-full max-w-screen-lg">
+            <div class="mt-[10px] mx-auto my-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-6 w-full max-w-screen-lg">
                 
                 <!-- card 1 -->
-                <div class="flex flex-col items-center ">
-                    <button @click="edit('card1')" class=" mb-[5px] w-fit bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.card1}}</p>
-                    </div>  
-                    <div v-if="editButton==='card1'">
-                        <textarea v-model="textAreas.card1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
-                </div>
 
                  <!-- card 2 -->
-                <div class="flex flex-col items-center">
-                    <button @click="edit('about_us1')" class=" mb-[5px] w-fit bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
+                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
-                    </div>  
-                    <div v-if="editButton==='about_us1'">
-                        <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
-                </div>
+                
 
                 <!-- card 3 -->
-                <div class="flex flex-col items-center ">
-                    <button @click="edit('about_us1')" class=" mb-[5px] w-fit bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
                     </div>  
-                    <div v-if="editButton==='about_us1'">
-                        <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
-                    </div>
-                </div>
 
                 <!-- card 4 -->
-                <div class="flex flex-col items-center">
-                    <button @click="edit('about_us1')" class=" mb-[5px] w-fit bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
+                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
-                    </div>  
-                    <div v-if="editButton==='about_us1'">
-                        <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
-                </div>
 
                 <!-- card 5 -->
-                <div class="flex flex-col items-center">
-                    <button @click="edit('about_us1')" class=" mb-[5px] w-fit bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
                     </div>  
-                    <div v-if="editButton==='about_us1'">
-                        <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
-                    </div>
-                </div>
 
                 <!-- card 6 -->
-                <div class="flex flex-col items-center">
-                    <button @click="edit('about_us1')" class=" mb-[5px] w-fit bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
                     </div>  
-                    <div v-if="editButton==='about_us1'">
-                        <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
-                    </div>
-                </div>
 
             </div>
         </div>

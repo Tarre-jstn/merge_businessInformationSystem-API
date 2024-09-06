@@ -17,7 +17,10 @@ class Business extends Model
         'business_Address',
         'business_Contact_Number',
         'business_Email',
-        'business_SocialMedia'
+        'business_Facebook',
+        'business_X',
+        'business_Instagram',
+        'business_Tiktok'
     ];
 
     

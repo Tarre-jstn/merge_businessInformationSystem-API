@@ -36,7 +36,10 @@ class BusinessController extends Controller
         'business_Address' => 'required|string|max:255',
         'business_Contact_Number' => 'required|string|max:255',
         'business_Email'=> 'required|string|lowercase|email|max:255|unique:businesses,business_Email',
-        'business_SocialMedia'=>'required|string|max:255'
+        'business_Facebook'=>'nullable|url',
+        'business_X'=>'nullable|url',
+        'business_Instagram'=>'nullable|url',
+        'business_Tiktok'=>'nullable|url'
     ]);
 
     $business_image=null;
@@ -56,7 +59,10 @@ class BusinessController extends Controller
             'business_Address' => $request->business_Address,
             'business_Contact_Number' => $request->business_Contact_Number,
             'business_Email'=> $request->business_Email,
-            'business_SocialMedia'=>$request->business_SocialMedia
+            'business_Facebook'=>$request->business_Facebook,
+            'business_X'=> $request->business_X,
+            'business_Instagram'=> $request->business_Instagram,
+            'business_Tiktok'=> $request->business_Tiktok
     ]);
 }
     }else{
@@ -78,85 +84,4 @@ public function showBusiness(Request $request){
     return response()->json($business);
 }
 
-    /**
-     * Display the specified resource.
-     */
-    // public function show(Request $request, Business $business_info)
-    // {
-    //     return $business_info->paginate(10);
-        
-    // }
-
-    // public function businessName(Request $request){
-    //     $user = User::find($request->user_id);
-    //     if($user->user_type='owner'){
-    //         return $request->business_Name;
-    //     }
-
-    // }
-    /**
-     * Update the specified resource in storage.
-     */
-//     public function update(int $id, Request $request)
-// {
-//     $request->validate([
-//         'businesslogo' => 'nullable|string|max:255',
-//         'businessname' => 'string|max:255',
-//         'businessemail' => 'string|max:255',
-//         'businessphone' => 'integer',
-//         'businesstelephone' => 'integer',
-//         'businessfb' => 'string|max:255',
-//         'businessig' => 'string|max:255',
-//         'businessx' => 'string|max:255',
-//     ]);
-
-//     $business_info = Business::findOrFail($id);
-//     $data = $request->all();
-
-//     if ($request->hasFile('businesslogo')) {
-//         // Delete the old image if it exists
-//         if ($business_info->businesslogo) {
-//             Storage::delete('public/business_logos/' . $business_info->businesslogo);
-//         }
-//         $image = $request->file('businesslogo');
-//         $path = $image->store('public/business_logos');
-//         $data['businesslogo'] = basename($path);
-//     }
-
-//     if (isset($data['businessname'])) {
-//         $business_info->businessname = $data['businessname'];
-//     }
-//     if (isset($data['businessemail'])) {
-//         $business_info->businessemail = $data['businessemail'];
-//     }
-//     if (isset($data['businessphone'])) {
-//         $business_info->businessphone = $data['businessphone'];
-//     }
-//     if (isset($data['businesstelephone'])) {
-//         $business_info->businesstelephone = $data['businesstelephone'];
-//     }
-//     if (isset($data['businessfb'])) {
-//         $business_info->businessfb = $data['businessfb'];
-//     }
-//     if (isset($data['businessig'])) {
-//         $business_info->businessig = $data['businessig'];
-//     }
-//     if (isset($data['businessx'])) {
-//         $business_info->businessx = $data['businessx'];
-//     }
-
-//     return [
-//         'success' => (bool) $business_info->save()
-//     ];
-// }
-
-//     /**
-//      * Remove the specified resource from storage.
-//      */
-//     public function destroy(int $id, Business $business_info)
-//     {
-//         return [
-//             'success' => (bool) $business_info -> where('id', $id)->delete()
-//         ];
-//     }
 }

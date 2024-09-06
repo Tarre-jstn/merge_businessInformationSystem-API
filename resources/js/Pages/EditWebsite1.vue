@@ -163,7 +163,7 @@ function goToEditWebsite2(){
 
         <div class="ml-1 bg-website-main flex min-h-screen">
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mt-40 ml-8 flex-col h-1/2">
+            <div class="mt-[90px] ml-8 flex-col h-1/2">
                 <div>
                     <button @click="edit('businessName')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <p class="text-white text-xl font-bold">{{textAreas.businessName.value}}</p>
@@ -174,18 +174,26 @@ function goToEditWebsite2(){
 
                 </div>
                 <div class="mt-5">
-                    <button @click="edit('businessDescription')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
+                    <div class="max-w-[100px]">
+                        <button @click="edit('businessDescription')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
+                    </div>
+                    <div class="max-w-[550px]">
                     <p class="font-bold text-xl text-white">{{ textAreas.businessDescription.value }}</p>
+                    </div>
                     <div v-if="editButton==='businessDescription'">
-                        <textarea v-model="textAreas.businessDescription.value" class="rows-2 cols-50 border boder-black"></textarea>
+                        <textarea v-model="textAreas.businessDescription.value" class="w-full h-40 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
                 <div class="mt-5" >
-                    <button @click="edit('businessDetails')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p id="business-details" class="text-white">{{ textAreas.businessDetails.value }} </p>
+                    <div class="max-w-[100px]">
+                        <button @click="edit('businessDetails')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
+                    </div>
+                    <div class="max-w-[550px]">
+                        <p id="business-details" class="text-white">{{ textAreas.businessDetails.value }} </p>
+                    </div>
                     <div v-if="editButton==='businessDetails'">
-                        <textarea v-model="textAreas.businessDetails.value" class="rows-2 cols-100 border boder-black"></textarea>
+                        <textarea v-model="textAreas.businessDetails.value" class="w-full h-[100px] border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
