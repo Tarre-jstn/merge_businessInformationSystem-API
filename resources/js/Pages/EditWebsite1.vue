@@ -142,7 +142,7 @@ function goToEditWebsite2(){
      
         <div class="bg-gray-300 flex items-center p-2">
             <p class="flex-grow text-center mr-3">You are currently using the edit mode.</p>
-                <button @click="save()" class="px-6 py-1 bg-gray-600 ml-auto">Save</button>
+                <button @click="save" class="px-6 py-1 bg-gray-600 ml-auto">Save</button>
         </div>
 
         <!-- header of business editable template-->
@@ -163,13 +163,13 @@ function goToEditWebsite2(){
 
         <div class="ml-1 bg-website-main flex min-h-screen">
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mt-[90px] ml-8 flex-col h-1/2">
+            <div class="mt-[110px] ml-8 flex-col h-1/2">
                 <div>
                     <button @click="edit('businessName')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class="text-white text-xl font-bold">{{textAreas.businessName.value}}</p>
+                    <p class="mt-[10px] text-white text-[29px] font-bold tracking-[3px]">{{textAreas.businessName.value}}</p>
                 <div v-if="editButton==='businessName'">
                     <textarea v-model="textAreas.businessName.value" class="rows-2 cols-50 border boder-black"></textarea>
-                    <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
+                    <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                 </div>
 
                 </div>
@@ -178,36 +178,36 @@ function goToEditWebsite2(){
                         <button @click="edit('businessDescription')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     </div>
                     <div class="max-w-[550px]">
-                    <p class="font-bold text-xl text-white">{{ textAreas.businessDescription.value }}</p>
+                    <p class="mt-[10px] font-bold text-xl text-white">{{ textAreas.businessDescription.value }}</p>
                     </div>
                     <div v-if="editButton==='businessDescription'">
-                        <textarea v-model="textAreas.businessDescription.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
+                        <textarea v-model="textAreas.businessDescription.value" class="w-full h-[100px] border boder-black"></textarea>
+                        <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
                 <div class="mt-5" >
                     <div class="max-w-[100px]">
                         <button @click="edit('businessDetails')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     </div>
-                    <div class="max-w-[550px]">
-                        <p id="business-details" class="text-white">{{ textAreas.businessDetails.value }} </p>
+                    <div class="max-w-[520px]">
+                        <p id="business-details" class="mt-[10px] text-white">{{ textAreas.businessDetails.value }} </p>
                     </div>
                     <div v-if="editButton==='businessDetails'">
-                        <textarea v-model="textAreas.businessDetails.value" class="w-full h-[100px] border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
+                        <textarea v-model="textAreas.businessDetails.value" class="w-full h-[130px] border boder-black"></textarea>
+                        <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
             
             </div>
 
             <!-- image -->
-            <div class="mt-[50px] ml-auto flex-grow-0 w-1/2 max-w-md">
+            <div class="mt-[50px] ml-auto flex-grow-0 w-1/2 max-w-lg">
                 <div class="mt-2 flex flex-col items-center">
                 <button @click="edit('image')" class="bg-white border border-white rounded-xl p-1">Edit Photo</button>
-                <img :src='textAreas.homePageImage.value' class ="mt-8 w-full h-[300px] object-cover rounded-tl-[30px]"/>
+                <img :src='textAreas.homePageImage.value' class ="mr-[8px] mt-8 w-full h-[340px] object-cover rounded-tl-[30px]"/>
                 <div v-if="editButton==='image'" class="flex flex-col items-center">
                     <input class="p6 bg-white" type="file" @change="imageUpload"/>
-                    <button @click="save()" class="mt-5 bg-gray-300 rounded-xl p-1 w-25">Save</button>
+                    <button @click="save" class="mt-5 bg-gray-300 rounded-xl p-1 w-25">Save</button>
                 </div>
             </div>
             </div>

@@ -124,8 +124,9 @@ function goToEditWebsite4(){
             </div>
 
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mt-[10px] mx-auto my-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-6 w-full max-w-screen-lg">
+            <div class=" mt-8 mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">
                 
+                <div class="block flex flex-row gap-4">
                 <!-- card 1 -->
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.card1}}</p>
@@ -141,7 +142,9 @@ function goToEditWebsite4(){
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
                     </div>  
+                </div>
 
+                <div class="block flex flex-row gap-4">
                 <!-- card 4 -->
                      <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
@@ -156,7 +159,7 @@ function goToEditWebsite4(){
                     <div class="flex flex-col bg-white w-[180px] h-[200px] p-4 rounded-lg shadow-lg border border-gray-200">
                         <p class="text-white text-xl font-bold">{{textAreas.about_us1}}</p>
                     </div>  
-
+                </div>
             </div>
         </div>
 

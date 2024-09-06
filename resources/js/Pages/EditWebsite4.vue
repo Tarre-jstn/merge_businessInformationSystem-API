@@ -116,7 +116,7 @@ async function save(){
             <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
             <!-- FootNote -->
             <div class="mr-auto mt-40 ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
-                <div>
+                <div class="max-w-[50px]">
                     <img :src='textAreas.businessImage.value' class="w-full h-full object-cover rounded-full"/>
                 </div>
 
@@ -127,10 +127,12 @@ async function save(){
                         <textarea v-model="textAreas.website_footNote.value" class="rows-2 cols-50 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
-                    <a :href="textAreas.business_Facebook.value" class="w-[30px] h-[40px] bg-white rounded-xl m-[5px] mt-[10px] p-1 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a :href="textAreas.business_X.value" class="w-[30px] h-[40px] bg-white rounded-xl m-[5px] mt-[10px] p-1 cursor-pointer"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a :href="textAreas.business_Instagram.value" class="w-[30px] h-[40px] bg-white rounded-xl m-[5px] mt-[10px] p-1 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
-                    <a :href="textAreas.business_Tiktok.value" class="w-[30px] h-[40px] bg-white rounded-xl m-[5px] mt-[10px] p-1 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+                    <div class="mt-[20px]">
+                    <a :href="textAreas.business_Facebook.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a :href="textAreas.business_X.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a :href="textAreas.business_Instagram.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
+                    <a :href="textAreas.business_Tiktok.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
                 </div>
             
             </div>

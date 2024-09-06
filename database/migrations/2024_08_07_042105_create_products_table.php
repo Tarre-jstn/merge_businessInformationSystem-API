@@ -12,9 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->enum('seniorPWD_discountable', ['yes','no'])->default('no');
-            $table->unsignedBigInteger('business_id')->default(1);
             $table->foreign('business_id')->references('business_id')->on('businesses')->onDelete('cascade');
+            $table->unsignedBigInteger('business_id')->default(1);
+            $table->enum('on_sale', ['yes','no']);
+            $table->decimal('on_sale_price', 8, 2);
+            $table->enum('featured', ['true','false']);
+            $table->enum('seniorPWD_discountable', ['yes','no']);
             $table->id();
             $table->string('name');
             $table->string('brand');
@@ -23,6 +26,7 @@ return new class extends Migration
             $table->integer('stock');
             $table->integer('sold')->default(0);
             $table->string('status');
+            $table->text('description');
             $table->date('expDate');
             $table->string('image')->nullable();
             $table->timestamps();

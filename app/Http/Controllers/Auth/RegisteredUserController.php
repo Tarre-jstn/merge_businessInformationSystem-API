@@ -45,13 +45,21 @@ class RegisteredUserController extends Controller
             'user_type'=> 'nullable|in:customer,owner'
         ]);
         Log::info('Validation passed.');
+        $user_type = null;
+        if($request->user_type==null){
+            $user_type = 'customer';
+        }else{
+            $user_type = 'owner';
+        }
         $user = User::create([
+            
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'address' => $request->address,
             'contact_number' => $request->contact_number,
-            'user_type'=> $request->user_type
+            'user_type'=> $user_type
+            
         ]);
         Log::info('User created: ', ['user' => $user]);
 
@@ -61,7 +69,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('homepage', absolute: false));
     }catch (Exception $e) {
             Log::error('Registration Error: ', ['error' => $e->getMessage()]);
             return back()->withErrors('Registration failed, please try again.');

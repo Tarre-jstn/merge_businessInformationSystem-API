@@ -93,7 +93,7 @@ function goToEditWebsite3(){
      
         <div class="bg-gray-300 flex items-center p-2">
             <p class="flex-grow text-center mr-3">You are currently using the edit mode.</p>
-                <button @click="save()" class="px-6 py-1 bg-gray-600 ml-auto">Save</button>
+                <button @click="save" class="px-6 py-1 bg-gray-600 ml-auto">Save</button>
         </div>
 
         <!-- header of business editable template-->
@@ -122,7 +122,11 @@ function goToEditWebsite3(){
             <!-- edit business info wag to iedit kasi business name ito-->
             <div class="ml-[120px] flex flex-row items-center justify-between w-full max-w-screen-lg">
                 
-                <div class="flex flex-col -mt-20 mr-[5px]">
+                <div class="flex -mt-[20px] flex-col items-center space-y-4">
+                    <div class="flex justify-center w-full">
+                        <a class="icon-color border border-transparent rounded-[30px] p-7 flex inline-flex items-center justify-center">
+                            <i class="fa fa-check-circle text-white text-[30px]"></i></a>
+                    </div>
                     <div class="max-w-[100px]">
                         <button @click="edit('about_us1')" class="bg-white border border-white rounded-xl p-1 mb-[10px]">Edit Text</button>
                     </div>
@@ -131,11 +135,15 @@ function goToEditWebsite3(){
                     </div>
                     <div v-if="editButton==='about_us1'">
                          <textarea v-model="textAreas.about_us1.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
+                        <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
 
-                <div class="flex flex-col -mt-20 mr-[5px]">
+                <div class="flex -mt-[20px] flex-col items-center space-y-4">
+                    <div class="flex justify-center w-full">
+                        <a class="icon-color border border-transparent rounded-[30px] p-7 flex inline-flex items-center justify-center">
+                            <i class="fa fa-tag text-white text-[30px]"></i></a>
+                    </div>
                     <div class="max-w-[100px]">
                         <button @click="edit('about_us2')" class="bg-white border border-white rounded-xl p-1 mb-[10px]">Edit Text</button>
                     </div>
@@ -144,11 +152,15 @@ function goToEditWebsite3(){
                     </div>
                     <div v-if="editButton==='about_us2'">
                          <textarea v-model="textAreas.about_us2.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
+                        <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
 
-                <div class="flex flex-col -mt-20 mr-[5px]">
+                <div class="flex -mt-[20px] flex-col items-center space-y-4">
+                    <div class="flex justify-center w-full">
+                        <a class="icon-color border border-transparent rounded-[30px] p-7 flex inline-flex items-center justify-center">
+                            <i class="fa fa-phone text-white text-[30px]"></i></a>
+                    </div>
                     <div class="max-w-[100px]">
                         <button @click="edit('about_us3')" class="bg-white border border-white rounded-xl p-1 mb-[10px]">Edit Text</button>
                     </div>
@@ -157,7 +169,7 @@ function goToEditWebsite3(){
                     </div>
                     <div v-if="editButton==='about_us3'">
                          <textarea v-model="textAreas.about_us3.value" class="w-full h-40 border boder-black"></textarea>
-                        <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
+                        <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                 </div>
 
@@ -178,4 +190,9 @@ function goToEditWebsite3(){
     </AuthenticatedLayout>
 
 </template>
+<style>
+.icon-color {
+    background-color: #306091; /* Replace with your desired color */
+}
+</style>
 
