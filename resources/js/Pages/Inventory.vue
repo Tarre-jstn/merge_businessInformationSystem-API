@@ -11,9 +11,7 @@ const showCategoriesModal = ref(false);
 const showEditProductModal = ref(false);
 const listedCategories = ref([]);
 const searchQuery = ref('');
-
-const imagePreviewUrl = ref(null); // Add this ref to hold the image preview URL
-
+const imagePreviewUrl = ref(null); 
 const editImagePreviewUrl = ref(null);
 
 
@@ -84,7 +82,7 @@ const addProduct = async () => {
         products.value.push(response.data.product);
         showAddProductModal.value = false;
         resetNewProduct();
-        imagePreviewUrl.value = null; // Reset preview URL
+        imagePreviewUrl.value = null; 
     } catch (error) {
         console.error("Error adding product:", error);
     }
@@ -101,14 +99,14 @@ const updateProduct = async () => {
     try {
         const formData = new FormData();
 
-        // Append other fields
+        
         for (const key in editProduct.value) {
             if (key !== 'image' && editProduct.value[key] !== null) {
                 formData.append(key, editProduct.value[key]);
             }
         }
 
-        // Append image if it exists and is a file (not a URL)
+        
         if (editProduct.value.image instanceof File) {
             formData.append('image', editProduct.value.image);
         }
@@ -120,7 +118,7 @@ const updateProduct = async () => {
             }
         });
 
-        // Handle success response
+        
         const index = products.value.findIndex(product => product.id === editProduct.value.id);
         products.value[index] = response.data.product;
         showEditProductModal.value = false;
@@ -133,9 +131,6 @@ const updateProduct = async () => {
         }
     }
 };
-
-
-
 
 const deleteProduct = async (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
@@ -153,10 +148,10 @@ const editProductDetails = (product) => {
 
     editImagePreviewUrl.value = product.image ? `/storage/${product.image}` : null;
 
-    // Reset the file input (clear previous selection)
+    
     const fileInput = document.getElementById('edit_image');
     if (fileInput) {
-        fileInput.value = ''; // Clear the input value to allow re-selection
+        fileInput.value = ''; 
     }
 
     showEditProductModal.value = true;
@@ -199,10 +194,10 @@ const resetEditProduct = () => {
         on_sale_price: 0,
         featured: 'false'
     };
-    editImagePreviewUrl.value = null; // Reset preview URL
+    editImagePreviewUrl.value = null; 
     const fileInput = document.getElementById('edit_image');
     if (fileInput) {
-        fileInput.value = ''; // Clear the input value to allow re-selection
+        fileInput.value = ''; 
     }
 };
 
@@ -224,7 +219,7 @@ const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
         newProduct.value.image = file;
-        imagePreviewUrl.value = URL.createObjectURL(file); // Create and set the preview URL
+        imagePreviewUrl.value = URL.createObjectURL(file); 
     }
 };
 
@@ -232,19 +227,12 @@ const handleEditImageUpload = (event) => {
     const file = event.target.files[0];
     if (file && ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
         editProduct.value.image = file;
-        editImagePreviewUrl.value = URL.createObjectURL(file); // Preview the selected image
+        editImagePreviewUrl.value = URL.createObjectURL(file); 
     } else {
         alert('Please upload a valid image file (jpg, jpeg, png).');
-        editProduct.value.image = null; // Clear invalid image
+        editProduct.value.image = null; 
     }
 };
-
-
-
-
-
-
-
 
 fetchProducts();
 fetchListedCategories();
@@ -312,7 +300,6 @@ fetchListedCategories();
                                             }">{{ product.status }}</span>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
-                                    
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 space-x-1">
                                         <div class="flex items-center">
                                             <label class="switch">
@@ -322,8 +309,6 @@ fetchListedCategories();
                                             <span class="ml-3 text-sm text-gray-700">{{ product.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                                         </div>
                                     </td>
-
-
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex space-x-4">
                                             <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
@@ -352,7 +337,6 @@ fetchListedCategories();
                 <h3 class="text-lg font-semibold text-center mb-3">Add a Product</h3>
                 <form @submit.prevent="addProduct">
                     <div class="grid grid-cols-3 gap-3">
-                        <!-- Image Upload (Left Side) -->
                         <div class="col-span-1">
                             <label class="block text-xs font-medium text-gray-700 mb-1">Image</label>
                             <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer">
@@ -360,27 +344,20 @@ fetchListedCategories();
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                 </svg>
-
-                                <!-- Image Preview -->
                                 <img v-if="imagePreviewUrl" :src="imagePreviewUrl" class="absolute inset-0 w-full h-full object-cover" />
-                            
                             </div>
                         </div>
-
-                        <!-- Product Info (Right Side) -->
                         <div class="col-span-2 grid grid-cols-2 gap-3">
-                            <!-- Name Field (Full Width) -->
+                            <!-- Name Field -->
                             <div class="col-span-2">
                                 <label for="name" class="block text-xs font-medium text-gray-700">Name *</label>
                                 <input type="text" id="name" v-model="newProduct.name" class="input-field w-full text-xs p-1" required />
                             </div>
-
                             <!-- Price Field -->
                             <div>
                                 <label for="price" class="block text-xs font-medium text-gray-700">Price (PHP) *</label>
                                 <input type="number" id="price" v-model="newProduct.price" class="input-field text-xs p-1" required />
                             </div>
-
                             <!-- Category Field -->
                             <div>
                                 <label for="category" class="block text-xs font-medium text-gray-700">Category *</label>
@@ -388,25 +365,21 @@ fetchListedCategories();
                                     <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
                                 </select>
                             </div>
-
                             <!-- Stock Field -->
                             <div>
                                 <label for="stock" class="block text-xs font-medium text-gray-700">Stock *</label>
                                 <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
                             </div>
-
                             <!-- Sold Field -->
                             <div>
                                 <label for="sold" class="block text-xs font-medium text-gray-700">Sold</label>
                                 <input type="number" id="sold" v-model="newProduct.sold" class="input-field text-xs p-1" />
                             </div>
-
                             <!-- Brand Field -->
                             <div>
                                 <label for="brand" class="block text-xs font-medium text-gray-700">Brand</label>
                                 <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
                             </div>
-
                             <!-- Status Field -->
                             <div>
                                 <label for="status" class="block text-xs font-medium text-gray-700">Status *</label>
@@ -417,20 +390,17 @@ fetchListedCategories();
                                 </select>
                             </div>
                         </div>
-
-                        <!-- Description (Below the Product Info) -->
+                        <!-- Description -->
                         <div class="col-span-3">
                             <label for="description" class="block text-xs font-medium text-gray-700">Description:</label>
                             <textarea id="description" v-model="newProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
-
-                        <!-- Expiry Date, Discountable, and Featured (Same Row) -->
+                        <!-- Expiry Date, Discountable, and Featured -->
                         <div class="col-span-2 grid grid-cols-3 gap-3">
                             <div>
                                 <label for="expDate" class="block text-xs font-medium text-gray-700">Expiry Date</label>
                                 <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
                             </div>
-
                             <!-- Discountable Toggle -->
                             <div>
                                 <label class="block text-xs font-medium text-gray-700">Discountable:</label>
@@ -442,7 +412,6 @@ fetchListedCategories();
                                     <span class="text-xs text-gray-700">{{ newProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                                 </div>
                             </div>
-
                             <!-- Featured Toggle -->
                             <div>
                                 <label class="block text-xs font-medium text-gray-700">Featured:</label>
@@ -455,7 +424,6 @@ fetchListedCategories();
                                 </div>
                             </div>
                         </div>
-
                         <!-- On Sale Toggle (Separate Row) -->
                         <div class="col-span-2">
                             <label class="block text-xs font-medium text-gray-700">On Sale:</label>
@@ -467,13 +435,11 @@ fetchListedCategories();
                                 <span class="text-xs text-gray-700">{{ newProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
                             </div>
                         </div>
-
                         <!-- On Sale Price (Visible only if 'On Sale' is selected) -->
                         <div class="col-span-3" v-if="newProduct.on_sale === 'yes'">
                             <label for="on_sale_price" class="block text-xs font-medium text-gray-700">On Sale Price (PHP):</label>
                             <input type="number" step="0.01" id="on_sale_price" v-model="newProduct.on_sale_price" class="input-field text-xs p-1"/>
                         </div>
-
                         <!-- Action Buttons -->
                         <div class="col-span-3 flex justify-end mt-3 space-x-2">
                             <button @click="showAddProductModal = false" class="button-cancel text-xs">Cancel</button>
@@ -484,14 +450,11 @@ fetchListedCategories();
             </div>
         </div>
 
-
         <div v-if="showEditProductModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
             <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl relative">
                 <h3 class="text-lg font-semibold text-center mb-3">Edit Product</h3>
                 <form @submit.prevent="updateProduct">
                     <div class="grid grid-cols-3 gap-3">
-                        <!-- Image Upload (Left Side) -->
-                        
                         <div class="col-span-1">
                             <label class="block text-xs font-medium text-gray-700 mb-1">Image</label>
                             <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400">
@@ -502,22 +465,17 @@ fetchListedCategories();
                                 <img v-if="editImagePreviewUrl" :src="editImagePreviewUrl" class="absolute inset-0 w-full h-full object-cover"/>
                             </div>
                         </div>
-
-
-                        <!-- Product Info (Right Side) -->
                         <div class="col-span-2 grid grid-cols-2 gap-3">
-                            <!-- Name Field (Full Width) -->
+                            <!-- Name Field -->
                             <div class="col-span-2">
                                 <label for="edit_name" class="block text-xs font-medium text-gray-700">Name *</label>
                                 <input type="text" id="edit_name" v-model="editProduct.name" class="input-field w-full text-xs p-1" required />
                             </div>
-
                             <!-- Price Field -->
                             <div>
                                 <label for="edit_price" class="block text-xs font-medium text-gray-700">Price (PHP) *</label>
                                 <input type="number" id="edit_price" v-model="editProduct.price" class="input-field text-xs p-1" required />
                             </div>
-
                             <!-- Category Field -->
                             <div>
                                 <label for="edit_category" class="block text-xs font-medium text-gray-700">Category *</label>
@@ -525,25 +483,21 @@ fetchListedCategories();
                                     <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
                                 </select>
                             </div>
-
                             <!-- Stock Field -->
                             <div>
                                 <label for="edit_stock" class="block text-xs font-medium text-gray-700">Stock *</label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
                             </div>
-
                             <!-- Sold Field -->
                             <div>
                                 <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
                                 <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
                             </div>
-
                             <!-- Brand Field -->
                             <div>
                                 <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
                                 <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
                             </div>
-
                             <!-- Status Field -->
                             <div>
                                 <label for="edit_status" class="block text-xs font-medium text-gray-700">Status *</label>
@@ -554,20 +508,17 @@ fetchListedCategories();
                                 </select>
                             </div>
                         </div>
-
-                        <!-- Description (Below the Product Info) -->
+                        <!-- Description -->
                         <div class="col-span-3">
                             <label for="edit_description" class="block text-xs font-medium text-gray-700">Description:</label>
                             <textarea id="edit_description" v-model="editProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
-
-                        <!-- Expiry Date, Discountable, and Featured (Same Row) -->
+                        <!-- Expiry Date, Discountable, and Featured -->
                         <div class="col-span-2 grid grid-cols-3 gap-3">
                             <div>
                                 <label for="edit_expDate" class="block text-xs font-medium text-gray-700">Expiry Date</label>
                                 <input type="date" id="edit_expDate" v-model="editProduct.expDate" class="input-field text-xs p-1"/>
                             </div>
-
                             <!-- Discountable Toggle -->
                             <div>
                                 <label class="block text-xs font-medium text-gray-700">Discountable:</label>
@@ -579,7 +530,6 @@ fetchListedCategories();
                                     <span class="text-xs text-gray-700">{{ editProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                                 </div>
                             </div>
-
                             <!-- Featured Toggle -->
                             <div>
                                 <label class="block text-xs font-medium text-gray-700">Featured:</label>
@@ -592,7 +542,6 @@ fetchListedCategories();
                                 </div>
                             </div>
                         </div>
-
                         <!-- On Sale Toggle (Separate Row) -->
                         <div class="col-span-2">
                             <label class="block text-xs font-medium text-gray-700">On Sale:</label>
@@ -604,13 +553,11 @@ fetchListedCategories();
                                 <span class="text-xs text-gray-700">{{ editProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
                             </div>
                         </div>
-
                         <!-- On Sale Price (Visible only if 'On Sale' is selected) -->
                         <div class="col-span-3" v-if="editProduct.on_sale === 'yes'">
                             <label for="edit_on_sale_price" class="block text-xs font-medium text-gray-700">On Sale Price (PHP):</label>
                             <input type="number" step="0.01" id="edit_on_sale_price" v-model="editProduct.on_sale_price" class="input-field text-xs p-1"/>
                         </div>
-
                         <!-- Action Buttons -->
                         <div class="col-span-3 flex justify-end mt-3 space-x-2">
                             <button @click="showEditProductModal = false" class="button-cancel text-xs">Cancel</button>
@@ -723,7 +670,7 @@ input[type="file"] {
     width: 100%;
     height: 100%;
     opacity: 0; /* Make the input invisible */
-    cursor: pointer; /* Ensure the cursor changes to pointer */
+    cursor: pointer; 
     z-index: 10; /* Bring the input above other elements */
 }
 
