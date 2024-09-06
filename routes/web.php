@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -36,9 +37,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Inventory');
     })->name('inventory');
 
-    Route::get('/receipt', function () {
-        return Inertia::render('Receipt');
-    })->name('receipt');
+    Route::get('/invoice', function () {
+        return Inertia::render('Invoice');
+    })->name('invoice');
 
     Route::get('/finance', function () {
         return Inertia::render('Finance');
