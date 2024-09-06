@@ -47,29 +47,29 @@ const newInvoice = ref({
 
 const editInvoice = ref({
     invoice_id: null,
-    date: '',
-    terms: '',
-    status: '',
-    authorized_Representative: '',
-    payment_Type: '',
-    customer_Name: '',
-    customer_Address: '',
-    customer_TIN: '0',
-    customer_Business_Style: '',
-    customer_PO_No: '0',
-    customer_OSCA_PWD_ID_No: '0',
-    VATable_Sales: '0',
-    VAT_Exempt_Sales: '0',
-    Zero_Rated_Sales: '0',
-    VAT_Amount: '0',
-    VAT_Inclusive: '0',
-    Less_VAT: '0',
-    Amount_NET_of_VAT: '0',
-    Less_SC_PWD_Discount: '0',
-    Amount_Due: '0',
-    Add_VAT: '0',
-    tax: '0',
-    total_Amount_Due: '0',
+    date: null,
+    terms: null,
+    status: null,
+    authorized_Representative: null,
+    payment_Type: null,
+    customer_Name: null,
+    customer_Address: null,
+    customer_TIN: null,
+    customer_Business_Style: null,
+    customer_PO_No: null,
+    customer_OSCA_PWD_ID_No: null,
+    VATable_Sales: null,
+    VAT_Exempt_Sales: null,
+    Zero_Rated_Sales: null,
+    VAT_Amount: null,
+    VAT_Inclusive: null,
+    Less_VAT: null,
+    Amount_NET_of_VAT: null,
+    Less_SC_PWD_Discount: null,
+    Amount_Due: null,
+    Add_VAT: null,
+    tax: null,
+    total_Amount_Due: null,
   });
 
 //GET INVOICES
@@ -123,37 +123,50 @@ const addInvoice = async () => {
 };
 
 //UPDATE AN INVOICE
-const updateInvoice = async () => {
-    try {
-        const formData = new FormData();
-        for (const key in editInvoice.value) {
-            // Append only if the value is not null or undefined
-            if (editInvoice.value[key] !== null && editInvoice.value[key] !== undefined) {
-                formData.append(key, editInvoice.value[key]);
-            }
-        }
-        const response = await axios.put(`/api/invoice/${editInvoice.value.invoice_id}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'X-HTTP-Method-Override': 'PUT'
-            }
-        });
-        const index = invoices.value.findIndex(invoice => invoice.invoice_id === editInvoice.value.invoice_id);
-        invoices.value[index] = response.data;
+// const updateInvoice = async () => {
+//     try {
+//         const formData = new FormData();
 
-        showEditInvoiceModal.value = false;
-        // resetEditInvoice();
-    } catch (error) {
-        console.error("Error updating invoice:", error);
-    }
-};
+//         for (const key in editInvoice.value) {
+//             // Append only if the value is not null or undefined
+//             if (editInvoice.value[key] !== null && editInvoice.value[key] !== undefined) {
+//                 formData.append(key, editInvoice.value[key]);
+//             }
+//         }
+//         const response = await axios.put(`/api/invoice/${editInvoice.value.invoice_id}`, formData, {
+//             headers: {
+//                 'Content-Type': 'multipart/form-data',
+//                 'X-HTTP-Method-Override': 'PUT'
+//             }
+//         });
+//         const index = invoices.value.findIndex(invoice => invoice.invoice_id === editInvoice.value.invoice_id);
+//         invoices.value[index] = response.data;
+
+//         showEditInvoiceModal.value = false;
+//         // resetEditInvoice();
+//     } catch (error) {
+//         console.error("Error updating invoice:", error);
+//     }
+// };
 
 const editInvoiceDetails = (invoice) => {
     editInvoice.value = { ...invoice };
     showEditInvoiceModal.value = true;
 };
 
+//DELETE AN INVOICE
 
+const deleteInvoice = async (invoice_system_id) => {
+    try {
+        await axios.delete(`/api/invoice/${invoice_system_id}`);
+        // Optionally, remove the invoice from the list if the request is successful
+        invoices.value = invoices.value.filter(invoice => invoice.invoice_system_id !== invoice_system_id);
+        alert("Invoice deleted successfully");
+    } catch (error) {
+        console.error("Error deleting invoice:", error);
+        alert("There was an issue deleting the invoice. Please try again.");
+    }
+};
 
 fetchInvoices();
 
@@ -223,7 +236,7 @@ fetchInvoices();
                                             <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="bg-yellow-500 text-white p-3 rounded-full mr-3">
                                                 <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                             </button>
-                                            <button @click="" class="bg-red-500 text-white p-3 rounded-full">
+                                            <button @click="deleteInvoice(invoice.invoice_system_id)" class="bg-red-500 text-white p-3 rounded-full">
                                                 <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
                                             </button>
                                         </td>
