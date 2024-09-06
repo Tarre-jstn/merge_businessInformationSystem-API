@@ -12,6 +12,11 @@ const showEditProductModal = ref(false);
 const listedCategories = ref([]);
 const searchQuery = ref('');
 
+const imagePreviewUrl = ref(null); // Add this ref to hold the image preview URL
+
+const editImagePreviewUrl = ref(null);
+
+
 const newProduct = ref({
     name: '',
     brand: '',
@@ -22,8 +27,11 @@ const newProduct = ref({
     status: '',
     expDate: '',
     image: null,
-    seniorPWD_discountable: null,
-    description: ''
+    seniorPWD_discountable: 'no',
+    description: '',
+    on_sale: 'no',
+    on_sale_price: 0,
+    featured: 'false',
 });
 
 const editProduct = ref({
@@ -38,7 +46,10 @@ const editProduct = ref({
     expDate: '',
     image: null,
     seniorPWD_discountable: null,
-    description: ''
+    description: '',
+    on_sale: null,
+    on_sale_price: 0,
+    featured: 'false'
 });
 
 const fetchProducts = async () => {
@@ -73,6 +84,7 @@ const addProduct = async () => {
         products.value.push(response.data.product);
         showAddProductModal.value = false;
         resetNewProduct();
+        imagePreviewUrl.value = null; // Reset preview URL
     } catch (error) {
         console.error("Error adding product:", error);
     }
@@ -86,24 +98,20 @@ const validateProduct = (product) => {
 };
 
 const updateProduct = async () => {
-    if (!validateProduct(editProduct.value)) {
-        console.error("Validation error: Missing required fields");
-        return;
-    }
-
     try {
         const formData = new FormData();
+
+        // Append other fields
         for (const key in editProduct.value) {
-            if (editProduct.value[key] !== null) {
+            if (key !== 'image' && editProduct.value[key] !== null) {
                 formData.append(key, editProduct.value[key]);
             }
         }
 
-        if (editProduct.value.image && typeof editProduct.value.image !== 'string') {
+        // Append image if it exists and is a file (not a URL)
+        if (editProduct.value.image instanceof File) {
             formData.append('image', editProduct.value.image);
         }
-
-        console.log([...formData.entries()]); // Debugging line
 
         const response = await axios.post(`/api/products/${editProduct.value.id}`, formData, {
             headers: {
@@ -112,6 +120,7 @@ const updateProduct = async () => {
             }
         });
 
+        // Handle success response
         const index = products.value.findIndex(product => product.id === editProduct.value.id);
         products.value[index] = response.data.product;
         showEditProductModal.value = false;
@@ -124,6 +133,8 @@ const updateProduct = async () => {
         }
     }
 };
+
+
 
 
 const deleteProduct = async (id) => {
@@ -139,6 +150,15 @@ const deleteProduct = async (id) => {
 
 const editProductDetails = (product) => {
     editProduct.value = { ...product };
+
+    editImagePreviewUrl.value = product.image ? `/storage/${product.image}` : null;
+
+    // Reset the file input (clear previous selection)
+    const fileInput = document.getElementById('edit_image');
+    if (fileInput) {
+        fileInput.value = ''; // Clear the input value to allow re-selection
+    }
+
     showEditProductModal.value = true;
 };
 
@@ -154,7 +174,10 @@ const resetNewProduct = () => {
         expDate: '',
         image: null,
         seniorPWD_discountable: null,
-        description: ''
+        description: '',
+        on_sale: null,
+        on_sale_price: 0,
+        featured: 'false'
     };
 };
 
@@ -171,8 +194,16 @@ const resetEditProduct = () => {
         expDate: '',
         image: null,
         seniorPWD_discountable: null,
-        description: ''
+        description: '',
+        on_sale: null,
+        on_sale_price: 0,
+        featured: 'false'
     };
+    editImagePreviewUrl.value = null; // Reset preview URL
+    const fileInput = document.getElementById('edit_image');
+    if (fileInput) {
+        fileInput.value = ''; // Clear the input value to allow re-selection
+    }
 };
 
 const filteredProducts = computed(() => {
@@ -193,15 +224,26 @@ const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
         newProduct.value.image = file;
+        imagePreviewUrl.value = URL.createObjectURL(file); // Create and set the preview URL
     }
 };
 
 const handleEditImageUpload = (event) => {
     const file = event.target.files[0];
-    if (file) {
+    if (file && ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
         editProduct.value.image = file;
+        editImagePreviewUrl.value = URL.createObjectURL(file); // Preview the selected image
+    } else {
+        alert('Please upload a valid image file (jpg, jpeg, png).');
+        editProduct.value.image = null; // Clear invalid image
     }
 };
+
+
+
+
+
+
 
 
 fetchProducts();
@@ -211,7 +253,7 @@ fetchListedCategories();
 <template>
     <AuthenticatedLayout>
         <div class="py-5">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <div class="flex justify-between items-center mb-4">
@@ -270,12 +312,18 @@ fetchListedCategories();
                                             }">{{ product.status }}</span>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
+                                    
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 space-x-1">
-                                        <input type="radio" :name="'discountable_' + product.id" value="yes" v-model="product.seniorPWD_discountable" />
-                                        <label for="discountable_yes">Yes</label>
-                                        <input type="radio" :name="'discountable_' + product.id" value="no" v-model="product.seniorPWD_discountable" />
-                                        <label for="discountable_no">No</label>
+                                        <div class="flex items-center">
+                                            <label class="switch">
+                                                <input type="checkbox" v-model="product.seniorPWD_discountable" true-value="yes" false-value="no" @change="updateDiscountable(product.id, product.seniorPWD_discountable)" />
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <span class="ml-3 text-sm text-gray-700">{{ product.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
+                                        </div>
                                     </td>
+
+
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex space-x-4">
                                             <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
@@ -300,164 +348,279 @@ fetchListedCategories();
         </div>
 
         <div v-if="showAddProductModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
-                <h3 class="text-xl font-semibold text-center mb-4">Add a Product</h3>
+            <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl relative">
+                <h3 class="text-lg font-semibold text-center mb-3">Add a Product</h3>
                 <form @submit.prevent="addProduct">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2 md:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700">Image here:</label>
-                            <div class="w-full h-32 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer relative">
-                                <input type="file" id="image" @change="handleImageUpload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- Image Upload (Left Side) -->
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Image</label>
+                            <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer">
+                                <input type="file" id="image" @change="handleImageUpload" class="absolute inset-0 opacity-0 cursor-pointer" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                                 </svg>
+
+                                <!-- Image Preview -->
+                                <img v-if="imagePreviewUrl" :src="imagePreviewUrl" class="absolute inset-0 w-full h-full object-cover" />
+                            
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="name" class="block text-sm font-medium text-gray-700">Name *</label>
-                            <input type="text" id="name" v-model="newProduct.name" class="input-field" required/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="brand" class="block text-sm font-medium text-gray-700">Brand</label>
-                            <input type="text" id="brand" v-model="newProduct.brand" class="input-field"/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="price" class="block text-sm font-medium text-gray-700">Price (PHP)*</label>
-                            <div class="relative">
-                                <input type="number" id="price" v-model="newProduct.price" class="input-field pl-10" required/>
+
+                        <!-- Product Info (Right Side) -->
+                        <div class="col-span-2 grid grid-cols-2 gap-3">
+                            <!-- Name Field (Full Width) -->
+                            <div class="col-span-2">
+                                <label for="name" class="block text-xs font-medium text-gray-700">Name *</label>
+                                <input type="text" id="name" v-model="newProduct.name" class="input-field w-full text-xs p-1" required />
+                            </div>
+
+                            <!-- Price Field -->
+                            <div>
+                                <label for="price" class="block text-xs font-medium text-gray-700">Price (PHP) *</label>
+                                <input type="number" id="price" v-model="newProduct.price" class="input-field text-xs p-1" required />
+                            </div>
+
+                            <!-- Category Field -->
+                            <div>
+                                <label for="category" class="block text-xs font-medium text-gray-700">Category *</label>
+                                <select id="category" v-model="newProduct.category" class="input-field text-xs p-1" required>
+                                    <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
+                                </select>
+                            </div>
+
+                            <!-- Stock Field -->
+                            <div>
+                                <label for="stock" class="block text-xs font-medium text-gray-700">Stock *</label>
+                                <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
+                            </div>
+
+                            <!-- Sold Field -->
+                            <div>
+                                <label for="sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <input type="number" id="sold" v-model="newProduct.sold" class="input-field text-xs p-1" />
+                            </div>
+
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="brand" class="block text-xs font-medium text-gray-700">Brand</label>
+                                <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
+                            </div>
+
+                            <!-- Status Field -->
+                            <div>
+                                <label for="status" class="block text-xs font-medium text-gray-700">Status *</label>
+                                <select id="status" v-model="newProduct.status" class="input-field text-xs p-1" required>
+                                    <option value="Listed">Listed</option>
+                                    <option value="Unlisted">Unlisted</option>
+                                    <option value="Out of Stock">Out of Stock</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="category" class="block text-sm font-medium text-gray-700">Category *</label>
-                            <select id="category" v-model="newProduct.category" class="input-field" required>
-                                <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
-                            </select>
+
+                        <!-- Description (Below the Product Info) -->
+                        <div class="col-span-3">
+                            <label for="description" class="block text-xs font-medium text-gray-700">Description:</label>
+                            <textarea id="description" v-model="newProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="stock" class="block text-sm font-medium text-gray-700">Stock *</label>
-                            <input type="number" id="stock" v-model="newProduct.stock" class="input-field" required/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="sold" class="block text-sm font-medium text-gray-700">Sold</label>
-                            <input type="number" id="sold" v-model="newProduct.sold" class="input-field"/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="status" class="block text-sm font-medium text-gray-700">Status *</label>
-                            <select id="status" v-model="newProduct.status" class="input-field" required>
-                                <option value="Listed">Listed</option>
-                                <option value="Unlisted">Unlisted</option>
-                                <option value="Out of Stock">Out of Stock</option>
-                            </select>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="expDate" class="block text-sm font-medium text-gray-700">Expiry Date</label>
-                            <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field"/>
-                        </div>
-                        <div class="col-span-2">
-                            <label for="description" class="block text-sm font-medium text-gray-700">Description:</label>
-                            <textarea id="description" v-model="newProduct.description" rows="3" class="input-field" placeholder="Enter your description here (will be shown in the website)…"></textarea>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700">Discountable:</label>
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <input type="radio" id="discountable_yes" value="yes" v-model="newProduct.seniorPWD_discountable" class="mr-1"/>
-                                    <label for="discountable_yes" class="text-sm text-gray-700">Yes</label>
+
+                        <!-- Expiry Date, Discountable, and Featured (Same Row) -->
+                        <div class="col-span-2 grid grid-cols-3 gap-3">
+                            <div>
+                                <label for="expDate" class="block text-xs font-medium text-gray-700">Expiry Date</label>
+                                <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
+                            </div>
+
+                            <!-- Discountable Toggle -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Discountable:</label>
+                                <div class="flex items-center space-x-2">
+                                    <label class="switch">
+                                        <input type="checkbox" v-model="newProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="text-xs text-gray-700">{{ newProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                                 </div>
-                                <div class="flex items-center">
-                                    <input type="radio" id="discountable_no" value="no" v-model="newProduct.seniorPWD_discountable" class="mr-1"/>
-                                    <label for="discountable_no" class="text-sm text-gray-700">No</label>
+                            </div>
+
+                            <!-- Featured Toggle -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Featured:</label>
+                                <div class="flex items-center space-x-2">
+                                    <label class="switch">
+                                        <input type="checkbox" v-model="newProduct.featured" true-value="true" false-value="false"/>
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="text-xs text-gray-700">{{ newProduct.featured === 'true' ? 'True' : 'False' }}</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex justify-end mt-4 space-x-3">
-                        <button @click="showAddProductModal = false" class="button-cancel">Cancel</button>
-                        <button type="submit" class="button-ok">OK</button>
+
+                        <!-- On Sale Toggle (Separate Row) -->
+                        <div class="col-span-2">
+                            <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+                            <div class="flex items-center space-x-2">
+                                <label class="switch">
+                                    <input type="checkbox" v-model="newProduct.on_sale" true-value="yes" false-value="no"/>
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="text-xs text-gray-700">{{ newProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- On Sale Price (Visible only if 'On Sale' is selected) -->
+                        <div class="col-span-3" v-if="newProduct.on_sale === 'yes'">
+                            <label for="on_sale_price" class="block text-xs font-medium text-gray-700">On Sale Price (PHP):</label>
+                            <input type="number" step="0.01" id="on_sale_price" v-model="newProduct.on_sale_price" class="input-field text-xs p-1"/>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="col-span-3 flex justify-end mt-3 space-x-2">
+                            <button @click="showAddProductModal = false" class="button-cancel text-xs">Cancel</button>
+                            <button type="submit" class="button-ok text-xs">OK</button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
 
+
         <div v-if="showEditProductModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
-                <h3 class="text-xl font-semibold text-center mb-4">Edit Product</h3>
+            <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl relative">
+                <h3 class="text-lg font-semibold text-center mb-3">Edit Product</h3>
                 <form @submit.prevent="updateProduct">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_image" class="block text-sm font-medium text-gray-700">Image here:</label>
-                            <div class="w-full h-32 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer relative">
-                                <input type="file" id="edit_image" @change="handleEditImageUpload" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"/>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- Image Upload (Left Side) -->
+                        
+                        <div class="col-span-1">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Image</label>
+                            <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400">
+                                <input type="file" id="edit_image" @change="handleEditImageUpload" class="absolute inset-0 opacity-0 cursor-pointer z-10"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" v-if="!editImagePreviewUrl">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
+                                <img v-if="editImagePreviewUrl" :src="editImagePreviewUrl" class="absolute inset-0 w-full h-full object-cover"/>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_name" class="block text-sm font-medium text-gray-700">Name *</label>
-                            <input type="text" id="edit_name" v-model="editProduct.name" class="input-field" required/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_brand" class="block text-sm font-medium text-gray-700">Brand</label>
-                            <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field"/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_price" class="block text-sm font-medium text-gray-700">Price (PHP)*</label>
-                            <div class="relative">
-                                <input type="number" id="edit_price" v-model="editProduct.price" class="input-field pl-10" required/>
+
+
+                        <!-- Product Info (Right Side) -->
+                        <div class="col-span-2 grid grid-cols-2 gap-3">
+                            <!-- Name Field (Full Width) -->
+                            <div class="col-span-2">
+                                <label for="edit_name" class="block text-xs font-medium text-gray-700">Name *</label>
+                                <input type="text" id="edit_name" v-model="editProduct.name" class="input-field w-full text-xs p-1" required />
+                            </div>
+
+                            <!-- Price Field -->
+                            <div>
+                                <label for="edit_price" class="block text-xs font-medium text-gray-700">Price (PHP) *</label>
+                                <input type="number" id="edit_price" v-model="editProduct.price" class="input-field text-xs p-1" required />
+                            </div>
+
+                            <!-- Category Field -->
+                            <div>
+                                <label for="edit_category" class="block text-xs font-medium text-gray-700">Category *</label>
+                                <select id="edit_category" v-model="editProduct.category" class="input-field text-xs p-1" required>
+                                    <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
+                                </select>
+                            </div>
+
+                            <!-- Stock Field -->
+                            <div>
+                                <label for="edit_stock" class="block text-xs font-medium text-gray-700">Stock *</label>
+                                <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
+                            </div>
+
+                            <!-- Sold Field -->
+                            <div>
+                                <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
+                            </div>
+
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
+                                <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
+                            </div>
+
+                            <!-- Status Field -->
+                            <div>
+                                <label for="edit_status" class="block text-xs font-medium text-gray-700">Status *</label>
+                                <select id="edit_status" v-model="editProduct.status" class="input-field text-xs p-1" required>
+                                    <option value="Listed">Listed</option>
+                                    <option value="Unlisted">Unlisted</option>
+                                    <option value="Out of Stock">Out of Stock</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_category" class="block text-sm font-medium text-gray-700">Category *</label>
-                            <select id="edit_category" v-model="editProduct.category" class="input-field" required>
-                                <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
-                            </select>
+
+                        <!-- Description (Below the Product Info) -->
+                        <div class="col-span-3">
+                            <label for="edit_description" class="block text-xs font-medium text-gray-700">Description:</label>
+                            <textarea id="edit_description" v-model="editProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_stock" class="block text-sm font-medium text-gray-700">Stock *</label>
-                            <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field" required/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_sold" class="block text-sm font-medium text-gray-700">Sold</label>
-                            <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field"/>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_status" class="block text-sm font-medium text-gray-700">Status *</label>
-                            <select id="edit_status" v-model="editProduct.status" class="input-field" required>
-                                <option value="Listed">Listed</option>
-                                <option value="Unlisted">Unlisted</option>
-                                <option value="Out of Stock">Out of Stock</option>
-                            </select>
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="edit_expDate" class="block text-sm font-medium text-gray-700">Expiry Date</label>
-                            <input type="date" id="edit_expDate" v-model="editProduct.expDate" class="input-field"/>
-                        </div>
-                        <div class="col-span-2">
-                            <label for="edit_description" class="block text-sm font-medium text-gray-700">Description:</label>
-                            <textarea id="edit_description" v-model="editProduct.description" rows="3" class="input-field" placeholder="Enter your description here (will be shown in the website)…"></textarea>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700">Discountable:</label>
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <input type="radio" id="edit_discountable_yes" value="yes" v-model="editProduct.seniorPWD_discountable" class="mr-1"/>
-                                    <label for="edit_discountable_yes" class="text-sm text-gray-700">Yes</label>
+
+                        <!-- Expiry Date, Discountable, and Featured (Same Row) -->
+                        <div class="col-span-2 grid grid-cols-3 gap-3">
+                            <div>
+                                <label for="edit_expDate" class="block text-xs font-medium text-gray-700">Expiry Date</label>
+                                <input type="date" id="edit_expDate" v-model="editProduct.expDate" class="input-field text-xs p-1"/>
+                            </div>
+
+                            <!-- Discountable Toggle -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Discountable:</label>
+                                <div class="flex items-center space-x-2">
+                                    <label class="switch">
+                                        <input type="checkbox" v-model="editProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="text-xs text-gray-700">{{ editProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                                 </div>
-                                <div class="flex items-center">
-                                    <input type="radio" id="edit_discountable_no" value="no" v-model="editProduct.seniorPWD_discountable" class="mr-1"/>
-                                    <label for="edit_discountable_no" class="text-sm text-gray-700">No</label>
+                            </div>
+
+                            <!-- Featured Toggle -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Featured:</label>
+                                <div class="flex items-center space-x-2">
+                                    <label class="switch">
+                                        <input type="checkbox" v-model="editProduct.featured" true-value="true" false-value="false"/>
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="text-xs text-gray-700">{{ editProduct.featured === 'true' ? 'True' : 'False' }}</span>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex justify-end mt-4 space-x-3">
-                        <button @click="showEditProductModal = false" class="button-cancel">Cancel</button>
-                        <button type="submit" class="button-ok">Save</button>
+
+                        <!-- On Sale Toggle (Separate Row) -->
+                        <div class="col-span-2">
+                            <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+                            <div class="flex items-center space-x-2">
+                                <label class="switch">
+                                    <input type="checkbox" v-model="editProduct.on_sale" true-value="yes" false-value="no"/>
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="text-xs text-gray-700">{{ editProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
+                            </div>
+                        </div>
+
+                        <!-- On Sale Price (Visible only if 'On Sale' is selected) -->
+                        <div class="col-span-3" v-if="editProduct.on_sale === 'yes'">
+                            <label for="edit_on_sale_price" class="block text-xs font-medium text-gray-700">On Sale Price (PHP):</label>
+                            <input type="number" step="0.01" id="edit_on_sale_price" v-model="editProduct.on_sale_price" class="input-field text-xs p-1"/>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="col-span-3 flex justify-end mt-3 space-x-2">
+                            <button @click="showEditProductModal = false" class="button-cancel text-xs">Cancel</button>
+                            <button type="submit" class="button-ok text-xs">Save</button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
+
 
         <CategoriesModal v-if="showCategoriesModal" @close-categories-modal="showCategoriesModal = false" />
     </AuthenticatedLayout>
@@ -505,4 +668,77 @@ fetchListedCategories();
 .button-ok:hover {
     background-color: #047857;
 }
+
+
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Make the input invisible */
+    cursor: pointer; /* Ensure the cursor changes to pointer */
+    z-index: 10; /* Bring the input above other elements */
+}
+
+.image-upload {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+}
+
+.image-upload svg,
+.image-upload img {
+    position: absolute;
+    z-index: 1; /* Ensure the preview image is below the file input */
+}
+
 </style>
