@@ -46,32 +46,6 @@ const newInvoice = ref({
 });
 
 const editInvoice = ref({
-<<<<<<< Updated upstream
-    invoice_id: null,
-    date: null,
-    terms: null,
-    status: null,
-    authorized_Representative: null,
-    payment_Type: null,
-    customer_Name: null,
-    customer_Address: null,
-    customer_TIN: null,
-    customer_Business_Style: null,
-    customer_PO_No: null,
-    customer_OSCA_PWD_ID_No: null,
-    VATable_Sales: null,
-    VAT_Exempt_Sales: null,
-    Zero_Rated_Sales: null,
-    VAT_Amount: null,
-    VAT_Inclusive: null,
-    Less_VAT: null,
-    Amount_NET_of_VAT: null,
-    Less_SC_PWD_Discount: null,
-    Amount_Due: null,
-    Add_VAT: null,
-    tax: null,
-    total_Amount_Due: null,
-=======
     business_id: '',
     business_Name: 'placeholder',
     business_Address: 'placeholder',
@@ -101,7 +75,6 @@ const editInvoice = ref({
     Add_VAT: '0',
     tax: '0',
     total_Amount_Due: '0',
->>>>>>> Stashed changes
   });
 
 //GET INVOICES
@@ -155,33 +128,6 @@ const addInvoice = async () => {
 };
 
 //UPDATE AN INVOICE
-<<<<<<< Updated upstream
-// const updateInvoice = async () => {
-//     try {
-//         const formData = new FormData();
-
-//         for (const key in editInvoice.value) {
-//             // Append only if the value is not null or undefined
-//             if (editInvoice.value[key] !== null && editInvoice.value[key] !== undefined) {
-//                 formData.append(key, editInvoice.value[key]);
-//             }
-//         }
-//         const response = await axios.put(`/api/invoice/${editInvoice.value.invoice_id}`, formData, {
-//             headers: {
-//                 'Content-Type': 'multipart/form-data',
-//                 'X-HTTP-Method-Override': 'PUT'
-//             }
-//         });
-//         const index = invoices.value.findIndex(invoice => invoice.invoice_id === editInvoice.value.invoice_id);
-//         invoices.value[index] = response.data;
-
-//         showEditInvoiceModal.value = false;
-//         // resetEditInvoice();
-//     } catch (error) {
-//         console.error("Error updating invoice:", error);
-//     }
-// };
-=======
 const updateInvoice = async () => {
     try {
         const formData = new FormData();
@@ -208,7 +154,6 @@ const updateInvoice = async () => {
         console.error("Error updating invoice:", error);
     }
 };
->>>>>>> Stashed changes
 
 
 const editInvoiceDetails = (invoice) => {
@@ -217,8 +162,6 @@ const editInvoiceDetails = (invoice) => {
 };
 
 //DELETE AN INVOICE
-<<<<<<< Updated upstream
-=======
 const deleteInvoice = async (invoice_system_id) => {
     try {
         await axios.delete(`/api/invoice/${invoice_system_id}`, {
@@ -237,19 +180,8 @@ const deleteInvoice = async (invoice_system_id) => {
 };
 
 
->>>>>>> Stashed changes
 
-const deleteInvoice = async (invoice_system_id) => {
-    try {
-        await axios.delete(`/api/invoice/${invoice_system_id}`);
-        // Optionally, remove the invoice from the list if the request is successful
-        invoices.value = invoices.value.filter(invoice => invoice.invoice_system_id !== invoice_system_id);
-        alert("Invoice deleted successfully");
-    } catch (error) {
-        console.error("Error deleting invoice:", error);
-        alert("There was an issue deleting the invoice. Please try again.");
-    }
-};
+
 
 fetchInvoices();
 

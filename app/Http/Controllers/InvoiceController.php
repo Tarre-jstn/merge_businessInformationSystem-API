@@ -144,20 +144,14 @@ public function show($invoice_id)
     public function update(Request $request, $invoice_system_id)
     {
         try {
-<<<<<<< Updated upstream
-=======
             // Find the invoice by invoice_system_id
->>>>>>> Stashed changes
             $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->first();
             
             if (!$invoice) {
                 return response()->json(['error' => 'Invoice not found'], 404);
             }
     
-<<<<<<< Updated upstream
-=======
             // Validate the request
->>>>>>> Stashed changes
             $validated = $request->validate([
                 'invoice_id' => 'nullable|unique:invoices,invoice_id',
                 'date' => 'required|date',
@@ -185,19 +179,12 @@ public function show($invoice_id)
                 'total_Amount_Due' => 'required|numeric'
             ]);
     
-<<<<<<< Updated upstream
-=======
             // Update the invoice
->>>>>>> Stashed changes
             $invoice->update($validated);
     
             return response()->json($invoice);
         } catch (Exception $e) {
-<<<<<<< Updated upstream
-            return response()->json(['error' => 'Unable to update invoice: ' . $e->getMessage()], 500);
-=======
             return response()->json(['error' => $e->getMessage()], 500);
->>>>>>> Stashed changes
         }
     }
 
