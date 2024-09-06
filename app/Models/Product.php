@@ -22,5 +22,8 @@ class Product extends Model
         'expDate',
         'image',
         'seniorPWD_discountable',
+        'on_sale',
+        'on_sale_price',
+        'featured',
     ];
 }
