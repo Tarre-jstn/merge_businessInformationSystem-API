@@ -234,6 +234,43 @@ const handleEditImageUpload = (event) => {
     }
 };
 
+
+const sortOrder = ref('asc'); // Default sort order
+
+function sortByName() {
+    // Toggle the sort order
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrder.value === 'asc') {
+            return a.name.localeCompare(b.name);
+        } else {
+            return b.name.localeCompare(a.name);
+        }
+    });
+}
+
+const expDateSortOrder = ref('asc'); // Default sort order for Exp. Date
+
+function sortByExpDate() {
+    // Toggle the sort order for Exp. Date
+    expDateSortOrder.value = expDateSortOrder.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current expDate sort order
+    products.value.sort((a, b) => {
+        const dateA = new Date(a.expDate);
+        const dateB = new Date(b.expDate);
+
+        if (expDateSortOrder.value === 'asc') {
+            return dateA - dateB; // Sort ascending by date (earliest first)
+        } else {
+            return dateB - dateA; // Sort descending by date (latest first)
+        }
+    });
+}
+
+
 fetchProducts();
 fetchListedCategories();
 </script>
@@ -265,14 +302,40 @@ fetchListedCategories();
                                 <tr>
                                     <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">ID No.</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Image</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Name</th>
+
+                                    <th 
+                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer"
+                                        @click="sortByName">
+                                        <div class="flex items-center space-x-1">
+                                            <font-awesome-icon 
+                                                :icon="['fas', 'angle-down']"
+                                                :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                                class="ml-2 transition-transform duration-300 ease-in-out" 
+                                            /> 
+                                            <span>Name</span>
+                                        </div>
+                                    </th>
+
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Stock</th>
                                     <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Sold</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Exp. Date</th>
+
+                                    <th 
+                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
+                                        @click="sortByExpDate">
+                                        <div class="flex items-center space-x-1">
+                                            <font-awesome-icon 
+                                                :icon="['fas', 'angle-down']" 
+                                                :class="expDateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                                class="ml-2 transition-transform duration-300 ease-in-out" 
+                                            />
+                                            <span>Exp. Date</span>
+                                        </div>
+                                    </th>
+
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Discountable</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
                                 </tr>
