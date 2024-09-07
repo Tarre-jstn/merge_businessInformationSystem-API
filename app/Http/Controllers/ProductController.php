@@ -45,6 +45,16 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product added successfully', 'product' => $product], 201);
     }
 
+
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
+        return response()->json(['product' => $product], 200);
+    }
+
+
+
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -91,5 +101,23 @@ class ProductController extends Controller
             Log::error('Error deleting product: ' . $e->getMessage());
             return response()->json(['error' => 'Unable to delete product'], 500);
         }
+    }
+
+    public function featured_products(Request $request){
+       
+        $featuredProducts = Product::where('business_id', $request->business_id)
+                            ->where('featured', 'true')->get();
+        if ($featuredProducts->isEmpty()) {
+            return response()->json(['error' => 'No featured products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($featuredProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image
+            ];
+        }
+        return response()->json($productsArray);
     }
 }
