@@ -68,11 +68,17 @@ const fetchListedCategories = async () => {
     }
 };
 
+const handleCategoryAdded = () => {
+    fetchListedCategories();
+};
+
 const addProduct = async () => {
     try {
         const formData = new FormData();
         for (const key in newProduct.value) {
-            formData.append(key, newProduct.value[key]);
+            if (newProduct.value[key] !== null) {
+                formData.append(key, newProduct.value[key]);
+            }
         }
         const response = await axios.post('/api/products', formData, {
             headers: {
@@ -233,6 +239,26 @@ const handleEditImageUpload = (event) => {
         editProduct.value.image = null; 
     }
 };
+
+const updateDiscountable = async (productId, discountableStatus) => {
+    try {
+        // Send a PUT request to update only the seniorPWD_discountable field
+        await axios.put(`/api/products/${productId}/discountable`, {
+            seniorPWD_discountable: discountableStatus
+        });
+
+        console.log(`Updated product ${productId} with discountable status: ${discountableStatus}`);
+    } catch (error) {
+        console.error("Error updating discountable status:", error);
+
+        // Optionally, you can revert the change in UI if the request fails
+        const product = products.value.find(product => product.id === productId);
+        if (product) {
+            product.seniorPWD_discountable = discountableStatus === 'yes' ? 'no' : 'yes'; // revert toggle
+        }
+    }
+};
+
 
 
 const sortOrder = ref('asc'); // Default sort order
@@ -433,16 +459,6 @@ fetchListedCategories();
                                 <label for="stock" class="block text-xs font-medium text-gray-700">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
                             </div>
-                            <!-- Sold Field -->
-                            <div>
-                                <label for="sold" class="block text-xs font-medium text-gray-700">Sold</label>
-                                <input type="number" id="sold" v-model="newProduct.sold" class="input-field text-xs p-1" />
-                            </div>
-                            <!-- Brand Field -->
-                            <div>
-                                <label for="brand" class="block text-xs font-medium text-gray-700">Brand <span class="text-red-500">*</span></label>
-                                <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
-                            </div>
                             <!-- Status Field -->
                             <div>
                                 <label for="status" class="block text-xs font-medium text-gray-700">Status <span class="text-red-500">*</span></label>
@@ -451,6 +467,11 @@ fetchListedCategories();
                                     <option value="Unlisted">Unlisted</option>
                                     <option value="Out of Stock">Out of Stock</option>
                                 </select>
+                            </div>
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="brand" class="block text-xs font-medium text-gray-700">Brand <span class="text-red-500">*</span></label>
+                                <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
                             </div>
                         </div>
                         <!-- Description -->
@@ -551,16 +572,6 @@ fetchListedCategories();
                                 <label for="edit_stock" class="block text-xs font-medium text-gray-700">Stock *</label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
                             </div>
-                            <!-- Sold Field -->
-                            <div>
-                                <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
-                                <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
-                            </div>
-                            <!-- Brand Field -->
-                            <div>
-                                <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
-                                <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
-                            </div>
                             <!-- Status Field -->
                             <div>
                                 <label for="edit_status" class="block text-xs font-medium text-gray-700">Status *</label>
@@ -570,6 +581,12 @@ fetchListedCategories();
                                     <option value="Out of Stock">Out of Stock</option>
                                 </select>
                             </div>
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
+                                <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
+                            </div>
+                            
                         </div>
                         <!-- Description -->
                         <div class="col-span-3">
@@ -632,7 +649,9 @@ fetchListedCategories();
         </div>
 
 
-        <CategoriesModal v-if="showCategoriesModal" @close-categories-modal="showCategoriesModal = false" />
+        <CategoriesModal v-if="showCategoriesModal" 
+                        @close-categories-modal="showCategoriesModal = false" 
+                        @category-added="fetchListedCategories" />
     </AuthenticatedLayout>
 </template>
 
