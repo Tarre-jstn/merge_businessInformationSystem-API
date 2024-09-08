@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CategoriesModal from "@/Components/CategoriesModal.vue";
@@ -48,6 +48,12 @@ const editProduct = ref({
     on_sale: null,
     on_sale_price: 0,
     featured: 'null'
+});
+
+watch(() => editProduct.value.on_sale, (newValue) => {
+    if (newValue === 'no') {
+        editProduct.value.on_sale_price = 0;
+    }
 });
 
 const fetchProducts = async () => {
@@ -163,6 +169,12 @@ const editProductDetails = (product) => {
     showEditProductModal.value = true;
 };
 
+const cancelAddProduct = () => {
+    showAddProductModal.value = false;
+    resetNewProduct();
+    imagePreviewUrl.value = null;
+};
+
 const resetNewProduct = () => {
     newProduct.value = {
         name: '',
@@ -216,7 +228,8 @@ const filteredProducts = computed(() => {
         return (
             product.name.toLowerCase().includes(searchTerm) ||
             product.category.toLowerCase().includes(searchTerm) ||
-            product.status.toLowerCase().includes(searchTerm)
+            product.status.toLowerCase().includes(searchTerm) || 
+            product.brand.toLowerCase().includes(searchTerm)
         );
     });
 });
@@ -242,7 +255,7 @@ const handleEditImageUpload = (event) => {
 
 const updateDiscountable = async (productId, discountableStatus) => {
     try {
-        // Send a PUT request to update only the seniorPWD_discountable field
+        // PUT request para maupdate yung discountable sa front-end
         await axios.put(`/api/products/${productId}/discountable`, {
             seniorPWD_discountable: discountableStatus
         });
@@ -251,10 +264,10 @@ const updateDiscountable = async (productId, discountableStatus) => {
     } catch (error) {
         console.error("Error updating discountable status:", error);
 
-        // Optionally, you can revert the change in UI if the request fails
+        // kahit wala, ibabalik lang yung state ng button kapag failed
         const product = products.value.find(product => product.id === productId);
         if (product) {
-            product.seniorPWD_discountable = discountableStatus === 'yes' ? 'no' : 'yes'; // revert toggle
+            product.seniorPWD_discountable = discountableStatus === 'yes' ? 'no' : 'yes'; 
         }
     }
 };
@@ -341,14 +354,12 @@ fetchListedCategories();
                                             <span>Name</span>
                                         </div>
                                     </th>
-
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Stock</th>
                                     <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Sold</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
-
                                     <th 
                                         class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
                                         @click="sortByExpDate">
@@ -361,25 +372,26 @@ fetchListedCategories();
                                             <span>Exp. Date</span>
                                         </div>
                                     </th>
-
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Senior/PWD Discountable</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr v-if="filteredProducts.length === 0">
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="10">No products available.</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="12">No products available.</td>
                                 </tr>
                                 <tr v-for="product in filteredProducts" :key="product.id">
-                                    <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.id }}</td>
+                                    <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.id }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                        <img :src="'/storage/' + product.image" alt="Product Image" class="w-12 h-12 object-cover"/>
+                                        <div class="flex items-center justify-center">
+                                            <img :src="'/storage/' + product.image" alt="Product Image" class="w-12 h-12 object-cover"/>
+                                        </div>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.name }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.brand }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.price }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.category }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.stock }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.price }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.category }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.stock }}</td>
                                     <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.sold }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">
                                             <span :class="{
@@ -389,8 +401,8 @@ fetchListedCategories();
                                             }">{{ product.status }}</span>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 space-x-1">
-                                        <div class="flex items-center">
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
+                                        <div class="flex items-left justify-center">
                                             <label class="switch">
                                                 <input type="checkbox" v-model="product.seniorPWD_discountable" true-value="yes" false-value="no" @change="updateDiscountable(product.id, product.seniorPWD_discountable)" />
                                                 <span class="slider round"></span>
@@ -399,7 +411,7 @@ fetchListedCategories();
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                        <div class="flex space-x-4">
+                                        <div class="flex items-center justify-center space-x-4">
                                             <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
                                                 <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                             </button>
@@ -480,37 +492,64 @@ fetchListedCategories();
                             <textarea id="description" v-model="newProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
                         <!-- Expiry Date, Discountable, and Featured -->
-                        <div class="col-span-2 grid grid-cols-3 gap-3">
-                            <div>
-                                <label for="expDate" class="block text-xs font-medium text-gray-700">Expiry Date <span class="text-red-500">*</span></label>
-                                <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
-                            </div>
-                            <!-- Discountable Toggle -->
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700">Senior/PWD Discountable:</label>
-                                <div class="flex items-center space-x-2">
-                                    <label class="switch">
-                                        <input type="checkbox" v-model="newProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <span class="text-xs text-gray-700">{{ newProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
-                                </div>
-                            </div>
-                            <!-- Featured Toggle -->
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700">Featured:</label>
-                                <div class="flex items-center space-x-2">
-                                    <label class="switch">
-                                        <input type="checkbox" v-model="newProduct.featured" true-value="true" false-value="false"/>
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <span class="text-xs text-gray-700">{{ newProduct.featured === 'true' ? 'True' : 'False' }}</span>
-                                </div>
+                    <div class="col-span-2 grid grid-cols-3 gap-3">
+                        <!-- Expiry Date -->
+                        <div>
+                            <label for="expDate" class="block text-xs font-medium text-gray-700">Expiry Date <span class="text-red-500">*</span></label>
+                            <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
+                        </div>
+                        <!-- Discountable Toggle -->
+                        <div class="flex flex-col space-y-2">
+                            <label class="flex items-center text-xs font-medium text-gray-700 whitespace-nowrap">
+                                Senior/PWD Discountable:
+                                <span class="relative group ml-1">
+                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
+                                    <!-- Tooltip -->
+                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
+                                        Enable this to apply discount for seniors/PWDs.
+                                    </span>
+                                </span>
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <label class="switch">
+                                    <input type="checkbox" v-model="newProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="text-xs text-gray-700">{{ newProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                             </div>
                         </div>
-                        <!-- On Sale Toggle (Separate Row) -->
+                        <!-- Featured Toggle -->
+                        <div class="flex flex-col space-y-2 ml-8">
+                            <label class="flex items-center text-xs font-medium text-gray-700 whitespace-nowrap">
+                                Featured:
+                                <span class="relative group ml-1">
+                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
+                                    <!-- Tooltip -->
+                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
+                                        Enable this to feature the product on the website.
+                                    </span>
+                                </span>
+                            </label>
+                            <div class="flex items-center space-x-2">
+                                <label class="switch">
+                                    <input type="checkbox" v-model="newProduct.featured" true-value="true" false-value="false"/>
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="text-xs text-gray-700">{{ newProduct.featured === 'true' ? 'True' : 'False' }}</span>
+                            </div>
+                        </div>
+                        <!-- On Sale Toggle -->
                         <div class="col-span-2">
-                            <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+                            <label class="flex items-center text-xs font-medium text-gray-700">
+                                On Sale:
+                                <span class="relative group ml-1">
+                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
+                                    <!-- Tooltip -->
+                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
+                                        Enable this to make the product on sale.
+                                    </span>
+                                </span>
+                            </label>
                             <div class="flex items-center space-x-2">
                                 <label class="switch">
                                     <input type="checkbox" v-model="newProduct.on_sale" true-value="yes" false-value="no"/>
@@ -519,6 +558,7 @@ fetchListedCategories();
                                 <span class="text-xs text-gray-700">{{ newProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
                             </div>
                         </div>
+                    </div>
                         <!-- On Sale Price (Visible only if 'On Sale' is selected) -->
                         <div class="col-span-3" v-if="newProduct.on_sale === 'yes'">
                             <label for="on_sale_price" class="block text-xs font-medium text-gray-700">On Sale Price (PHP):</label>
@@ -526,7 +566,7 @@ fetchListedCategories();
                         </div>
                         <!-- Action Buttons -->
                         <div class="col-span-3 flex justify-end mt-3 space-x-2">
-                            <button @click="showAddProductModal = false" class="button-cancel text-xs">Cancel</button>
+                            <button @click="cancelAddProduct" class="button-cancel text-xs">Cancel</button>
                             <button type="submit" class="button-ok text-xs">OK</button>
                         </div>
                     </div>
@@ -601,7 +641,15 @@ fetchListedCategories();
                             </div>
                             <!-- Discountable Toggle -->
                             <div>
-                                <label class="block text-xs font-medium text-gray-700"> Senior/PWD Discountable:</label>
+                                <label class="block text-xs font-medium text-gray-700"> Senior/PWD Discountable:
+                                    <span class="relative group ml-1">
+                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
+                                    <!-- Tooltip -->
+                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
+                                        Enable this to apply discount for seniors/PWDs.
+                                    </span>
+                                </span>
+                                </label>
                                 <div class="flex items-center space-x-2">
                                     <label class="switch">
                                         <input type="checkbox" v-model="editProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
@@ -612,7 +660,15 @@ fetchListedCategories();
                             </div>
                             <!-- Featured Toggle -->
                             <div>
-                                <label class="block text-xs font-medium text-gray-700">Featured:</label>
+                                <label class="block text-xs font-medium text-gray-700">Featured:
+                                    <span class="relative group ml-1">
+                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
+                                    <!-- Tooltip -->
+                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
+                                        Enable this to feature the product on the website.
+                                    </span>
+                                </span>
+                                </label>
                                 <div class="flex items-center space-x-2">
                                     <label class="switch">
                                         <input type="checkbox" v-model="editProduct.featured" true-value="true" false-value="false"/>
@@ -624,7 +680,15 @@ fetchListedCategories();
                         </div>
                         <!-- On Sale Toggle (Separate Row) -->
                         <div class="col-span-2">
-                            <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+                            <label class="block text-xs font-medium text-gray-700">On Sale:
+                                <span class="relative group ml-1">
+                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
+                                    <!-- Tooltip -->
+                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
+                                        Enable this to make the product on sale.
+                                    </span>
+                                </span>
+                            </label>
                             <div class="flex items-center space-x-2">
                                 <label class="switch">
                                     <input type="checkbox" v-model="editProduct.on_sale" true-value="yes" false-value="no"/>
@@ -647,7 +711,6 @@ fetchListedCategories();
                 </form>
             </div>
         </div>
-
 
         <CategoriesModal v-if="showCategoriesModal" 
                         @close-categories-modal="showCategoriesModal = false" 
