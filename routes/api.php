@@ -43,9 +43,10 @@ Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
 
 Route::get('/invoice', [InvoiceController::class, 'index']);
 Route::post('/invoice', [InvoiceController::class, 'store']);
-Route::put('/invoice/{invoice_system_id}', [InvoiceController::class, 'update']);
-Route::get('/invoice/{invoice_system_id}', [InvoiceController::class, 'show']);
+Route::post('/invoice/{invoice_system_id}', [InvoiceController::class, 'update']);
 Route::delete('/invoice/{invoice_system_id}', [InvoiceController::class, 'destroy']);
+
+
 
 /*Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);

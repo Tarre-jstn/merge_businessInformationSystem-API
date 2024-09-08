@@ -25,7 +25,7 @@ const newInvoice = ref({
   status: '',
   authorized_Representative: '',
   payment_Type: '',
-  customer_Name: '',
+  customer_Name: null,
   customer_Address: '',
   customer_TIN: '0',
   customer_Business_Style: '',
@@ -49,32 +49,32 @@ const editInvoice = ref({
     business_id: '',
     business_Name: 'placeholder',
     business_Address: 'placeholder',
-    business_TIN: '0',              
+    business_TIN: 0,              
     invoice_system_id: null,
-    invoice_id: 'null',
+    invoice_id: null,
     date: '',
     terms: '',
     status: '',
     authorized_Representative: '',
     payment_Type: '',
-    customer_Name: '',
+    customer_Name: null,
     customer_Address: '',
-    customer_TIN: '0',
+    customer_TIN: 0,
     customer_Business_Style: '',
-    customer_PO_No: '0',
-    customer_OSCA_PWD_ID_No: '0',
-    VATable_Sales: '0',
-    VAT_Exempt_Sales: '0',
-    Zero_Rated_Sales: '0',
-    VAT_Amount: '0',
-    VAT_Inclusive: '0',
-    Less_VAT: '0',
-    Amount_NET_of_VAT: '0',
-    Less_SC_PWD_Discount: '0',
-    Amount_Due: '0',
-    Add_VAT: '0',
-    tax: '0',
-    total_Amount_Due: '0',
+    customer_PO_No: 0,
+    customer_OSCA_PWD_ID_No: 0,
+    VATable_Sales: 0,
+    VAT_Exempt_Sales: 0,
+    Zero_Rated_Sales: 0,
+    VAT_Amount: 0,
+    VAT_Inclusive: 0,
+    Less_VAT: 0,
+    Amount_NET_of_VAT: 0,
+    Less_SC_PWD_Discount: 0,
+    Amount_Due: 0,
+    Add_VAT: 0,
+    tax: 0,
+    total_Amount_Due: 0,
   });
 
 //GET INVOICES
@@ -118,9 +118,8 @@ const addInvoice = async () => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        invoice.value.push(response.data);
         showAddInvoiceModal.value = false;
-        
+        fetchInvoices();
         // resetNewInvoice();
     } catch (error) {
         console.error("Error adding invoice:", error);
@@ -130,31 +129,48 @@ const addInvoice = async () => {
 //UPDATE AN INVOICE
 const updateInvoice = async () => {
     try {
+        
+        console.log('editInvoice:', editInvoice.value);
+        console.log('customer_Name:', editInvoice.value.customer_Name);
+
+        // Create a FormData object and append the necessary fields
         const formData = new FormData();
         for (const key in editInvoice.value) {
             if (editInvoice.value[key] !== null && editInvoice.value[key] !== undefined) {
                 formData.append(key, editInvoice.value[key]);
             }
         }
+        
 
-        // Use invoice_system_id in the PUT request
-        const response = await axios.put(`/api/invoice/${editInvoice.value.invoice_system_id}`, formData, {
+        console.log('editInvoice:', editInvoice.value);
+        console.log('customer_Name:', editInvoice.value.customer_Name);
+
+        // Use the invoice_system_id from editInvoice for the request URL
+        const response = await axios.post(`/api/invoice/${editInvoice.value.invoice_system_id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             }
         });
 
+        console.log('editInvoice:', editInvoice.value);
+        console.log('customer_Name:', editInvoice.value.customer_Name);
+
+        // Update the invoices array with the new data
         const index = invoices.value.findIndex(invoice => invoice.invoice_system_id === editInvoice.value.invoice_system_id);
         if (index !== -1) {
             invoices.value[index] = response.data;
         }
 
+        
+        console.log('editInvoice:', editInvoice.value);
+        console.log('customer_Name:', editInvoice.value.customer_Name);
+
+        // Hide the edit invoice modal
         showEditInvoiceModal.value = false;
     } catch (error) {
         console.error("Error updating invoice:", error);
     }
 };
-
 
 const editInvoiceDetails = (invoice) => {
     editInvoice.value = { ...invoice };
@@ -178,10 +194,6 @@ const deleteInvoice = async (invoice_system_id) => {
         alert("There was an issue deleting the invoice. Please try again.");
     }
 };
-
-
-
-
 
 fetchInvoices();
 

@@ -138,55 +138,96 @@ public function show($invoice_id)
         }
     }
 
+    public function update(Request $request){
+        
+        $request->validate([
+            'invoice_id' => 'nullable|unique:invoices,invoice_id',
+            'date' => 'required|date',
+            'terms' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+            'authorized_Representative' => 'required|string|max:255',
+            'payment_Type' => 'required|string|max:255',
+            'customer_Name' => 'required|string|max:255',
+            'customer_Address' => 'required|string|max:255',
+            'customer_TIN' => 'required|integer',
+            'customer_Business_Style' => 'required|string|max:255',
+            'customer_PO_No' => 'required|integer',
+            'customer_OSCA_PWD_ID_No' => 'required|integer',
+            'VATable_Sales' => 'required|numeric',
+            'VAT_Exempt_Sales' => 'required|numeric',
+            'Zero_Rated_Sales' => 'required|numeric',
+            'VAT_Amount' => 'required|numeric',
+            'VAT_Inclusive' => 'required|numeric',
+            'Less_VAT' => 'required|numeric',
+            'Amount_NET_of_VAT' => 'required|numeric',
+            'Less_SC_PWD_Discount' => 'required|numeric',
+            'Amount_Due' => 'required|numeric',
+            'Add_VAT' => 'required|numeric',
+            'tax' => 'required|numeric',
+            'total_Amount_Due' => 'required|numeric'
+        ]);
+        Log::info('RECEIPT LOGS');
+        $invoice = Invoice::where('invoice_system_id', $request->invoice_system_id)->first();
+        Log::info('RECEIPT LOGS');
+        if($invoice){
+        $data = $request->all();
+        $invoice->update($data);
 
 
-
-    public function update(Request $request, $invoice_system_id)
-    {
-        try {
-            // Find the invoice by invoice_system_id
-            $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->first();
-            
-            if (!$invoice) {
-                return response()->json(['error' => 'Invoice not found'], 404);
-            }
-    
-            // Validate the request
-            $validated = $request->validate([
-                'invoice_id' => 'nullable|unique:invoices,invoice_id',
-                'date' => 'required|date',
-                'terms' => 'required|string|max:255',
-                'status' => 'required|string|max:255',
-                'authorized_Representative' => 'required|string|max:255',
-                'payment_Type' => 'required|string|max:255',
-                'customer_Name' => 'required|string|max:255',
-                'customer_Address' => 'required|string|max:255',
-                'customer_TIN' => 'required|integer',
-                'customer_Business_Style' => 'required|string|max:255',
-                'customer_PO_No' => 'required|integer',
-                'customer_OSCA_PWD_ID_No' => 'required|integer',
-                'VATable_Sales' => 'required|numeric',
-                'VAT_Exempt_Sales' => 'required|numeric',
-                'Zero_Rated_Sales' => 'required|numeric',
-                'VAT_Amount' => 'required|numeric',
-                'VAT_Inclusive' => 'required|numeric',
-                'Less_VAT' => 'required|numeric',
-                'Amount_NET_of_VAT' => 'required|numeric',
-                'Less_SC_PWD_Discount' => 'required|numeric',
-                'Amount_Due' => 'required|numeric',
-                'Add_VAT' => 'required|numeric',
-                'tax' => 'required|numeric',
-                'total_Amount_Due' => 'required|numeric'
-            ]);
-    
-            // Update the invoice
-            $invoice->update($validated);
-    
-            return response()->json($invoice);
-        } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        $invoice->save();
+        Log::info('RECEIPT LOGS');
+        return response()->json(['message' => 'Invoic updated successfully'], 200);
         }
     }
+
+
+
+    // public function update(Request $request, $invoice_system_id)
+    // {
+    //     try {
+    //         // Find the invoice by invoice_system_id
+    //         $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->first();
+            
+    //         if (!$invoice) {
+    //             return response()->json(['error' => 'Invoice not found'], 404);
+    //         }
+    
+    //         // Validate the request
+    //         $validated = $request->validate([
+    //             'invoice_id' => 'nullable|unique:invoices,invoice_id',
+    //             'date' => 'required|date',
+    //             'terms' => 'required|string|max:255',
+    //             'status' => 'required|string|max:255',
+    //             'authorized_Representative' => 'required|string|max:255',
+    //             'payment_Type' => 'required|string|max:255',
+    //             'customer_Name' => 'required|string|max:255',
+    //             'customer_Address' => 'required|string|max:255',
+    //             'customer_TIN' => 'required|integer',
+    //             'customer_Business_Style' => 'required|string|max:255',
+    //             'customer_PO_No' => 'required|integer',
+    //             'customer_OSCA_PWD_ID_No' => 'required|integer',
+    //             'VATable_Sales' => 'required|numeric',
+    //             'VAT_Exempt_Sales' => 'required|numeric',
+    //             'Zero_Rated_Sales' => 'required|numeric',
+    //             'VAT_Amount' => 'required|numeric',
+    //             'VAT_Inclusive' => 'required|numeric',
+    //             'Less_VAT' => 'required|numeric',
+    //             'Amount_NET_of_VAT' => 'required|numeric',
+    //             'Less_SC_PWD_Discount' => 'required|numeric',
+    //             'Amount_Due' => 'required|numeric',
+    //             'Add_VAT' => 'required|numeric',
+    //             'tax' => 'required|numeric',
+    //             'total_Amount_Due' => 'required|numeric'
+    //         ]);
+    
+    //         // Update the invoice
+    //         $invoice->update($validated);
+    
+    //         return response()->json($invoice);
+    //     } catch (Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()], 500);
+    //     }
+    // }
 
     public function destroy($invoice_system_id)
     {
