@@ -163,7 +163,7 @@ function goToEditWebsite2(){
 
         <div class="ml-1 bg-website-main flex min-h-screen">
             <!-- edit business info wag to iedit kasi business name ito-->
-            <div class="mt-[110px] ml-8 flex-col h-1/2">
+            <div class="mt-[90px] ml-8 flex-col h-1/2">
                 <div>
                     <button @click="edit('businessName')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
                     <p class="mt-[10px] text-white text-[29px] font-bold tracking-[3px]">{{textAreas.businessName.value}}</p>
@@ -196,6 +196,11 @@ function goToEditWebsite2(){
                         <textarea v-model="textAreas.businessDetails.value" class="w-full h-[130px] border boder-black"></textarea>
                         <button @click="save" class="bg-white rounded-xl p-1">Save</button>
                     </div>
+                    <div class="mt-[30px] flex flex-row">
+                    <button class="mr-[20px] cursor-pointer bg-white border border-white rounded-sm py-[8px] px-[50px]">Register</button>
+                    <p class="text-white text-xl">|</p>
+                    <a class="ml-[35px] justify-center text-white text-[18px]">See All Products</a>
+                </div>
                 </div>
             
             </div>
