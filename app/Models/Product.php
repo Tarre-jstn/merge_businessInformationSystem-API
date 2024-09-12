@@ -12,12 +12,18 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'brand',
         'price',
         'category',
         'stock',
         'sold',
         'status',
+        'description',
         'expDate',
-        'image'
+        'image',
+        'seniorPWD_discountable',
+        'on_sale',
+        'on_sale_price',
+        'featured',
     ];
 }
