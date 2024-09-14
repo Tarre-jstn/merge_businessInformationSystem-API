@@ -57,6 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Settings');
     })->name('settings');
 
+    Route::get('/preview-homepage', function () {
+        return Inertia::render('Preview_Homepage');
+    })->name('preview_homepage');
+
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');
     })->name('editWebsite1');
