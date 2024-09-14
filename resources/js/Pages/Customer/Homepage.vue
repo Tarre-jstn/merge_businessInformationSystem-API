@@ -135,11 +135,11 @@ function goTochatPage(){
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a>Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]">Products & Services</a>
+                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
                     <a class="text-white text-[18px]">About Us</a>
                     <p>|</p>
                     <button @click="logout('register')" class="text-white">Register</button>
-                    <button @click="logout('logout')" class=" cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
+                    <button @click="logout('logout')" class="cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
                 </div>
         </div>
 
@@ -356,7 +356,7 @@ function goTochatPage(){
 </template>
 <style>
 .icon-color {
-    background-color: #306091; /* Replace with your desired color */
+    background-color: #306091; 
 }
 .fa.fa-twitter{
 	font-family:sans-serif;

@@ -61,6 +61,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Preview_Homepage');
     })->name('preview_homepage');
 
+    Route::get('/products_page', function () {
+        return Inertia::render('Customer/Products');
+    })->name('products_page');
+
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');
     })->name('editWebsite1');
