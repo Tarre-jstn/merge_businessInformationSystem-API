@@ -29,10 +29,11 @@ Route::post('/products', [ProductController::class, 'store']);
 Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
-Route::get('/business_info', [BusinessController::class, 'show']);
-Route::post('/business_info', [BusinessController::class, 'store']);
-Route::put('/business_info/{id}', [BusinessController::class, 'update']);
-Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+Route::get('/Business', [BusinessController::class, 'show']);
+Route::post('/Business', [BusinessController::class, 'store']);
+Route::put('/Business/{id}', [BusinessController::class, 'update']);
+Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
+
 
 
 

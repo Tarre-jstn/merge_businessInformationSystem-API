@@ -15,6 +15,8 @@ Route::get('/', function () {
     ]);
 });
 
+
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
@@ -47,6 +49,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings', function () {
         return Inertia::render('Settings');
     })->name('settings');
+
+    Route::get('/BusinessInfo', function () {
+        return Inertia::render('BusinessInfo');
+    })->name('BusinessInfo');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
