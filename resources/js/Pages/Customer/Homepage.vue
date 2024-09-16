@@ -37,6 +37,9 @@ const textAreas = {
     website_footNote: ref('')
 }
 
+const feature_toggle=ref('');
+const onSale_toggle=ref('');
+
 function logout(button){
     Inertia.post(route('logout'), {button});
 }
@@ -223,7 +226,8 @@ function goTochatPage(){
 </section>
 
     <!-- section 3/EditWebsite3 -->
-    <section>
+    
+    <section v-if="feature_toggle==='true'">
         <div class=" bg-website-main flex min-h-screen relative" style="min-height: calc(100vh + 100px);">
 
 <div class="flex flex-col items-center p-3 absolute top-[10px] left-0 right-0 bottom-[500px] m-auto">
@@ -283,6 +287,7 @@ function goTochatPage(){
 
     <!-- section 4/Chat Section -->
 <section>
+    <div class="bg-website-main h-[2px] w-full"></div>
         <div class="bg-website-main1 flex flex-col min-h-screen">
 
         

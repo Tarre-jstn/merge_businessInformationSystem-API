@@ -35,11 +35,14 @@ class WebsiteController extends Controller
                 return response()->json(['error' => $e->getMessage()], 500);
             }
         }
+    
+
     public function info(Request $request){
         $business_id = $request->query('business_id');
         $website = Website::where('business_id', $business_id)->first();
         return response()->json($website);
     }
+
     public function update(Request $request){
        
         

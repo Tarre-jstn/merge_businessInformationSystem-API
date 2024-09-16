@@ -82,6 +82,7 @@ async function getWebsiteInfo(){
 }
 async function save(){
 
+
     const response_userId = await axios.get('/user-id');
         const userId = response_userId.data.user_id;
     const getBusinessInfo = await axios.get('/api/business_info', {
@@ -94,11 +95,17 @@ async function save(){
         formData.append('featured_section', feature_toggle.value);
         formData.append('onSale_section', onSale_toggle.value);
 
+        console.log("Form Data being sent:");
+    for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
+    }
+
     const saveBusinessDesc = await axios.post('/api/website-update', formData, {
         headers:{
             'Content-Type': 'multipart/form-data'
         }
     });
+
     const getWebsiteInfo = await axios.get('/api/website', {
             params: {business_id: businessId}
         });
@@ -143,7 +150,8 @@ function goToEditWebsite4(){
             </div>
                 
                 <button @click="save" class="mt-6 text-white px-6 py-1 bg-gray-600 ml-auto">Save</button>
-        </div>
+                
+            </div>
 
             <div class="flex flex-col items-center p-3 relative top-[10px] left-0 right-0 bottom-[300px] m-auto">
                 <p class="mt-[10px] text-[40px]  text-white font-bold  text-center">Featured Products</p>

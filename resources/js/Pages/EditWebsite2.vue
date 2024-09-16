@@ -55,7 +55,6 @@ async function save(){
 
     const response_userId = await axios.get('/user-id');
         const userId = response_userId.data.user_id;
-        console.log("Save function called");
     const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: userId}
         });
