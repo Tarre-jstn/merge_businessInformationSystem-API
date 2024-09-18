@@ -32,10 +32,11 @@ Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 //Dedicated for seniorPWD_discoubtable
 Route::put('/products/{id}/discountable', [ProductController::class, 'updateDiscountable']);
 
-Route::get('/business_info', [BusinessController::class, 'show']);
-Route::post('/business_info', [BusinessController::class, 'store']);
-Route::put('/business_info/{id}', [BusinessController::class, 'update']);
-Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+Route::get('/Business', [BusinessController::class, 'show']);
+Route::post('/Business', [BusinessController::class, 'store']);
+Route::put('/Business/{id}', [BusinessController::class, 'update']);
+Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
+
 
 
 
