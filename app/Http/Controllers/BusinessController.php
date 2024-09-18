@@ -18,162 +18,155 @@ class BusinessController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        //
-    }
+{
+    $Business = Business::where('user_id', auth()->id())->first(); 
+    return response()->json($Business);
+}
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
 {
-    try{
-    $request->validate([
-        'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        'user_id' => 'required|numeric|exists:users,id',
-        'business_Name' => 'required|string|max:255',
-        'business_Address' => 'required|string|max:255',
-        'business_Contact_Number' => 'required|string|max:255',
-        'business_Email'=> 'required|string|lowercase|email|max:255|unique:businesses,business_Email',
-        'business_SocialMedia'=>'required|string|max:255'
-    ]);
+    try {
+        $request->validate([
+            'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'business_Name' => 'required|string|max:255',
+            'business_Email' => 'required|string|lowercase|email|max:255',
+            'business_Province' => 'required|string|max:255',
+            'business_City' => 'required|string|max:255',
+            'business_Barangay' => 'required|string|max:255',
+            'business_Address' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
+            'business_Telephone_Number' => 'required|string|max:255',
+            'business_Facebook' => 'required|string|max:255',
+            'business_X' => 'required|string|max:255',
+            'business_Instagram' => 'required|string|max:255',
+            'business_Tiktok' => 'required|string|max:255'
+        ]);
 
-    $business_image=null;
-    if ($request->hasFile('business_image')) {
-        $image = $request->file('business_image');
-        $path = $image->store('public/business_logos');
-        $business_image = basename($path);
-    }
+        $business_image = null; // Initialize the variable
 
-    if($request->user_id){
-        $user = User::find($request->user_id);
-        if($user->user_type=='owner'){
-            $business = Business::create([
-            'business_image' => $business_image,
-            'user_id' => $request->user_id,
-            'business_Name' => $request->business_Name,
-            'business_Address' => $request->business_Address,
-            'business_Contact_Number' => $request->business_Contact_Number,
-            'business_Email'=> $request->business_Email,
-            'business_SocialMedia'=>$request->business_SocialMedia
-    ]);
-}
-    }else{
-        throw new \Exception('The selected user must be an owner.');
-    }
-    }catch(Exception $e){
+        if ($request->hasFile('business_image')) {
+            $image = $request->file('business_image');
+            // Store the image in the 'public/business_logos' directory
+            $path = $image->store('public/business_logos');
+            // Get the basename of the stored file path
+            $business_image = basename($path);
+        }
+
+        // Ensure the user is of type 'owner' before creating the business
+        if ($request->user_id) {
+            $user = User::find($request->user_id);
+            if ($user->user_type == 'owner') {
+                $Business = Business::create([
+                    'business_image' => $business_image,  // Save the image path here
+                    'business_Name' => $request->business_Name,
+                    'business_Email' => $request->business_Email,
+                    'business_Province' => $request->business_Province,
+                    'business_City' => $request->business_City,
+                    'business_Barangay' => $request->business_Barangay,
+                    'business_Address' => $request->business_Address,
+                    'business_Phone_Number' => $request->business_Phone_Number,
+                    'business_Telephone_Number' => $request->business_Telephone_Number,
+                    'business_Facebook' => $request->business_Facebook,
+                    'business_X' => $request->business_X,
+                    'business_Instagram' => $request->business_Instagram,
+                    'business_Tiktok' => $request->business_Tiktok
+                ]);
+
+                return response()->json(['success' => true, 'business' => $Business], 201);
+            }
+        } else {
+            throw new \Exception('The selected user must be an owner.');
+        }
+    } catch (Exception $e) {
         return response()->json(['error' => $e->getMessage()], 500);
     }
-    // $request->validate([
-    //     'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    //     'user_id' => 'required|integer',
-    //     'business_Name' => 'required|string|max:255',
-    //     'business_Address' => 'required|string|max:255',
-    //     'business_Contact_Number' => 'required|integer',
-    //     'business_Email' => 'required|string|max:255',
-    //     'business_SocialMedia' => 'required|string|max:255'
-    // ]);
-
-    // $data = $request->all();
-    
-    // if ($request->hasFile('business_image')) {
-    //     $image = $request->file('business_image');
-    //     $path = $image->store('public/business_logos');
-    //     $data['business_image'] = basename($path);
-    // }
-
-    
-    // $business_info = new Business($data);
-
-    // $business_info->user_id = $data['user_id'];
-    // $business_info->business_Name = $data['business_image'];
-    // $business_info->business_Address = $data['business_Address'];
-    // $business_info->business_Contact_Number = $data['business_Contact_Number'];
-    // $business_info->business_Email = $data['business_Email'];
-    // $business_info->business_SocialMedia = $data['business_SocialMedia'];
-
-    // return [
-    //     'success' => (bool) $business_info->save()
-    // ];
-    // // try{
-    // //     $business = Business::create($data);
-    // //     return response()->json(['sucess'=>true, 'data'=>($business)]);
-    // // }catch(Exception $e){
-    // //     return response()->json(['error'=>$e->getMessage(), 500]);
-    // // }
 }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Business $business_info)
+    public function show(Request $request, Business $Business)
     {
-        return $business_info->paginate(10);
+        return $Business->all();
     }
 
     /**
      * Update the specified resource in storage.
      */
-//     public function update(int $id, Request $request)
-// {
-//     $request->validate([
-//         'businesslogo' => 'nullable|string|max:255',
-//         'businessname' => 'string|max:255',
-//         'businessemail' => 'string|max:255',
-//         'businessphone' => 'integer',
-//         'businesstelephone' => 'integer',
-//         'businessfb' => 'string|max:255',
-//         'businessig' => 'string|max:255',
-//         'businessx' => 'string|max:255',
-//     ]);
+    public function update(int $id, Request $request, Business $Business)
+    {
+        $request->validate([
+            'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'business_Name' => 'required|string|max:255',
+            'business_Email'=> 'required|string|lowercase|email|max:255', 
+            'business_Province' => 'required|string|max:255',
+            'business_City' => 'required|string|max:255',
+            'business_Barangay' => 'required|string|max:255',
+            'business_Address' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
+            'business_Telephone_Number' => 'required|string|max:255',
+            'business_Facebook'=>'required|string|max:255',
+            'business_X'=>'required|string|max:255',
+            'business_Instagram'=>'required|string|max:255',
+            'business_Tiktok'=>'required|string|max:255'
+        ]);
 
-//     $business_info = Business::findOrFail($id);
-//     $data = $request->all();
+        $business = Business::find($id);
 
-//     if ($request->hasFile('businesslogo')) {
-//         // Delete the old image if it exists
-//         if ($business_info->businesslogo) {
-//             Storage::delete('public/business_logos/' . $business_info->businesslogo);
-//         }
-//         $image = $request->file('businesslogo');
-//         $path = $image->store('public/business_logos');
-//         $data['businesslogo'] = basename($path);
-//     }
+        if ($request->hasFile('business_image')) {
+            // Handle the file upload
+            $image = $request->file('business_image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            
+            // Save the image to storage/app/public/business_logos
+            $image->storeAs('public/business_logos', $imageName);
+    
+            // Save the image name in the database (just the filename, not the full path)
+            $business->business_image = $imageName;
+        }
 
-//     if (isset($data['businessname'])) {
-//         $business_info->businessname = $data['businessname'];
-//     }
-//     if (isset($data['businessemail'])) {
-//         $business_info->businessemail = $data['businessemail'];
-//     }
-//     if (isset($data['businessphone'])) {
-//         $business_info->businessphone = $data['businessphone'];
-//     }
-//     if (isset($data['businesstelephone'])) {
-//         $business_info->businesstelephone = $data['businesstelephone'];
-//     }
-//     if (isset($data['businessfb'])) {
-//         $business_info->businessfb = $data['businessfb'];
-//     }
-//     if (isset($data['businessig'])) {
-//         $business_info->businessig = $data['businessig'];
-//     }
-//     if (isset($data['businessx'])) {
-//         $business_info->businessx = $data['businessx'];
-//     }
+        // Update other business fields
+        $business->business_Name = $request->input('business_Name');
+        $business->business_Email = $request->input('business_Email');
+        $business->business_Province = $request->input('business_Province');
+        $business->business_City = $request->input('business_City');
+        $business->business_Barangay = $request->input('business_Barangay');
+        $business->business_Address = $request->input('business_Address');
+        $business->business_Phone_Number = $request->input('business_Phone_Number');
+        $business->business_Telephone_Number = $request->input('business_Telephone_Number');
+        $business->business_Facebook = $request->input('business_Facebook');
+        $business->business_X = $request->input('business_X');
+        $business->business_Instagram = $request->input('business_Instagram');
+        $business->business_Tiktok = $request->input('business_Tiktok');
 
-//     return [
-//         'success' => (bool) $business_info->save()
-//     ];
-// }
+        // Save the business profile
+        $business->save();
 
-//     /**
-//      * Remove the specified resource from storage.
-//      */
-//     public function destroy(int $id, Business $business_info)
-//     {
-//         return [
-//             'success' => (bool) $business_info -> where('id', $id)->delete()
-//         ];
-//     }
+        return response()->json(['success' => true]);
+    }
+
+    
+
+
+    
+
+
+
+    /**
+     * Remove the specified resource from storage.
+     */
+        public function destroy(int $id)
+    {
+        $business = Business::findOrFail($id);
+        return [
+            'success' => (bool) $business->delete()
+        ];
+    }
+
+
+
 }
