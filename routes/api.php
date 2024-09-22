@@ -36,6 +36,7 @@ Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
 Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');
+Route::get('/sale-products', [ProductController::class, 'sale_products'])->name('sale_products');
 
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);

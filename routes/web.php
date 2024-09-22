@@ -29,6 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Customer/Homepage');
     })->name('homepage');
 
+    Route::get('/sale', function () {
+        return Inertia::render('Customer/SaleProducts');
+    })->name('sale');
+
     Route::get('/home', function () {
         return Inertia::render('Home');
     })->name('home');
@@ -64,6 +68,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/products_page', function () {
         return Inertia::render('Customer/Products');
     })->name('products_page');
+
+    Route::get('/aboutUs_page', function () {
+        return Inertia::render('Customer/AboutUs');
+    })->name('aboutUs_page');
 
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');

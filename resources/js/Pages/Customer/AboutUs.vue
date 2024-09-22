@@ -22,18 +22,6 @@ const textAreas = {
     about_us1: ref(''),
     about_us2: ref(''),
     about_us3: ref(''),
-    card1: ref(''),
-    card1_img: ref(''),
-    card2: ref(''),
-    card2_img: ref(''),
-    card3: ref(''),
-    card3_img: ref(''),
-    card4: ref(''),
-    card4_img: ref(''),
-    card5: ref(''),
-    card5_img: ref(''),
-    card6: ref(''),
-    card6_img: ref(''),
     website_footNote: ref('')
 }
 
@@ -83,46 +71,10 @@ async function getWebsiteInfo(){
         textAreas.about_us3.value = getWebsiteInfo1.data.about_us3;
         textAreas.website_footNote.value = getWebsiteInfo1.data.website_footNote;
 
-        const getProductsInfo = await axios.get('/api/featured-products', {
-            params: {business_id: 1}
-        });
 
-        const featuredProducts = getProductsInfo.data.slice(0, 6);
-
-        if(featuredProducts.length<5){
-            console.error('Featured Products must be 6 in number');
-        }else{
-            
-        featuredProducts.forEach((product, index) => {
-            const imgPath = product.product_img.replace('products/', '');
-        if (index === 0) {
-            textAreas.card1.value = product.product_name;
-            textAreas.card1_img.value = imgPath;
-        } else if (index === 1) {
-            textAreas.card2.value = product.product_name;
-            textAreas.card2_img.value = imgPath;
-        } else if (index === 2) {
-            textAreas.card3.value = product.product_name;
-            textAreas.card3_img.value = imgPath;
-        } else if (index === 3) {
-            textAreas.card4.value = product.product_name;
-            textAreas.card4_img.value = imgPath;
-        } else if (index === 4) {
-            textAreas.card5.value = product.product_name;
-            textAreas.card5_img.value = imgPath;
-        }else if (index === 5) {
-            textAreas.card6.value = product.product_name;
-            textAreas.card6_img.value = imgPath;
-        }
-        });
-    }
     }catch(error){
         console.error('There was an error fetching the data:', error);
     }
-}
-
-function goTochatPage(){
-    //none pa
 }
 </script>
 
@@ -133,50 +85,15 @@ function goTochatPage(){
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a>Home</a>
+                    <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
                     <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
-                    <a class="text-white text-[18px]":href="route('aboutUs_page')">About Us</a>
+                    <a class="text-black text-[18px]" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
                     <button @click="logout('register')" class="text-white">Register</button>
                     <button @click="logout('logout')" class="cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
                 </div>
         </div>
-
-        <!-- section 1/EditWebsite1 -->
-        <section>
-        <div class="bg-website-main flex min-h-screen">
-
-            <div class="mt-[150px] ml-[80px] flex-col h-1/2">
-                <div>
-                    <p class="text-white text-[40px] tracking-[5px]">{{businessInfo.businessName.value}}</p>
-                </div>
-                <div class="mt-[30px]">
-                    <div class="max-w-[550px]">
-                    <p class="font-extrabold text-[25px] text-white">{{ businessInfo.businessDescription.value }}</p>
-                    </div>
-                </div>
-                <div class="mt-[30px]" >
-                    <div class="max-w-[550px]">
-                        <p id="business-details" class="text-[19px] text-white">{{ businessInfo.businessDetails.value }} </p>
-                    </div>
-                </div>
-
-                <div class="mt-[90px] flex flex-row">
-                    <button @click="logout('register')" class="mr-[20px] cursor-pointer bg-white border border-white rounded-sm py-[8px] px-[70px]">Register</button>
-                    <p class="text-white text-xl">|</p>
-                    <a class="ml-[35px] justify-center text-white text-[18px]">See All Products</a>
-                </div>
-            </div>
-
-
-            <!-- image -->
-            <div class="mr-[8px] mt-[130px] ml-auto flex-grow-0 w-1/2 max-w-xl">
-                
-                <img :src='businessInfo.homePageImage.value' class ="mt-8 w-full h-[390px] object-cover rounded-tl-[30px]"/>
-            </div>
-        </div>
-        </section>
 
         <!-- section 2/EditWebsite2 -->
 <section>
@@ -221,95 +138,6 @@ function goTochatPage(){
 </div>
 </div>
 </section>
-
-    <!-- section 3/EditWebsite3 -->
-    <section>
-        <div class=" bg-website-main flex min-h-screen relative" style="min-height: calc(100vh + 100px);">
-
-<div class="flex flex-col items-center p-3 absolute top-[10px] left-0 right-0 bottom-[500px] m-auto">
-    <p class="mt-[30px] text-[40px]  text-white font-bold  text-center">Featured Products</p>
-    <p class="mt-[10px] text-[20px]  text-white  text-center">
-        A list of the most popular products loved by customers. 
-        Best prices guaranteed everyday.
-    </p>
-</div>
-
-<!-- edit business info wag to iedit kasi business name ito-->
-<div class=" mt-8 mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">
-    
-    <div class="block flex flex-row gap-5">
-    <!-- card 1 -->
-        <div class="flex flex-col bg-white w-[220px] h-[240px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card1_img.value}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] h-1/5 mt-[20px] text-center">{{textAreas.card1.value}}</p>
-        </div>
-
-     <!-- card 2 -->
-     <div class="flex flex-col bg-white w-[220px] h-[240px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card2_img.value}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] h-1/5 mt-[20px] text-center">{{textAreas.card2.value}}</p>
-        </div>
-    
-
-    <!-- card 3 -->
-    <div class="flex flex-col bg-white w-[220px] h-[240px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card3_img.value}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] h-1/5 mt-[20px] text-center">{{textAreas.card3.value}}</p>
-        </div>
-    </div>
-
-    <div class="block flex flex-row gap-5">
-    <!-- card 4 -->
-    <div class="flex flex-col bg-white w-[220px] h-[240px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card4_img.value}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] h-1/5 mt-[20px] text-center">{{textAreas.card4.value}}</p>
-        </div>
-
-    <!-- card 5 -->
-    <div class="flex flex-col bg-white w-[220px] h-[240px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card5_img.value}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] h-1/5 mt-[20px] text-center">{{textAreas.card5.value}}</p>
-        </div>
-
-    <!-- card 6 -->
-    <div class="flex flex-col bg-white w-[220px] h-[240px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card6_img.value}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] h-1/5 mt-[20px] text-center">{{textAreas.card6.value}}</p>
-        </div> 
-    </div>
-</div>
-        </div>
-    </section>
-
-    <!-- section 4/Chat Section -->
-<section>
-        <div class="bg-website-main1 flex flex-col min-h-screen">
-
-        
-    <div class="flex w-full justify-center items-center p-3">
-        <p class="mt-[20px] text-[45px] tracking-[3px] text-white font-bold flex-grow text-center">Connect with Us!</p>
-    </div>
-
-<div class="flex flex-row items-center">
-            <!-- image -->
-    <div class="ml-[50px] mt-[100px] mr-auto w-1/2 max-w-xl">
-        <img src="/storage/images/chat_img_homepage.jpeg" class ="mt-6 w-full h-[390px] object-cover rounded-[20px]"/>
-    </div>
-
-    <div class=" w-1/2 ml-auto flex-col h-1/2">
-            <p class="text-white text-[30px] text-center mr-[50px]">
-            Chat us using this website. Inquiries and feedback are accepted
-             and to further reach us please refer to our contact information.
-            </p>
-            <img src="/storage/images/chat_icon.png" 
-            class =" mx-auto mt-[90px] w-[88px] h-[120px] object-cover"
-            @click="goTochatPage"/>
-            
-    </div>
-</div>
-</div>
-
-    </section>
 
     <section>
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
