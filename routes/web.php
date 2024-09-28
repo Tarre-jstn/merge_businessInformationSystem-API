@@ -4,6 +4,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GetIdController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -53,6 +54,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/BusinessInfo', function () {
         return Inertia::render('BusinessInfo');
     })->name('BusinessInfo');
+
+    Route::get('/user-id', [GetIdController::class, 'getUserId']);
+    Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -28,9 +28,22 @@ try {
     const response = await axios.get('/api/Business');
     console.log("API Response:", response.data);
 
+    //get the logged in user's user_id
+    const response_userId = await axios.get('/user-id');
+    const userId = response_userId.data.user_id;
+    
+    //with the user_id got, check its fk usage in business table to get business_id
+    const getBusinessInfo = await axios.get('/api/business_info', {
+            params: {user_id: userId}
+    });
+    const businessId = getBusinessInfo.data.business_id;
+
     if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-        const businessData = response.data[0];
-        business.value = {
+        
+            const businessData = response.data.find(data=>data.business_id === businessId);
+        
+            if(businessData){
+            business.value = {
             business_id: businessData.business_id,
             name: businessData.business_Name,
             email: businessData.business_Email,
@@ -44,9 +57,9 @@ try {
             x: businessData.business_X,
             instagram: businessData.business_Instagram,
             tiktok: businessData.business_Tiktok,
-            image: businessData.business_image, // This should be the image filename or URL
-        };
-
+            image: businessData.business_image,
+            };
+        }
         // Set profile picture or default if not available
         profilePicture.value = businessData.business_image 
         ? `/storage/business_logos/${businessData.business_image}` 
@@ -403,4 +416,3 @@ methods: {
 },
 };
 </script>
-

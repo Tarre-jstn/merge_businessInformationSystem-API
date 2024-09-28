@@ -36,14 +36,8 @@ Route::get('/Business', [BusinessController::class, 'show']);
 Route::post('/Business', [BusinessController::class, 'store']);
 Route::put('/Business/{id}', [BusinessController::class, 'update']);
 Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
+Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 
-
-
-
-/*Route::get('/categories', [CategoryController::class, 'index']);
-Route::post('/categories', [CategoryController::class, 'store']);
-Route::put('/categories/{category}', [CategoryController::class, 'update']);
-Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);*/
 
 Route::apiResource('categories', CategoryController::class);
 
