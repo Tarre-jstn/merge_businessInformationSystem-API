@@ -13,8 +13,14 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Montserrat','Figtree', ...defaultTheme.fontFamily.sans],
+
             },
+            colors: {
+                'business-website-header': '#667984',
+                'website-main': '#1a202c',
+                'website-main1': '#1A518A',
+            }
         },
     },
 
