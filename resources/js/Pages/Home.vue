@@ -20,6 +20,33 @@
                                     <th>Sold</th>
                                     <th>Stock</th>
                                 </tr>
+                                <tr v-for="product in filteredProducts" :key="product.id">
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.id }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                        <img :src="'/storage/' + product.image" alt="Product Image" class="w-12 h-12 object-cover"/>
+                                    </td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.name }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.price }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.category }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.stock }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.sold }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                            <span :class="{
+                                                'bg-red-500 text-white py-1 px-3 rounded-full': product.status === 'Unlisted',
+                                                'bg-green-500 text-white py-1 px-3 rounded-full': product.status === 'Listed',
+                                                'bg-gray-500 text-white py-1 px-3 rounded-full': product.status === 'Out of Stock',
+                                            }">{{ product.status }}</span>
+                                    </td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex space-x-4">
+                                        <button @click="editProductDetails(product)" class="bg-yellow-500 text-white p-3 rounded-full">
+                                            <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                        </button>
+                                        <button @click="deleteProduct(product.id)" class="bg-red-500 text-white p-3 rounded-full">
+                                            <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
+                                        </button>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td>You</td>
                                     <td>You</td>
@@ -93,6 +120,78 @@ import DoughnutChart from '@/Components/DoughnutChart.vue';
 import VueCal from 'vue-cal';
 import 'vue-cal/dist/vuecal.css';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import { ref, computed } from 'vue';
+import axios from 'axios';
+import CategoriesModal from "@/Components/CategoriesModal.vue";
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+
+const products = ref([]);
+const showAddProductModal = ref(false);
+const showCategoriesModal = ref(false);
+const showEditProductModal = ref(false);
+const listedCategories = ref([]);
+const searchQuery = ref('');
+
+const newProduct = ref({
+    name: '',
+    price: 0,
+    category: '',
+    stock: 0,
+    sold: 0,
+    status: '',
+    expDate: '',
+    image: null,
+});
+
+const editProduct = ref({
+    id: null,
+    name: '',
+    price: 0,
+    category: '',
+    stock: 0,
+    sold: 0,
+    status: '',
+    expDate: '',
+    image: null,
+});
+
+const fetchProducts = async () => {
+    try {
+        const response = await axios.get('/api/products');
+        products.value = response.data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+};
+
+const fetchListedCategories = async () => {
+    try {
+        const response = await axios.get('/api/categories');
+        listedCategories.value = response.data.filter(category => category.status === 'listed');
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+};
+
+const addProduct = async () => {
+    try {
+        const formData = new FormData();
+        for (const key in newProduct.value) {
+            formData.append(key, newProduct.value[key]);
+        }
+        const response = await axios.post('/api/products', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        products.value.push(response.data);
+        showAddProductModal.value = false;
+        resetNewProduct();
+    } catch (error) {
+        console.error("Error adding product:", error);
+    }
+};
+
 
 export default {
     name: 'App',
