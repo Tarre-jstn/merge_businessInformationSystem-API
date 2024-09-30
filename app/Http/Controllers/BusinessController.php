@@ -40,10 +40,10 @@ class BusinessController extends Controller
             'business_Address' => 'required|string|max:255',
             'business_Phone_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
-            'business_Facebook' => 'required|string|max:255',
-            'business_X' => 'required|string|max:255',
-            'business_Instagram' => 'required|string|max:255',
-            'business_Tiktok' => 'required|string|max:255'
+            'business_Facebook' => 'nullable|string|max:255',
+            'business_X' => 'nullable|string|max:255',
+            'business_Instagram' => 'nullable|string|max:255',
+            'business_Tiktok' => 'nullable|string|max:255'
         ]);
 
         $business_image = null; // Initialize the variable
@@ -109,10 +109,10 @@ class BusinessController extends Controller
             'business_Address' => 'required|string|max:255',
             'business_Phone_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
-            'business_Facebook'=>'required|string|max:255',
-            'business_X'=>'required|string|max:255',
-            'business_Instagram'=>'required|string|max:255',
-            'business_Tiktok'=>'required|string|max:255'
+            'business_Facebook'=>'nullable|string|max:255',
+            'business_X'=>'nullable|string|max:255',
+            'business_Instagram'=>'nullable|string|max:255',
+            'business_Tiktok'=>'nullable|string|max:255'
         ]);
 
         $business = Business::find($id);
