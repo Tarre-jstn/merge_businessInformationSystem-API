@@ -37,6 +37,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Home');
     })->name('home');
 
+    Route::get('/account', function () {
+        return Inertia::render('Customer/Account');
+    })->name('account_settings');
+
     Route::get('/website', function () {
         return Inertia::render('Website');
     })->name('website');
@@ -92,6 +96,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user-id', [GetIdController::class, 'getUserId']);
     Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
 
+    Route::get('/showUser', [ProfileController::class, 'show'])
+    ->name('showUser');
+
+    Route::put('/update_user/{id}', [ProfileController::class, 'update']);
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

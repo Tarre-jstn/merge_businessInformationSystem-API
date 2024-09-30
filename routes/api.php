@@ -3,11 +3,12 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Log;
-
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\User;
 use App\Models\Business;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +38,9 @@ Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
 Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');
 Route::get('/sale-products', [ProductController::class, 'sale_products'])->name('sale_products');
+
+
+
 
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
