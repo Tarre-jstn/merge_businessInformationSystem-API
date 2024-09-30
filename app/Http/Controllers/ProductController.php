@@ -120,4 +120,42 @@ class ProductController extends Controller
             return response()->json(['error' => 'Unable to delete product'], 500);
         }
     }
+
+    public function featured_products(Request $request){
+       
+        $featuredProducts = Product::where('business_id', $request->business_id)
+                            ->where('featured', 'true')->get();
+        if ($featuredProducts->isEmpty()) {
+            return response()->json(['error' => 'No featured products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($featuredProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image
+            ];
+        }
+        return response()->json($productsArray);
+    }
+
+    public function listed_products(Request $request){
+       
+        $listedProducts = Product::where('business_id', $request->business_id)
+                            ->where('status', 'Listed')->get();
+
+        if ($listedProducts->isEmpty()) {
+            return response()->json(['error' => 'No on sale products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($listedProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image,
+                'product_desc' => $product->description
+            ];
+        }
+        return response()->json($productsArray);
+    }
 }

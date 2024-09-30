@@ -28,22 +28,9 @@ try {
     const response = await axios.get('/api/Business');
     console.log("API Response:", response.data);
 
-    //get the logged in user's user_id
-    const response_userId = await axios.get('/user-id');
-    const userId = response_userId.data.user_id;
-    
-    //with the user_id got, check its fk usage in business table to get business_id
-    const getBusinessInfo = await axios.get('/api/business_info', {
-            params: {user_id: userId}
-    });
-    const businessId = getBusinessInfo.data.business_id;
-
     if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-        
-            const businessData = response.data.find(data=>data.business_id === businessId);
-        
-            if(businessData){
-            business.value = {
+        const businessData = response.data[0];
+        business.value = {
             business_id: businessData.business_id,
             name: businessData.business_Name,
             email: businessData.business_Email,
@@ -51,15 +38,15 @@ try {
             city: businessData.business_City,
             barangay: businessData.business_Barangay,
             address: businessData.business_Address,
-            phone_number: businessData.business_Phone_Number,
+            phone_number: businessData.business_Contact_Number,
             telephone_number: businessData.business_Telephone_Number,
             facebook: businessData.business_Facebook,
             x: businessData.business_X,
             instagram: businessData.business_Instagram,
             tiktok: businessData.business_Tiktok,
-            image: businessData.business_image,
-            };
-        }
+            image: businessData.business_image, // This should be the image filename or URL
+        };
+
         // Set profile picture or default if not available
         profilePicture.value = businessData.business_image 
         ? `/storage/business_logos/${businessData.business_image}` 
@@ -84,7 +71,7 @@ if (file) {
     profilePicture.value = URL.createObjectURL(file);  // Display selected image preview
     business.value.image = file;  // Store the file to be sent to the backend
 } else {
-    profilePicture.value = '/storage/business_logos/default-profile.jpg';  // Default image fallback
+    profilePicture.value = '/storage/business_logos/default-profile.png';  // Default image fallback
     business.value.image = null;
 }
 };
@@ -121,7 +108,7 @@ formData.append('business_Province', business.value.province.trim());
 formData.append('business_City', business.value.city.trim());
 formData.append('business_Barangay', business.value.barangay.trim());
 formData.append('business_Address', business.value.address.trim());
-formData.append('business_Phone_Number', business.value.phone_number.trim());
+formData.append('business_Contact_Number', business.value.phone_number.trim());
 formData.append('business_Telephone_Number', business.value.telephone_number.trim());
 formData.append('business_Facebook', business.value.facebook.trim());
 formData.append('business_X', business.value.x.trim());

@@ -14,9 +14,13 @@ const businessInfo = {
     business_Tiktok: ref(''),
     businessDescription: ref(''),
     businessDetails: ref(''), 
-    homePageImage: ref('')
+    homePageImage: ref(''),
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref('')
 }
 
+let isLoading = ref(true);
 
 const textAreas = {
     about_us1: ref(''),
@@ -37,8 +41,15 @@ const textAreas = {
     website_footNote: ref('')
 }
 
+const feature_toggle=ref('');
+const onSale_toggle=ref('');
+
 function logout(button){
     Inertia.post(route('logout'), {button});
+}
+
+function account(){
+    Inertia.visit(route('account_settings'));
 }
 
 onMounted(()=>{
@@ -59,12 +70,18 @@ async function getWebsiteInfo(){
         
         console.log('Website data: ',getWebsiteInfo1.data);
 
-        const imgBusinessUrl = `/storage/${getBusinessInfo.data.business_image}`;
-        businessInfo.businessImage.value = imgBusinessUrl;
+        businessInfo.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+       
+
         businessInfo.businessName.value = getBusinessInfo.data.business_Name;
         businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
         businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
         businessInfo.business_Address.value = getBusinessInfo.data.business_Address;
+
+        businessInfo.business_Province.value = getBusinessInfo.data.business_Province;
+        businessInfo.business_City.value = getBusinessInfo.data.business_City;
+        businessInfo.business_Barangay.value = getBusinessInfo.data.business_Barangay;
+
 
         businessInfo.business_Facebook.value = getBusinessInfo.data.business_Facebook;
         businessInfo.business_X.value = getBusinessInfo.data.business_X;
@@ -135,11 +152,19 @@ function goTochatPage(){
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a>Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
+                    <a class="text-white text-[18px]">Products & Services</a>
                     <a class="text-white text-[18px]">About Us</a>
                     <p>|</p>
-                    <button @click="logout('register')" class="text-white">Register</button>
-                    <button @click="logout('logout')" class="cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
+                    <div class="flex flex-col">
+                        <a @click="links('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
+                    </div> 
+                    <div class="w-[50px] h-[50px]">
+                        <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
+                        <img v-else-if="businessInfo.businessImage.value" :src='businessInfo.businessImage.value' alt="Logo" />
+                        <img v-else src='/storage/business_logos/default-profile.png'/>
+                    </div>
+                    
                 </div>
         </div>
 
@@ -223,7 +248,8 @@ function goTochatPage(){
 </section>
 
     <!-- section 3/EditWebsite3 -->
-    <section>
+    
+    <section v-if="feature_toggle==='true'">
         <div class=" bg-website-main flex min-h-screen relative" style="min-height: calc(100vh + 100px);">
 
 <div class="flex flex-col items-center p-3 absolute top-[10px] left-0 right-0 bottom-[500px] m-auto">
@@ -283,6 +309,7 @@ function goTochatPage(){
 
     <!-- section 4/Chat Section -->
 <section>
+    <div class="bg-website-main h-[10px] w-full"></div>
         <div class="bg-website-main1 flex flex-col min-h-screen">
 
         
@@ -340,6 +367,8 @@ function goTochatPage(){
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>
         <p class="text-white">Contact No.: {{ businessInfo.business_Contact_Number }} </p>
         <p class="text-white">Address: {{ businessInfo.business_Address }} </p>
+        <p class="text-white">{{ businessInfo.business_Province }}, 
+            {{ businessInfo.business_City }}, {{ businessInfo.business_Barangay }}  </p>
     </div>
 </div>
 </div>
@@ -356,7 +385,7 @@ function goTochatPage(){
 </template>
 <style>
 .icon-color {
-    background-color: #306091; 
+    background-color: #306091; /* Replace with your desired color */
 }
 .fa.fa-twitter{
 	font-family:sans-serif;
