@@ -140,10 +140,10 @@ import { Head } from '@inertiajs/vue3';
     formData.append('business_Address', business.value.address.trim());
     formData.append('business_Phone_Number', business.value.phone_number.trim());
     formData.append('business_Telephone_Number', business.value.telephone_number.trim());
-    formData.append('business_Facebook', business.value.facebook.trim());
-    formData.append('business_X', business.value.x.trim());
-    formData.append('business_Instagram', business.value.instagram.trim());
-    formData.append('business_Tiktok', business.value.tiktok.trim());
+    formData.append('business_Facebook', business.value.facebook);
+    formData.append('business_X', business.value.x);
+    formData.append('business_Instagram', business.value.instagram);
+    formData.append('business_Tiktok', business.value.tiktok);
 
     if (business.value.image instanceof File) {
         formData.append('business_image', business.value.image);
