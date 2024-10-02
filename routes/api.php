@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Business;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\csrfController;
+use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,17 +25,30 @@ Route::get('/all-business', function(){
     return Business::all();
 });
 
+
+Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 Route::post('/website', [WebsiteController::class, 'store']);
 Route::get('/website', [WebsiteController::class, 'info']);
 Route::post('/website-update', [WebsiteController::class, 'update']);
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);
-Route::get('products/{id}', [ProductController::class, 'show']);
 Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-//Dedicated for seniorPWD_discoubtable
-Route::put('/products/{id}/discountable', [ProductController::class, 'updateDiscountable']);
+Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
+Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');
+Route::get('/sale-products', [ProductController::class, 'sale_products'])->name('sale_products');
+
+Route::post('/business_info', [BusinessController::class, 'store']);
+Route::put('/business_info/{id}', [BusinessController::class, 'update']);
+Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+
+
+
+/*Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store']);
+Route::put('/categories/{category}', [CategoryController::class, 'update']);
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);*/
 
 
 Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
@@ -50,6 +63,7 @@ Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+
 
 Route::apiResource('categories', CategoryController::class);
 

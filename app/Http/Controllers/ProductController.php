@@ -52,6 +52,9 @@ class ProductController extends Controller
         return response()->json(['product' => $product], 200);
     }
 
+
+
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -84,27 +87,6 @@ class ProductController extends Controller
 
         return response()->json(['product' => $product], 200);
     }
-
-
-
-
-    //Dedicated for seniorPWD_discoubtable 
-    public function updateDiscountable(Request $request, $id)
-{
-    // Validate only the seniorPWD_discountable field
-    $validated = $request->validate([
-        'seniorPWD_discountable' => 'required|in:yes,no',
-    ]);
-
-    // Find the product
-    $product = Product::findOrFail($id);
-
-    // Update only the seniorPWD_discountable field
-    $product->seniorPWD_discountable = $validated['seniorPWD_discountable'];
-    $product->save();
-
-    return response()->json(['message' => 'Discountable status updated successfully.'], 200);
-}
 
 
 
@@ -158,4 +140,27 @@ class ProductController extends Controller
         }
         return response()->json($productsArray);
     }
+
+
+    public function sale_products(Request $request){
+       
+        $saleProducts = Product::where('business_id', $request->business_id)
+                            ->where('on_sale', 'yes')->get();
+
+        if ($saleProducts->isEmpty()) {
+            return response()->json(['error' => 'No on sale products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($saleProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image,
+                'product_price' => $product->on_sale_price
+            ];
+        }
+        return response()->json($productsArray);
+    }
+
+}
 }

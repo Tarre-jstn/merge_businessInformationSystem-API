@@ -16,35 +16,34 @@ const businessInfo = {
     website_footNote: ref('')
 }
 
-
 const textAreas = reactive({
     card1: '',
     card1_img: '',
-    card1_desc: '',
+    card1_price: '',
     card2: '',
     card2_img: '',
-    card2_desc: '',
+    card2_price: '',
     card3: '',
     card3_img: '',
-    card3_desc: '',
+    card3_price: '',
     card4: '',
     card4_img: '',
-    card4_desc: '',
+    card4_price: '',
     card5: '',
     card5_img: '',
-    card5_desc: '',
+    card5_price: '',
     card6: '',
     card6_img: '',
-    card6_desc: '',
+    card6_price: '',
     card7: '',
     card7_img: '',
-    card7_desc: '',
+    card7_price: '',
     card8: '',
     card8_img: '',
-    card8_desc: '',
+    card8_price: '',
     card9: '',
     card9_img: '',
-    card9_desc: '',
+    card9_price: '',
     website_footNote: ''
 });
 
@@ -96,21 +95,24 @@ async function getWebsiteInfo(){
 
         businessInfo.website_footNote.value = getWebsiteInfo1.data.website_footNote;
 
-        const getProductsInfo = await axios.get('/api/listed-products', {
+        const getProductsInfo = await axios.get('/api/sale-products', {
             params: {business_id: 1}
         });
 
-        const listedProducts = getProductsInfo.data
-        lengthArray.value = listedProducts.length;
-        
-        listedProducts.forEach((product, index) => {
+        const saleProducts = getProductsInfo.data;
+        lengthArray.value = saleProducts.length;
+
+        if(saleProducts){
+        saleProducts.forEach((product, index) => {
+            console.log('imgPath: '+product.product_img);
             const imgPath = product.product_img.replace('products/', '');
+
             
             if(!next.value){
                     if(index<9){
                     textAreas[`card${index+1}`] = product.product_name;
                     textAreas[`card${index+1}_img`] = imgPath;
-                    textAreas[`card${index+1}_desc`]=product.product_desc;
+                    textAreas[`card${index+1}_price`]=product.product_price;
                     }
 
             }else{
@@ -118,15 +120,18 @@ async function getWebsiteInfo(){
                 for(let i=1;i<=9;i++){
                     textAreas[`card${i}`] = '';
                     textAreas[`card${i}_img`] = '';
-                    textAreas[`card${i}_desc`]='';
+                    textAreas[`card${i}_price`]='';
                 }
                 if(index>=9&&index<=17){
                 textAreas[`card${index-8}`] = product.product_name;
                 textAreas[`card${index-8}_img`] = imgPath;
-                textAreas[`card${index-8}_desc`]=product.product_desc;
+                textAreas[`card${index-8}_price`]=product.product_desc;
                 }
             }
         });
+        }else{
+            alert("There are currently no on SALE products.");
+        }
     
     }catch(error){
         console.error('There was an error fetching the data:', error);
@@ -150,8 +155,9 @@ function goTochatPage(){
                     <a class="text-black text-[18px]">Products & Services</a>
                     <a class="text-white text-[18px]" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    
-                  </div>
+                    <button @click="logout('register')" class="text-white">Register</button>
+                    <button @click="logout('logout')" class=" cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
+                </div>
         </div>
 
        
@@ -162,30 +168,24 @@ function goTochatPage(){
         <div class=" bg-website-main flex min-h-screen relative" style="min-height: calc(100vh + 800px);">
 
 <div class="flex flex-col items-center p-3 absolute top-[10px] left-0 right-0 bottom-[500px] m-auto">
-    <p class="mt-[30px] text-[40px]  text-white font-bold  text-center">Products</p>
-    <p class="mt-[10px] text-[20px]  text-white  text-center">
-        A list of all the quality products provided. 
-        Best prices and quality guaranteed.
-    </p>
-    <a class="mt-[10px] text-[20px] text-white  text-center" :href="route('sale')"><u>Check out our on SALE products</u></a>
+    <p class="mt-[30px] text-[40px]  text-white font-bold  text-center">SALE Products</p>
 </div>
 
-<div class=" mt-[30px] mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">
+<div class=" mt-8 mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">
     
     <div class="block flex flex-row gap-9">
     <!-- card 1 -->
         <div v-if="textAreas.card1_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            
             <img :src="`/storage/products/${textAreas.card1_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card1}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card1_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card1_price}}</p>
         </div>
 
      <!-- card 2 -->
      <div v-if="textAreas.card2_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card2_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card2}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card2_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card2_price}}</p>
         </div>
     
 
@@ -193,7 +193,7 @@ function goTochatPage(){
     <div v-if="textAreas.card3_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card3_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card3}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card3_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card3_price}}</p>
         </div>
     </div>
 
@@ -202,23 +202,21 @@ function goTochatPage(){
     <div v-if="textAreas.card4_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card4_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card4}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card4_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card4_price}}</p>
         </div>
 
     <!-- card 5 -->
     <div v-if="textAreas.card5_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card5_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card5}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card5_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card5_price}}</p>
         </div>
 
     <!-- card 6 -->
     <div v-if="textAreas.card6_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card6_img}`" class="w-full h-4/5 object-cover"/>
-            
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card6}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card6_desc}}</p>
-          
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card6_price}}</p>
         </div> 
     </div>
 
@@ -228,25 +226,25 @@ function goTochatPage(){
         <div v-if="textAreas.card7_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card7_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card7}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card7_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card7_price}}</p>
         </div> 
 
         <!-- card 8 -->
         <div v-if="textAreas.card8_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card8_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card8}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card8_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card8_price}}</p>
         </div> 
 
         <!-- card 9 -->
         <div v-if="textAreas.card9_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
             <img :src="`/storage/products/${textAreas.card9_img}`" class="w-full h-4/5 object-cover"/>
             <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card9}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card9_desc}}</p>
+            <p class="text-black text-[18px] text-center">Price: <i class="fa-solid fa-peso-sign"></i>{{textAreas.card9_price}}</p>
         </div> 
 
     </div>
-    <div>
+    <div class="block mx-auto">
         <button @click="showMore" class="cursor-pointer bg-white border border-white rounded-sm py-6 px-9">Show More</button>
         
     </div>
