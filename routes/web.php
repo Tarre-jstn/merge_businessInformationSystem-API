@@ -37,9 +37,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Home');
     })->name('home');
 
+    Route::get('/homepage', function () {
+        return Inertia::render('Customer/Homepage');
+    })->name('homepage');
+
     Route::get('/website', function () {
         return Inertia::render('Website');
     })->name('website');
+
+    Route::get('/account', function () {
+        return Inertia::render('Customer/Account');
+    })->name('account_settings');
 
     Route::get('/chats', function () {
         return Inertia::render('Chats');
@@ -72,6 +80,30 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/aboutUs_page', function () {
         return Inertia::render('Customer/AboutUs');
     })->name('aboutUs_page');
+
+    Route::get('/editWebsite1', function () {
+        return Inertia::render('EditWebsite1');
+    })->name('editWebsite1');
+
+    Route::get('/editWebsite2', function () {
+        return Inertia::render('EditWebsite2');
+    })->name('editWebsite2');
+
+    Route::get('/editWebsite3', function () {
+        return Inertia::render('EditWebsite3');
+    })->name('editWebsite3');
+
+    Route::get('/editWebsite4', function () {
+        return Inertia::render('EditWebsite4');
+    })->name('editWebsite4');
+
+    Route::get('/preview-homepage', function () {
+        return Inertia::render('Preview_Homepage');
+    })->name('preview_homepage');
+
+    Route::get('/products_page', function () {
+        return Inertia::render('Customer/Products');
+    })->name('products_page');
 
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');

@@ -150,9 +150,8 @@ function goTochatPage(){
                     <a class="text-black text-[18px]">Products & Services</a>
                     <a class="text-white text-[18px]" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <button @click="logout('register')" class="text-white">Register</button>
-                    <button @click="logout('logout')" class=" cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
-                </div>
+                    
+                  </div>
         </div>
 
        

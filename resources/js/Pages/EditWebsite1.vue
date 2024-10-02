@@ -58,11 +58,11 @@ async function getWebsiteInfo(){
         });
         console.log(getWebsiteInfo.data);
 
-        textAreas.businessImage.value = getBusinessInfo.data.business_image;
+        textAreas.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
         textAreas.businessName.value = getBusinessInfo.data.business_Name;
         textAreas.businessDescription.value = getWebsiteInfo.data.website_description;
         textAreas.businessDetails.value = getWebsiteInfo.data.website_details;
-        const imgUrl = `/storage/${getWebsiteInfo.data.website_image}`;
+        let imgUrl = `/storage/${getWebsiteInfo.data.website_image}`;
         // storage/app/public//app/public/images
         textAreas.homePageImage.value=imgUrl;
     }catch(error){
@@ -103,7 +103,7 @@ async function save(){
                 'Content-Type': 'multipart/form-data'
             }
         });
-        }
+        }uploadedFile=null;
     const saveBusinessDesc = await axios.post('/api/website-update', formData, {
         headers:{
             'Content-Type': 'multipart/form-data'
@@ -148,7 +148,7 @@ function goToEditWebsite2(){
         <!-- header of business editable template-->
         <div class="ml-1 bg-business-website-header flex items-center p-2">
             <div class="ml-6 w-10 h-10">
-                <img src="https://picsum.photos/200" class="w-full h-full object-cover rounded-full"/>
+                <img :src='textAreas.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-4 ">
                     <a>Home</a>

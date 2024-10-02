@@ -44,6 +44,12 @@ class AuthenticatedSessionController extends Controller
         return back()->withErrors('Login failed. Please try again.');
     }
 
+    public function show(Request $request){
+        $user = Auth::user();
+        return $user;
+    }
+
+   
     /**
      * Destroy an authenticated session.
      */
