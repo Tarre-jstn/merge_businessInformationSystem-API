@@ -152,7 +152,7 @@ function goTochatPage(){
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a>Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]">Products & Services</a>
+                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
                     <a class="text-white text-[18px]">About Us</a>
                     <p>|</p>
                     <div class="flex flex-col">

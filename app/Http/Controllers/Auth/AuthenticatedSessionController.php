@@ -49,6 +49,7 @@ class AuthenticatedSessionController extends Controller
         return $user;
     }
 
+   
     /**
      * Destroy an authenticated session.
      */

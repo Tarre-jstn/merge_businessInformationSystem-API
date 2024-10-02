@@ -41,9 +41,9 @@ class BusinessController extends Controller
         'business_Address' => 'required|string|max:255',
         'business_Contact_Number' => 'required|string|max:255',
         'business_Telephone_Number' => 'required|string|max:255',
-        'business_Facebook'=>'nullable|url',
-        'business_X'=>'nullable|url',
-        'business_Instagram'=>'nullable|url'
+        'business_Facebook'=>'nullable|string|max:255',
+        'business_X'=>'nullable|string|max:255',
+        'business_Instagram'=>'nullable|string|max:255'
         ]);
 
         Log::info("Request validation successfully.");
@@ -113,10 +113,10 @@ class BusinessController extends Controller
             'business_Address' => 'required|string|max:255',
             'business_Contact_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
-            'business_Facebook'=>'required|string|max:255',
-            'business_X'=>'required|string|max:255',
-            'business_Instagram'=>'required|string|max:255',
-            'business_Tiktok'=>'required|string|max:255'
+            'business_Facebook'=>'nullable|string|max:255',
+            'business_X'=>'nullable|string|max:255',
+            'business_Instagram'=>'nullable|string|max:255',
+            'business_Tiktok'=>'nullable|string|max:255'
         ]);
 
         $business = Business::find($id);
