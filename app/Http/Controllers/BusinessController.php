@@ -19,6 +19,8 @@ class BusinessController extends Controller
      */
     public function index()
 {
+    $Business = Business::where('user_id', auth()->id())->first(); 
+    return response()->json($Business);
     // $Business = Business::where('user_id', auth()->id())->first(); 
     // return response()->json($Business);
 }
@@ -31,6 +33,21 @@ class BusinessController extends Controller
 {
     try {
         $request->validate([
+            'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'business_Name' => 'required|string|max:255',
+            'business_Email' => 'required|string|lowercase|email|max:255',
+            'business_Province' => 'required|string|max:255',
+            'business_City' => 'required|string|max:255',
+            'business_Barangay' => 'required|string|max:255',
+            'business_Address' => 'required|string|max:255',
+            'business_Contact_Number' => 'required|string|max:255',
+            'business_Telephone_Number' => 'required|string|max:255',
+            'business_Facebook' => 'nullable|string|max:255',
+            'business_X' => 'nullable|string|max:255',
+            'business_Instagram' => 'nullable|string|max:255',
+            'business_Tiktok' => 'nullable|string|max:255'
+        ]);
+
         'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'user_id' => 'required|numeric|exists:users,id',
         'business_Name' => 'required|string|max:255',
@@ -56,7 +73,12 @@ class BusinessController extends Controller
             // Get the basename of the stored file path
             $business_image = basename($path);
         }
-
+        // Ensure the user is of type 'owner' before creating the business
+        if ($request->user_id) {
+            $user = User::find($request->user_id);
+            if ($user->user_type == 'owner') {
+                $Business = Business::create([
+                    'business_image' => $business_image,  // Save the image path here
         
         // Ensure the user is of type 'owner' before creating the business
         if ($request->user_id) {
@@ -79,6 +101,7 @@ class BusinessController extends Controller
                     'business_Instagram' => $request->business_Instagram,
                     'business_Tiktok' => $request->business_Tiktok
                 ]);
+                return response()->json(['success' => true, 'business' => $Business], 201);
                 Log::info("Created record success");
                 return response()->json(['success' => true, 'business' => $business], 201);
             }
@@ -164,6 +187,7 @@ class BusinessController extends Controller
             'success' => (bool) $business->delete()
         ];
     }
+
 
     public function showBusiness(Request $request){
         $user_id = $request->query('user_id');
