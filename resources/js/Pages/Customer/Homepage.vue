@@ -191,7 +191,7 @@ function goTochatPage(){
                 <div class="mt-[90px] flex flex-row">
                     <button @click="logout('register')" class="mr-[20px] cursor-pointer bg-white border border-white rounded-sm py-[8px] px-[70px]">Register</button>
                     <p class="text-white text-xl">|</p>
-                    <a class="ml-[35px] justify-center text-white text-[18px]">See All Products</a>
+                    <a class="ml-[35px] justify-center text-white text-[18px]" :href="route('products_page')">See All Products</a>
                 </div>
             </div>
 

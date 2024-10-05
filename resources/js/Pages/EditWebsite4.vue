@@ -47,8 +47,7 @@ async function getWebsiteInfo(){
         });
         console.log(getWebsiteInfo.data);
 
-        const imgUrl = `/storage/${getBusinessInfo.data.business_image}`;
-        textAreas.businessImage.value=imgUrl;
+        textAreas.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
         // textAreas.businessImage.value = getBusinessInfo.data.business_image;
         textAreas.businessName.value = getBusinessInfo.data.business_Name;
         textAreas.business_Email.value = getBusinessInfo.data.business_Email;
@@ -124,7 +123,9 @@ async function save(){
             <!-- FootNote -->
             <div class="mr-auto mt-40 ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
                 <div class="max-w-[50px]">
-                    <img :src='textAreas.businessImage.value' class="w-full h-full object-cover rounded-full"/>
+                    <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
+                    <img v-else-if="textAreas.businessImage.value" :src='textAreas.businessImage.value' alt="Logo"  class="w-[50px] h-[50px] object-cover rounded-full" />
+                    <img v-else src='/storage/business_logos/default-profile.png'/>
                 </div>
 
                 <div class="mt-5">

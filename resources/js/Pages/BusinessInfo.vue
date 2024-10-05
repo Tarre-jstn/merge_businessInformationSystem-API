@@ -277,7 +277,7 @@ import { Head } from '@inertiajs/vue3';
                                     type="text"
                                     id="phone-number"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    v-model="business_Contact_Number"
+                                    v-model="business.phone_number"
                                 >
                             </div>
                         </div>
