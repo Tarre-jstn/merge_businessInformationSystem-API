@@ -141,6 +141,7 @@ class ProductController extends Controller
         return response()->json($productsArray);
     }
 
+
     public function sale_products(Request $request){
        
         $saleProducts = Product::where('business_id', $request->business_id)
@@ -161,4 +162,5 @@ class ProductController extends Controller
         return response()->json($productsArray);
     }
 
+}
 }

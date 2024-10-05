@@ -18,7 +18,10 @@ const textAreas = {
     business_Facebook: ref(''),
     business_X: ref(''),
     business_Instagram: ref(''),
-    business_Tiktok: ref('')
+    business_Tiktok: ref(''),
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref('')
 }
 
 onMounted(()=>{
@@ -50,7 +53,11 @@ async function getWebsiteInfo(){
         textAreas.businessName.value = getBusinessInfo.data.business_Name;
         textAreas.business_Email.value = getBusinessInfo.data.business_Email;
         textAreas.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
+        
         textAreas.business_Address.value = getBusinessInfo.data.business_Address;
+        textAreas.business_Province.value = getBusinessInfo.data.business_Province;
+        textAreas.business_City.value = getBusinessInfo.data.business_City;
+        textAreas.business_Barangay.value = getBusinessInfo.data.business_Barangay;
 
         textAreas.business_Facebook.value = getBusinessInfo.data.business_Facebook;
         textAreas.business_X.value = getBusinessInfo.data.business_X;
@@ -144,6 +151,8 @@ async function save(){
                     <p class="text-white mt-[10px]">Email: {{ textAreas.business_Email }} </p>
                     <p class="text-white">Contact No.: {{ textAreas.business_Contact_Number }} </p>
                     <p class="text-white">Address: {{ textAreas.business_Address }} </p>
+                    <p class="text-white">{{ textAreas.business_Province }}, 
+                        {{ textAreas.business_City }}, {{ textAreas.business_Barangay }}  </p>
                 </div>
             </div>
         </div>
