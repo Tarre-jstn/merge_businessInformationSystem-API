@@ -23,7 +23,9 @@ class Website extends Model
         'about_us1',
         'about_us2',
         'about_us3',
-        'website_footNote'
+        'website_footNote',
+        'featured_section',
+        'onSale_section'
         
     ];
 

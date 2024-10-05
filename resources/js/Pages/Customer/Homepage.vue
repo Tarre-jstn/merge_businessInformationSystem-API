@@ -94,7 +94,8 @@ async function getWebsiteInfo(){
         businessInfo.homePageImage.value=imgUrl;
 
         
-       
+        feature_toggle.value = getWebsiteInfo1.data.featured_section;
+        onSale_toggle.value = getWebsiteInfo1.data.onSale_section;
         textAreas.about_us1.value = getWebsiteInfo1.data.about_us1;
         textAreas.about_us2.value = getWebsiteInfo1.data.about_us2;
         textAreas.about_us3.value = getWebsiteInfo1.data.about_us3;
@@ -156,7 +157,7 @@ function goTochatPage(){
                     <a class="text-white text-[18px]":href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
                     <div class="flex flex-col">
-                        <a @click="links('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
                     </div> 
                     <div class="w-[50px] h-[50px]">

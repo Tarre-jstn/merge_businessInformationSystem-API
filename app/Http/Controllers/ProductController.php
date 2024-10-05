@@ -163,4 +163,4 @@ class ProductController extends Controller
     }
 
 }
-}
+

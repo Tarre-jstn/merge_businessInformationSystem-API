@@ -16,7 +16,9 @@ const businessInfo = {
     website_footNote: ref('')
 }
 
-
+function account(){
+    Inertia.visit(route('account_settings'));
+}
 const textAreas = reactive({
     card1: '',
     card1_img: '',
@@ -47,7 +49,7 @@ const textAreas = reactive({
     card9_desc: '',
     website_footNote: ''
 });
-
+const onSale_toggle=ref('');
 const next = ref(false);
 const lengthArray = ref(null);
 
@@ -94,6 +96,7 @@ async function getWebsiteInfo(){
         businessInfo.business_Instagram.value = getBusinessInfo.data.business_Instagram;
         businessInfo.business_Tiktok.value = getBusinessInfo.data.business_Tiktok;
 
+        onSale_toggle.value = getWebsiteInfo1.data.onSale_section;
         businessInfo.website_footNote.value = getWebsiteInfo1.data.website_footNote;
 
         const getProductsInfo = await axios.get('/api/listed-products', {
@@ -144,14 +147,23 @@ function goTochatPage(){
             <div class="ml-[50px] w-[50px] h-[50px]">
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
-                <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a class="text-white text-[18px]":href="route('homepage')">Home</a>
+            <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
+                    <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
                     <a class="text-black text-[18px]">Products & Services</a>
-                    <a class="text-white text-[18px]" :href="route('aboutUs_page')">About Us</a>
+                    <a class="text-white text-[18px]":href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
+                    <div class="flex flex-col">
+                        <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
+                    </div> 
+                    <div class="w-[50px] h-[50px]">
+                        <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
+                        <img v-else-if="businessInfo.businessImage.value" :src='businessInfo.businessImage.value' alt="Logo" />
+                        <img v-else src='/storage/business_logos/default-profile.png'/>
+                    </div>
                     
-                  </div>
+                </div>
         </div>
 
        
@@ -167,7 +179,9 @@ function goTochatPage(){
         A list of all the quality products provided. 
         Best prices and quality guaranteed.
     </p>
-    <a class="mt-[10px] text-[20px] text-white  text-center" :href="route('sale')"><u>Check out our on SALE products</u></a>
+    <div v-if="onSale_toggle===true">
+    <a  class="mt-[10px] text-[20px] text-white  text-center" :href="route('sale')"><u>Check out our on SALE products</u></a>
+</div>
 </div>
 
 <div class=" mt-[30px] mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">

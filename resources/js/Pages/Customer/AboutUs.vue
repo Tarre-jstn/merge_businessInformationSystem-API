@@ -17,7 +17,9 @@ const businessInfo = {
     homePageImage: ref('')
 }
 
-
+function account(){
+    Inertia.visit(route('account_settings'));
+}
 const textAreas = {
     about_us1: ref(''),
     about_us2: ref(''),
@@ -84,14 +86,22 @@ async function getWebsiteInfo(){
             <div class="ml-[50px] w-[50px] h-[50px]">
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
-                <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
+            <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
-                    <a class="text-black text-[18px]" :href="route('aboutUs_page')">About Us</a>
+                    <a class="text-black text-[18px]" :href="route('products_page')">Products & Services</a>
+                    <a class="text-white text-[18px]":href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <button @click="logout('register')" class="text-white">Register</button>
-                    <button @click="logout('logout')" class="cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
+                    <div class="flex flex-col">
+                        <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
+                    </div> 
+                    <div class="w-[50px] h-[50px]">
+                        <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
+                        <img v-else-if="businessInfo.businessImage.value" :src='businessInfo.businessImage.value' alt="Logo" />
+                        <img v-else src='/storage/business_logos/default-profile.png'/>
+                    </div>
+                    
                 </div>
         </div>
 

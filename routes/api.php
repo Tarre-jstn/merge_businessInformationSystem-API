@@ -2,9 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\WebsiteController;
 use Illuminate\Support\Facades\Log;
-
 use App\Models\User;
 use App\Models\Business;
 use App\Http\Controllers\business_info_controller;
@@ -42,14 +40,6 @@ Route::get('/sale-products', [ProductController::class, 'sale_products'])->name(
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
-
-
-
-/*Route::get('/categories', [CategoryController::class, 'index']);
-Route::post('/categories', [CategoryController::class, 'store']);
-Route::put('/categories/{category}', [CategoryController::class, 'update']);
-Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);*/
-
 
 Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
 Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');

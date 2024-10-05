@@ -121,9 +121,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('EditWebsite4');
     })->name('editWebsite4');
 
+    Route::get('/BusinessInfo', function () {
+        return Inertia::render('BusinessInfo');
+    })->name('BusinessInfo');
+
     Route::get('/user-id', [GetIdController::class, 'getUserId']);
     Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
-
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

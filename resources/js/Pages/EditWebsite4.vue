@@ -47,7 +47,7 @@ async function getWebsiteInfo(){
         });
         console.log(getWebsiteInfo.data);
 
-        const imgUrl = `/storage/${getBusinessInfo.data.website_image}`;
+        const imgUrl = `/storage/${getBusinessInfo.data.business_image}`;
         textAreas.businessImage.value=imgUrl;
         // textAreas.businessImage.value = getBusinessInfo.data.business_image;
         textAreas.businessName.value = getBusinessInfo.data.business_Name;

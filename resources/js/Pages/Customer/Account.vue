@@ -93,7 +93,7 @@ try {
                     <a class="text-white text-[18px]">About Us</a>
                     <p>|</p>
                     <div class="flex flex-col">
-                        <a @click="links('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
                     </div> 
                     <div class="w-[50px] h-[50px]">
