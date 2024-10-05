@@ -152,8 +152,8 @@ function goTochatPage(){
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a>Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
-                    <a class="text-white text-[18px]":href="route('aboutUs_page')">About Us</a>
+                    <a class="text-white text-[18px]">Products & Services</a>
+                    <a class="text-white text-[18px]">About Us</a>
                     <p>|</p>
                     <div class="flex flex-col">
                         <a @click="links('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
@@ -339,7 +339,7 @@ function goTochatPage(){
     </section>
 
     <section>
-        <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
+        <div class="ml-1 bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
 
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
 <!-- FootNote -->
