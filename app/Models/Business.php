@@ -29,7 +29,7 @@ class Business extends Model
         'business_City',
         'business_Barangay',
         'business_Address',
-        'business_Phone_Number',
+        'business_Contact_Number',
         'business_Telephone_Number',
         'business_Facebook',
         'business_X',
@@ -38,23 +38,6 @@ class Business extends Model
     ];
 }
 
-    // protected static function boot(){
-
-    //     //para ma-run yung general Model setups na nakukuha ng ibang models
-    //     parent::boot();
-
-    //     static::creating (function ($business){
-    //         if(!$business->user_id){
-    //             throw new \Exception('Null user_id field.');
-    //         }else{
-    //         $user = User::find($business->user_id);
-    //         if(!$user || $user->user_type !== "owner"){
-    //             throw new \Exception('The selected user must be an owner.');
-    //         }
-    //     }
-    //     });
-
-    // }
 
     
 

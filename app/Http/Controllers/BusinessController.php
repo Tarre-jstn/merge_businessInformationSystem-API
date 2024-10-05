@@ -21,6 +21,8 @@ class BusinessController extends Controller
 {
     $Business = Business::where('user_id', auth()->id())->first(); 
     return response()->json($Business);
+    // $Business = Business::where('user_id', auth()->id())->first(); 
+    // return response()->json($Business);
 }
 
 
@@ -38,7 +40,7 @@ class BusinessController extends Controller
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
-            'business_Phone_Number' => 'required|string|max:255',
+            'business_Contact_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
             'business_Facebook' => 'nullable|string|max:255',
             'business_X' => 'nullable|string|max:255',
@@ -46,6 +48,22 @@ class BusinessController extends Controller
             'business_Tiktok' => 'nullable|string|max:255'
         ]);
 
+        'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'user_id' => 'required|numeric|exists:users,id',
+        'business_Name' => 'required|string|max:255',
+        'business_Email'=> 'required|string|lowercase|email|max:255|unique:businesses,business_Email',
+        'business_Province' => 'required|string|max:255',
+        'business_City' => 'required|string|max:255',
+        'business_Barangay' => 'required|string|max:255',
+        'business_Address' => 'required|string|max:255',
+        'business_Contact_Number' => 'required|string|max:255',
+        'business_Telephone_Number' => 'required|string|max:255',
+        'business_Facebook'=>'nullable|string|max:255',
+        'business_X'=>'nullable|string|max:255',
+        'business_Instagram'=>'nullable|string|max:255'
+        ]);
+
+        Log::info("Request validation successfully.");
         $business_image = null; // Initialize the variable
 
         if ($request->hasFile('business_image')) {
@@ -55,28 +73,37 @@ class BusinessController extends Controller
             // Get the basename of the stored file path
             $business_image = basename($path);
         }
-
         // Ensure the user is of type 'owner' before creating the business
         if ($request->user_id) {
             $user = User::find($request->user_id);
             if ($user->user_type == 'owner') {
                 $Business = Business::create([
                     'business_image' => $business_image,  // Save the image path here
+        
+        // Ensure the user is of type 'owner' before creating the business
+        if ($request->user_id) {
+            $user = User::find($request->user_id);
+            Log::info("User id found");
+            if ($user->user_type == 'owner') {
+                $business = Business::create([
+                    'business_image' => $business_image,  // Save the image path here
+                    'user_id' => $request->user_id,
                     'business_Name' => $request->business_Name,
                     'business_Email' => $request->business_Email,
                     'business_Province' => $request->business_Province,
                     'business_City' => $request->business_City,
                     'business_Barangay' => $request->business_Barangay,
                     'business_Address' => $request->business_Address,
-                    'business_Phone_Number' => $request->business_Phone_Number,
+                    'business_Contact_Number' => $request->business_Contact_Number,
                     'business_Telephone_Number' => $request->business_Telephone_Number,
                     'business_Facebook' => $request->business_Facebook,
                     'business_X' => $request->business_X,
                     'business_Instagram' => $request->business_Instagram,
                     'business_Tiktok' => $request->business_Tiktok
                 ]);
-
                 return response()->json(['success' => true, 'business' => $Business], 201);
+                Log::info("Created record success");
+                return response()->json(['success' => true, 'business' => $business], 201);
             }
         } else {
             throw new \Exception('The selected user must be an owner.');
@@ -107,7 +134,7 @@ class BusinessController extends Controller
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
-            'business_Phone_Number' => 'required|string|max:255',
+            'business_Contact_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
             'business_Facebook'=>'nullable|string|max:255',
             'business_X'=>'nullable|string|max:255',
@@ -136,7 +163,7 @@ class BusinessController extends Controller
         $business->business_City = $request->input('business_City');
         $business->business_Barangay = $request->input('business_Barangay');
         $business->business_Address = $request->input('business_Address');
-        $business->business_Phone_Number = $request->input('business_Phone_Number');
+        $business->business_Contact_Number = $request->input('business_Contact_Number');
         $business->business_Telephone_Number = $request->input('business_Telephone_Number');
         $business->business_Facebook = $request->input('business_Facebook');
         $business->business_X = $request->input('business_X');
@@ -150,12 +177,6 @@ class BusinessController extends Controller
     }
 
     
-
-
-    
-
-
-
     /**
      * Remove the specified resource from storage.
      */
@@ -167,6 +188,15 @@ class BusinessController extends Controller
         ];
     }
 
+
+    public function showBusiness(Request $request){
+        $user_id = $request->query('user_id');
+        $business = Business::where('user_id', $user_id)->first();
+        if (!$business) {
+            return response()->json(['error' => 'Business record not found'], 404);
+        }
+        return response()->json($business);
+    }
 
 
 }

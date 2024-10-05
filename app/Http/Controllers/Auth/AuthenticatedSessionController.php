@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,9 +34,22 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+        if($user->user_type == 'owner'){
+            return redirect()->intended(route('dashboard', absolute: false));
+        }else if($user->user_type == 'customer'){
+            return redirect()->intended(route('homepage', absolute: false));
+        }
+
+        return back()->withErrors('Login failed. Please try again.');
     }
 
+    public function show(Request $request){
+        $user = Auth::user();
+        return $user;
+    }
+
+   
     /**
      * Destroy an authenticated session.
      */
@@ -47,6 +61,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
+        $button = $request->input('button');
+        if($button=='register'){
+            return redirect('/register');
+        }
         return redirect('/');
     }
+
 }

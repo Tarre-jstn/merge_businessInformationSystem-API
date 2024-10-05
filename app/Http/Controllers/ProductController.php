@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -16,60 +16,79 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
+            'brand' => 'required|string|max:255',
             'price' => 'required|numeric',
             'category' => 'required|string|max:255',
             'stock' => 'required|integer',
             'sold' => 'required|integer',
             'status' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
             'expDate' => 'required|date',
-            'image' => 'nullable|image|max:2048', // Validate image file
+            'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048', // Validate the file input
+            'seniorPWD_discountable' => 'nullable|in:yes,no',
+            'on_sale' => 'nullable|in:yes,no',
+            'on_sale_price' => 'nullable|numeric',
+            'featured' => 'required|in:true,false',
         ]);
 
-        // Handle file upload
+        $product = new Product($request->except('image'));
+
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products', 'public');
-            $validated['image'] = $imagePath;
+            $path = $request->file('image')->store('products', 'public');
+            $product->image = $path;
         }
 
-        $product = Product::create($validated);
+        $product->save();
 
-        return response()->json($product, 201);
+        return response()->json(['message' => 'Product added successfully', 'product' => $product], 201);
     }
 
-    public function show(Product $product)
+
+    public function show($id)
     {
-        return response()->json($product);
+        $product = Product::findOrFail($id);
+        return response()->json(['product' => $product], 200);
     }
 
-    public function update(Request $request, Product $product)
+
+
+
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'brand' => 'required|string|max:255',
             'price' => 'required|numeric',
             'category' => 'required|string|max:255',
             'stock' => 'required|integer',
             'sold' => 'required|integer',
             'status' => 'required|string|max:255',
+            'description' => 'required|string|max:1000',
             'expDate' => 'required|date',
-            'image' => 'nullable|image|max:2048', // Validate image file
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'seniorPWD_discountable' => 'nullable|in:yes,no',
+            'on_sale' => 'required|in:yes,no',
+            'on_sale_price' => 'required|numeric',
+            'featured' => 'required|in:true,false',
         ]);
 
-        // Handle file upload
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $imagePath = $request->file('image')->store('products', 'public');
-            $validated['image'] = $imagePath;
-        }
+        $product = Product::findOrFail($id);
 
         $product->update($validated);
 
-        return response()->json($product);
+        if ($request->hasFile('image')) {
+            // Handle image upload
+            $imagePath = $request->file('image')->store('products', 'public');
+            $product->image = $imagePath;
+            $product->save();
+        }
+
+        return response()->json(['product' => $product], 200);
     }
+
+
 
     public function destroy($id)
     {
@@ -83,4 +102,65 @@ class ProductController extends Controller
             return response()->json(['error' => 'Unable to delete product'], 500);
         }
     }
+
+    public function featured_products(Request $request){
+       
+        $featuredProducts = Product::where('business_id', $request->business_id)
+                            ->where('featured', 'true')->get();
+        if ($featuredProducts->isEmpty()) {
+            return response()->json(['error' => 'No featured products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($featuredProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image
+            ];
+        }
+        return response()->json($productsArray);
+    }
+
+    public function listed_products(Request $request){
+       
+        $listedProducts = Product::where('business_id', $request->business_id)
+                            ->where('status', 'Listed')->get();
+
+        if ($listedProducts->isEmpty()) {
+            return response()->json(['error' => 'No on sale products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($listedProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image,
+                'product_desc' => $product->description
+            ];
+        }
+        return response()->json($productsArray);
+    }
+
+
+    public function sale_products(Request $request){
+       
+        $saleProducts = Product::where('business_id', $request->business_id)
+                            ->where('on_sale', 'yes')->get();
+
+        if ($saleProducts->isEmpty()) {
+            return response()->json(['error' => 'No on sale products found'], 404);
+        }
+        $productsArray=[];
+
+        foreach($saleProducts as $product){
+            $productsArray[]=[
+                'product_name' => $product->name,
+                'product_img' => $product->image,
+                'product_price' => $product->on_sale_price
+            ];
+        }
+        return response()->json($productsArray);
+    }
+
+}
 }
