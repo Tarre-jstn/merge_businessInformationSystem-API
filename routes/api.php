@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatbotController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -45,6 +46,12 @@ Route::get('/sale-products', [ProductController::class, 'sale_products'])->name(
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+
+Route::get('/chatbot-response', [ChatbotController::class, 'index']);
+Route::post('/chatbot-response', [ChatbotController::class, 'store']);
+Route::put('/chatbot-response/{id}', [ChatbotController::class, 'update']);
+Route::delete('/chatbot-response/{id}', [ChatbotController::class, 'destroy']);
+
 
 
 /*Route::get('/categories', [CategoryController::class, 'index']);

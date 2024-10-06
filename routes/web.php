@@ -9,7 +9,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BotmanController;
 use Inertia\Inertia;
+use BotMan\BotMan\BotMan;
+use BotMan\BotMan\Drivers\DriverManager;
+use BotMan\BotMan\Messages\Incoming\Answer;
+
+
+DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -104,7 +111,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     
+    Route::post('/botman', [BotmanController::class, 'handle']);
+
    
 });
 

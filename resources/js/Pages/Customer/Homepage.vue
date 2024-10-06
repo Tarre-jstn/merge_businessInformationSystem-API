@@ -1,6 +1,8 @@
 <script setup>
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref } from 'vue';
+import Chatbot from '@/Components/Chatbot.vue';
+const showChatbot = ref(false);
 
 const businessInfo = {
     businessImage: ref(''),
@@ -381,7 +383,10 @@ function goTochatPage(){
     <p class="text-[17px] text-white mt-2"><i class="fa fa-copyright"></i> {{ textAreas.businessName }} All rights reserved</p>
 </div>
 </div>
-    </section>
+
+<Chatbot />
+
+</section>
 </template>
 <style>
 .icon-color {
