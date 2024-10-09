@@ -1,4 +1,4 @@
-<template>
+  <template>
     <div id="chatbot">
       <!-- The chat circle -->
       <div 
@@ -6,94 +6,179 @@
         @click="expandChat" 
         class="chat-circle"
       >
-        <!-- Icon or image for the chatbot -->
         <img src="chat-icon.png" alt="Chat" />
       </div>
-  
+
       <!-- The expanded chat window -->
-      <div 
-        v-if="chatExpanded" 
-        class="chat-window"
-      >
+      <div v-if="chatExpanded" class="chat-window">
         <!-- Chatbot header with close option -->
         <div class="chat-header">
           <span>Chatbot</span>
           <button @click="collapseChat">X</button>
         </div>
-  
+
         <!-- Chatbot body for messages and buttons -->
         <div class="chat-body">
-          <div class="messages">
-            <div 
-              v-for="message in messages" 
-              :key="message.id" 
-              class="message"
-            >
-              {{ message.text }}
+          <div ref="messages" class="messages">
+            <!-- Animate each message -->
+            <transition-group name="message" tag="div">
+              <div 
+                v-for="message in messages" 
+                :key="message.id" 
+                :class="['message', message.sender]"
+              >
+                {{ message.text }}
+                <!-- Check if the message is from the bot and if buttons should appear -->
+                <div v-if="message.buttons && message.sender === 'bot'" class="chat-buttons">
+                  <button 
+                    v-for="button in message.buttons" 
+                    :key="button.id" 
+                    @click="handleButtonClick(button)"
+                  >
+                    {{ button.text }}
+                  </button>
+                </div>
+              </div>
+            </transition-group>
+
+            <!-- Typing indicator when bot is thinking -->
+            <div v-if="isTyping" class="message bot typing">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
             </div>
-          </div>
-  
-          <!-- Buttons for interaction -->
-          <div class="chat-buttons">
-            <button 
-              v-for="button in buttons" 
-              :key="button.id" 
-              @click="handleButtonClick(button)"
-            >
-              {{ button.text }}
-            </button>
           </div>
         </div>
       </div>
     </div>
   </template>
-  
+
   <script>
+  import axios from 'axios';
   export default {
-    data() {
-      return {
-        chatExpanded: false, // State to toggle between circle and window
-        messages: [], // Chatbot messages
-        buttons: [] // Buttons to interact with the chatbot
-      };
-    },
-    methods: {
-      expandChat() {
-        this.chatExpanded = true;
-        this.initializeChat(); // Initialize chatbot logic
-      },
-      collapseChat() {
-        this.chatExpanded = false;
-      },
-      initializeChat() {
-        // Fetch or set up the initial buttons and message
-        this.messages.push({ id: 1, text: "Hello! How can I assist you?" });
-        this.buttons = [
-          { id: 1, text: "Option 1" },
-          { id: 2, text: "Option 2" },
-          { id: 3, text: "Option 3" }
-        ];
-      },
-      handleButtonClick(button) {
-        // Handle button click and fetch Botman responses
-        this.messages.push({ id: new Date().getTime(), text: `You clicked ${button.text}` });
-        // Send message to Botman to get response
-        this.sendMessageToBotman(button.text);
-      },
-      sendMessageToBotman(text) {
-        axios.post('/botman', { message: text })
-          .then(response => {
-            const botResponse = response.data;
-            this.messages.push({ id: new Date().getTime(), text: botResponse });
-          })
-          .catch(error => {
-            console.error("Error communicating with Botman:", error);
-          });
+  data() {
+    return {
+      chatExpanded: false,
+      messages: [],
+      isTyping: false, // For typing animation
+      businessName: '', // To store the business name
+      chatInitialized: false, // Flag to check if chat has been initialized
+    };
+  },
+  methods: {
+    expandChat() {
+      this.chatExpanded = true;
+      
+      // Only initialize chat if it's the first time
+      if (!this.chatInitialized) {
+        this.initializeChat();
+        this.chatInitialized = true; // Set the flag to true after initialization
       }
+    },
+    collapseChat() {
+      this.chatExpanded = false;
+    },
+    async initializeChat() {
+      try {
+        const response = await axios.get('/api/Business');
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+          const businessData = response.data[0];  
+          const businessName = businessData.business_Name;
+          const welcomeMessage = `Hi! Welcome to ${businessName}. How can we help you today?`;
+          
+          this.messages.push({
+            id: 1,
+            text: welcomeMessage,
+            sender: 'bot',
+            buttons: [
+              { id: 1, text: "Book a Demo" },
+              { id: 2, text: "Know about me" },
+              { id: 3, text: "Chatbot use cases" }
+            ]
+          });
+        } else {
+          console.error("No business data found or invalid format.");
+          this.messages.push({
+            id: 1,
+            text: "Hi! Welcome to our business. How can I help you today?",
+            sender: 'bot',
+            buttons: [
+              { id: 1, text: "Book a Demo" },
+              { id: 2, text: "Know about me" },
+              { id: 3, text: "Chatbot use cases" }
+            ]
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching business data:", error);
+        this.messages.push({
+          id: 1,
+          text: "Hi! Welcome to our business. How can I help you today?",
+          sender: 'bot',
+          buttons: [
+            { id: 1, text: "Book a Demo" },
+            { id: 2, text: "Know about me" },
+            { id: 3, text: "Chatbot use cases" }
+          ]
+        });
+      }
+    },
+    handleButtonClick(button) {
+      // Add user message
+      this.messages.push({ id: new Date().getTime(), text: `You clicked ${button.text}`, sender: 'user' });
+      this.scrollToBottom();
+
+      // Simulate typing animation
+      this.isTyping = true;
+
+      // Simulate bot response after a delay based on the button clicked
+      setTimeout(() => {
+        this.isTyping = false; // Stop typing animation
+
+        let botResponse = '';
+        switch (button.id) {
+          case 1:
+            botResponse = 'You chose "Book a Demo"! This option helps you with scheduling a demo.';
+            this.messages.push({
+              id: new Date().getTime(),
+              text: 'Please choose:',
+              sender: 'bot',
+              buttons: [
+                { id: 4, text: "Schedule for Today" },
+                { id: 5, text: "Schedule for Tomorrow" }
+              ]
+            });
+            break;
+          case 2:
+            botResponse = 'You selected "Know about me"! Here’s some information about BotPenguin.';
+            break;
+          case 3:
+            botResponse = 'You picked "Chatbot use cases"! Let me show you how chatbots can help.';
+            break;
+          case 4:
+            botResponse = 'You chose to "Schedule for Today". We will get back to you shortly.';
+            break;
+          case 5:
+            botResponse = 'You chose to "Schedule for Tomorrow". We will confirm the availability soon.';
+            break;
+          default:
+            botResponse = 'I\'m not sure what you selected!';
+        }
+
+        this.messages.push({ id: new Date().getTime(), text: botResponse, sender: 'bot' });
+        this.scrollToBottom();
+      }, 1000); // 1 second delay for bot response
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const messagesContainer = this.$refs.messages;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      });
     }
-  };
+  }
+};
   </script>
-  
+
   <style scoped>
   /* Basic styles for the chat circle and window */
   #chatbot {
@@ -101,7 +186,7 @@
     bottom: 20px;
     right: 20px;
   }
-  
+
   .chat-circle {
     width: 60px;
     height: 60px;
@@ -112,7 +197,7 @@
     justify-content: center;
     cursor: pointer;
   }
-  
+
   .chat-window {
     width: 300px;
     height: 400px;
@@ -123,7 +208,7 @@
     display: flex;
     flex-direction: column;
   }
-  
+
   .chat-header {
     background-color: #007bff;
     color: white;
@@ -132,44 +217,104 @@
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .chat-body {
     flex: 1;
     padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden; /* Prevent messages from overflowing */
   }
-  
+
   .messages {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* Allows scrolling */
+    max-height: 300px; /* Ensures messages container stays within limits */
   }
-  
+
   .message {
-    background-color: #f1f1f1;
     padding: 5px 10px;
     margin-bottom: 10px;
     border-radius: 5px;
+    transition: transform 0.3s, opacity 0.3s; /* Smooth transition */
   }
-  
-  .chat-buttons {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 10px;
+
+  .message.bot {
+    background-color: #f1f1f1;
+    text-align: left;
   }
-  
-  button {
-    padding: 10px;
+
+  .message.user {
     background-color: #007bff;
     color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    text-align: right;
   }
-  
-  button:hover {
-    background-color: #0056b3;
+
+  .message-enter-active,
+  .message-leave-active {
+    transition: all 0.3s ease;
+  }
+
+  .message-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .message-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  .chat-buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .chat-buttons button {
+    padding: 8px;
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .chat-buttons button:hover {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .typing {
+    display: flex;
+    gap: 5px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background-color: #007bff;
+    border-radius: 50%;
+    animation: blink 1s infinite alternate;
+  }
+
+  .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes blink {
+    from {
+      opacity: 0.3;
+    }
+    to {
+      opacity: 1;
+    }
   }
   </style>
-  

@@ -107,13 +107,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('showUser');
 
     Route::put('/update_user/{id}', [ProfileController::class, 'update']);
+
+    
+    Route::get('/BusinessInfo', function () {
+        return Inertia::render('BusinessInfo');
+    })->name('BusinessInfo');
+
     
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     
-    Route::post('/botman', [BotmanController::class, 'handle']);
 
    
 });

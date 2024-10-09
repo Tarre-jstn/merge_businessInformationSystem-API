@@ -2,7 +2,6 @@
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref } from 'vue';
 import Chatbot from '@/Components/Chatbot.vue';
-const showChatbot = ref(false);
 
 const businessInfo = {
     businessImage: ref(''),

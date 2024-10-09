@@ -26,8 +26,6 @@ Route::get('/all-business', function(){
     return Business::all();
 });
 
-Route::get('/business_info', [BusinessController::class, 'showBusiness']);
-
 Route::post('/website', [WebsiteController::class, 'store']);
 Route::get('/website', [WebsiteController::class, 'info']);
 Route::post('/website-update', [WebsiteController::class, 'update']);
@@ -41,11 +39,10 @@ Route::get('/listed-products', [ProductController::class, 'listed_products'])->n
 Route::get('/sale-products', [ProductController::class, 'sale_products'])->name('sale_products');
 
 
-
-
-Route::post('/business_info', [BusinessController::class, 'store']);
-Route::put('/business_info/{id}', [BusinessController::class, 'update']);
-Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+Route::get('/Business', [BusinessController::class, 'show']);
+Route::post('/Business', [BusinessController::class, 'store']);
+Route::put('/Business/{id}', [BusinessController::class, 'update']);
+Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
 
 Route::get('/chatbot-response', [ChatbotController::class, 'index']);
 Route::post('/chatbot-response', [ChatbotController::class, 'store']);
