@@ -60,7 +60,7 @@ onMounted(()=>{
 async function getWebsiteInfo(){
     try{
 
-        const getBusinessInfo = await axios.get('/api/business_info', {
+        const getBusinessInfo = await axios.get('/api/Business', {
             params: {user_id: 1}
         });
         
