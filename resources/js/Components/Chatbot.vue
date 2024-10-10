@@ -65,13 +65,15 @@ export default {
       businessName: '',
       chatInitialized: false,
       chatbotImageUrl: '', // Reactive URL for the chat image
+      buttonIndex: 0, // Tracks the current set of buttons
+      buttonLimit: 3, // Maximum number of buttons to display at a time
     };
   },
   mounted() {
     // Preload the business data and image when the component is mounted
     this.preloadBusinessData();
   },
-  methods: {
+    methods: {
     expandChat() {
       this.chatExpanded = true;
       if (!this.chatInitialized) {
@@ -83,14 +85,11 @@ export default {
       this.chatExpanded = false;
     },
     async preloadBusinessData() {
-      // Fetch business data to preload the image before the chat is opened
       try {
         const response = await axios.get('/api/Business');
         if (response.data && Array.isArray(response.data) && response.data.length > 0) {
           const businessData = response.data[0];
           const businessImage = businessData.business_image;
-
-          // Set the chatbot image URL as soon as the data is available
           this.chatbotImageUrl = `/storage/business_logos/${businessImage}`;
         } else {
           console.error("No business data found or invalid format.");
@@ -100,14 +99,14 @@ export default {
       }
     },
     async initializeChat() {
-      // Reuse the preloadBusinessData logic for initialization if needed
       if (!this.chatbotImageUrl) {
         await this.preloadBusinessData();
       }
-
-      // Initialize the chat after the image has been loaded
+      this.addInitialChatMessage();
+    },
+    addInitialChatMessage() {
       this.messages.push({
-        id: 1,
+        id: new Date().getTime(),
         text: `Hi! Welcome to ${this.businessName || 'our business'}. How can we help you today?`,
         sender: 'bot',
         buttons: [
@@ -117,13 +116,28 @@ export default {
         ]
       });
     },
+    showEndMessage() {
+      this.messages.push({
+        id: new Date().getTime(),
+        text: 'Is there anything else you would like to know?',
+        sender: 'bot',
+        buttons: [
+          { id: 1, text: "Business Details" },
+          { id: 2, text: "Regional Delivery Times" },
+          { id: 3, text: "Chatbot use cases" }
+        ]
+      });
+    },
+
     handleButtonClick(button) {
       this.messages.push({ id: new Date().getTime(), text: `You clicked ${button.text}`, sender: 'user' });
       this.scrollToBottom();
       this.isTyping = true;
+      
       setTimeout(() => {
         this.isTyping = false;
         let botResponse = '';
+        
         switch (button.id) {
           case 1:
             this.messages.push({
@@ -136,23 +150,64 @@ export default {
               ]
             });
             break;
+            
           case 2:
-            botResponse = 'You selected "Know about me"! Here’s some information about BotPenguin.';
+          this.messages.push({
+              id: new Date().getTime(),
+              text: 'Please Select a Region:',
+              sender: 'bot',
+              buttons: [
+                { id: 7, text: "Region 1" },
+                { id: 8, text: "Region 2" },
+                { id: 9, text: "Region 3 " },
+                { id: 10, text: "Region 4" },
+                { id: 11, text: "Region 5" }
+              ]
+            });
             break;
+            
           case 3:
             botResponse = 'You picked "Chatbot use cases"! Let me show you how chatbots can help.';
             break;
+            
           case 4:
-            botResponse = 'You chose to "Schedule for Today". We will get back to you shortly.';
+            // Send the response for id: 4
+            this.messages.push({
+              id: new Date().getTime(),
+              text: 'You chose to "Schedule for Today". We will get back to you shortly.',
+              sender: 'bot'
+            });
+            
+           
+            setTimeout(() => {
+              this.showEndMessage(); 
+              this.scrollToBottom();
+            }, 1000); // Small delay for a better user experience
+            
             break;
+            
           case 5:
             botResponse = 'You chose to "Schedule for Tomorrow". We will confirm the availability soon.';
             break;
+
+          case 6:
+            this.messages.push({
+              id: new Date().getTime(),
+              text: 'Is there anything else you would like to know?:',
+              sender: 'bot',
+              buttons: [
+                { id: 1, text: "Business Details" },
+                { id: 2, text: "Regional Delivery Times" },
+                { id: 3, text: "Chatbot use cases" }
+              ]
+            });
+            break;
+            
           default:
             botResponse = 'I\'m not sure what you selected!';
         }
 
-        // Only push non-empty bot responses
+        // If there's a response, push it to the chat
         if (botResponse.trim()) {
           this.messages.push({ id: new Date().getTime(), text: botResponse, sender: 'bot' });
         }
@@ -166,7 +221,7 @@ export default {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       });
     }
-  }
+  } 
 };
 </script>
 
