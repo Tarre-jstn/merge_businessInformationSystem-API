@@ -13,7 +13,7 @@ class ExportDatabase extends Command
 
     public function handle()
     {
-        $tables = ['categories', 'financial_report', 'invoice', 'products', 'website_page'];
+        $tables = ['categories', 'financial_report', 'invoice', 'products', 'websites'];
 
         $backupPath = storage_path('app/backups/backup.sql');
 

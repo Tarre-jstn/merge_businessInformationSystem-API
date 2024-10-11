@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon } from '@heroicons/vue/24/solid'
+import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon, Cog6ToothIcon, ArrowDownTrayIcon  } from '@heroicons/vue/24/solid'
 import { onMounted, ref } from 'vue';
 
 let businessImage = ref('');
@@ -20,9 +20,12 @@ async function getWebsiteInfo(){
         });
         console.log(getBusinessInfo.data);
 
+        if(getBusinessInfo.data.business_image){
         businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
-        businessName.value = getBusinessInfo.data.business_Name;
         isLoading.value = false;
+    }
+        businessName.value = getBusinessInfo.data.business_Name;
+        
     }
 </script>
 
@@ -66,12 +69,14 @@ async function getWebsiteInfo(){
                     <span class="ml-3">Finance</span>
                 </Link></li>
 
-                <li class="flex items-center mb-4"><Link :href="route('settings')" :class="{ active: route().current('settings') }">
-                    <i class="icon-settings"></i>
-                    <span class="ml-3">Additional Settings</span>
-                </Link></li>
                 <li class="flex items-center mb-4"><Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
-                    <span class="ml-3">BusinessInfo</span>
+                    <Cog6ToothIcon class="size-6"/>
+                    <span class="ml-2">Business Information</span>
+                </Link></li>
+
+                <li class="flex items-center mb-4"><Link :href="route('backup-main')" :class="{ active: route().current('backup-main') }">
+                    <ArrowDownTrayIcon class="size-6"/>
+                    <span class="ml-2">Backup and<br>Restore</span>
                 </Link></li>
             </ul>
         </nav>
@@ -97,7 +102,7 @@ async function getWebsiteInfo(){
 }
 
 nav ul {
-    margin-top: 2rem;
+    margin-top: 1rem;
     display: flex;
     flex-direction: column; 
     align-items: center; 
@@ -124,7 +129,7 @@ nav ul li a {
 
 nav ul li a svg {
     margin-right: 10px;
-    margin-left:50px; 
+    margin-left:37px; 
     width: 30px;
     height: 30px;
 }

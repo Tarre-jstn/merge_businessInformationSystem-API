@@ -23,7 +23,7 @@ const textAreas = {
     business_City: ref(''),
     business_Barangay: ref('')
 }
-
+let isLoading = ref(true);
 onMounted(()=>{
     getWebsiteInfo();
 });
@@ -47,8 +47,11 @@ async function getWebsiteInfo(){
         });
         console.log(getWebsiteInfo.data);
 
-        textAreas.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
-        // textAreas.businessImage.value = getBusinessInfo.data.business_image;
+        if(getBusinessInfo.data.business_image){
+        businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+        isLoading.value = false;
+    }
+    // textAreas.businessImage.value = getBusinessInfo.data.business_image;
         textAreas.businessName.value = getBusinessInfo.data.business_Name;
         textAreas.business_Email.value = getBusinessInfo.data.business_Email;
         textAreas.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;

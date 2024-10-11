@@ -18,7 +18,6 @@ return new class extends Migration
             // $table->foreign('business_id')->references('business_id')->on('business')->onDelete('cascade');
             // $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreignId('business_id')->references('business_id')->on('businesses')->onDelete('cascade');
-            $table->foreignId('product_id')->nullable()->references('id')->on('products')->onDelete('cascade');
             $table->string('website_description')->nullable();
             $table->string('website_details')->nullable();
             $table->string('website_image')->nullable();

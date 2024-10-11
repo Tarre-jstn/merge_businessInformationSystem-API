@@ -24,10 +24,6 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-
     Route::get('/homepage', function () {
         return Inertia::render('Customer/Homepage');
     })->name('homepage');
@@ -75,6 +71,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings', function () {
         return Inertia::render('Settings');
     })->name('settings');
+
+    Route::get('/backup-main', function () {
+        return Inertia::render('BackupMainPage');
+    })->name('backup-main');
+
     Route::get('/backup', function () {
         return Inertia::render('Backup');
     })->name('backup');

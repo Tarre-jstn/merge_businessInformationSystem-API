@@ -359,7 +359,7 @@ const formatUrl = (url) => {
     </section>
 
     <section>
-        <div class="ml-1 bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
+        <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
 
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
 <!-- FootNote -->

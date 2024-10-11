@@ -14,8 +14,13 @@ const businessInfo = {
     business_Tiktok: ref(''),
     businessDescription: ref(''),
     businessDetails: ref(''), 
-    homePageImage: ref('')
+    homePageImage: ref(''),
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref('')
 }
+
+let isLoading = ref(true);
 
 
 const textAreas = {
@@ -37,8 +42,17 @@ const textAreas = {
     website_footNote: ref('')
 }
 
+const feature_toggle=ref('');
+const onSale_toggle=ref('');
+let profile_img = ref('');
+const profilePicture = ref(null);
+
 function logout(button){
     Inertia.post(route('logout'), {button});
+}
+
+function account(){
+    Inertia.visit(route('account_settings'));
 }
 
 onMounted(()=>{
@@ -47,6 +61,17 @@ onMounted(()=>{
 
 async function getWebsiteInfo(){
     try{
+
+        const response = await axios.get('/showUser');
+        if (response.data) {
+            profilePicture.value = response.data.profile_img 
+        ? `/storage/user_profile/${response.data.profile_img}` 
+        : '/storage/user_profile/default-profile.png';
+            isLoading.value=false;
+        }
+        profilePicture.value = response.data.profile_img 
+        ? `/storage/user_profile/${response.data.profile_img}` 
+        : '/storage/user_profile/default-profile.png';
 
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: 1}
@@ -59,12 +84,18 @@ async function getWebsiteInfo(){
         
         console.log('Website data: ',getWebsiteInfo1.data);
 
-        const imgBusinessUrl = `/storage/${getBusinessInfo.data.business_image}`;
-        businessInfo.businessImage.value = imgBusinessUrl;
+        businessInfo.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+       
+
         businessInfo.businessName.value = getBusinessInfo.data.business_Name;
         businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
         businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
         businessInfo.business_Address.value = getBusinessInfo.data.business_Address;
+
+        businessInfo.business_Province.value = getBusinessInfo.data.business_Province;
+        businessInfo.business_City.value = getBusinessInfo.data.business_City;
+        businessInfo.business_Barangay.value = getBusinessInfo.data.business_Barangay;
+
 
         businessInfo.business_Facebook.value = getBusinessInfo.data.business_Facebook;
         businessInfo.business_X.value = getBusinessInfo.data.business_X;
@@ -77,7 +108,8 @@ async function getWebsiteInfo(){
         businessInfo.homePageImage.value=imgUrl;
 
         
-       
+        feature_toggle.value = getWebsiteInfo1.data.featured_section;
+        onSale_toggle.value = getWebsiteInfo1.data.onSale_section;
         textAreas.about_us1.value = getWebsiteInfo1.data.about_us1;
         textAreas.about_us2.value = getWebsiteInfo1.data.about_us2;
         textAreas.about_us3.value = getWebsiteInfo1.data.about_us3;
@@ -121,9 +153,14 @@ async function getWebsiteInfo(){
     }
 }
 
-function goTochatPage(){
-    //none pa
-}
+const formatUrl = (url) => {
+    // Check if the URL starts with http:// or https://
+    if (!/^https?:\/\//i.test(url)) {
+        // Prepend https:// if it doesn't
+        return `https://${url}`;
+    }
+    return url;
+};
 </script>
 
 <template>
@@ -134,12 +171,20 @@ function goTochatPage(){
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a>Home</a>
-                    <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]">Products & Services</a>
-                    <a class="text-white text-[18px]">About Us</a>
+                    <a class="text-white text-[18px] cursor-pointer">Chat with Us</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <button @click="logout('register')" class="text-white">Register</button>
-                    <button @click="logout('logout')" class=" cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
+                    <div class="flex flex-col">
+                        <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
+                    </div> 
+                    <div class="w-[50px] h-[50px]">
+                        <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
+                        <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />
+                        <img v-else src='/storage/user_profile/default-profile.png'/>
+                    </div>
+                    
                 </div>
         </div>
 
@@ -165,7 +210,7 @@ function goTochatPage(){
                 <div class="mt-[90px] flex flex-row">
                     <button @click="logout('register')" class="mr-[20px] cursor-pointer bg-white border border-white rounded-sm py-[8px] px-[70px]">Register</button>
                     <p class="text-white text-xl">|</p>
-                    <a class="ml-[35px] justify-center text-white text-[18px]">See All Products</a>
+                    <a class="ml-[35px] justify-center text-white text-[18px]" :href="route('products_page')">See All Products</a>
                 </div>
             </div>
 
@@ -223,7 +268,8 @@ function goTochatPage(){
 </section>
 
     <!-- section 3/EditWebsite3 -->
-    <section>
+    
+    <section v-if="feature_toggle==='true'">
         <div class=" bg-website-main flex min-h-screen relative" style="min-height: calc(100vh + 100px);">
 
 <div class="flex flex-col items-center p-3 absolute top-[10px] left-0 right-0 bottom-[500px] m-auto">
@@ -283,6 +329,7 @@ function goTochatPage(){
 
     <!-- section 4/Chat Section -->
 <section>
+    <div class="bg-website-main h-[10px] w-full"></div>
         <div class="bg-website-main1 flex flex-col min-h-screen">
 
         
@@ -312,7 +359,7 @@ function goTochatPage(){
     </section>
 
     <section>
-        <div class="ml-1 bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
+        <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
 
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
 <!-- FootNote -->
@@ -324,10 +371,10 @@ function goTochatPage(){
     <div class="mt-5">
         <p class=" text-xl text-white">{{ textAreas.website_footNote }}</p>
         <div class="mt-[20px]">
-        <a :href="businessInfo.business_Facebook.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
-        <a :href="businessInfo.business_X.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
-        <a :href="businessInfo.business_Instagram.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
-        <a :href="businessInfo.business_Tiktok.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+        <a :href="formatUrl(businessInfo.business_Facebook.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
+        <a :href="formatUrl(businessInfo.business_X.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
+        <a :href="formatUrl(businessInfo.business_Instagram.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
+        <a :href="formatUrl(businessInfo.business_Tiktok.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
         </div>
     </div>
 
@@ -340,6 +387,8 @@ function goTochatPage(){
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>
         <p class="text-white">Contact No.: {{ businessInfo.business_Contact_Number }} </p>
         <p class="text-white">Address: {{ businessInfo.business_Address }} </p>
+        <p class="text-white">{{ businessInfo.business_Province }}, 
+            {{ businessInfo.business_City }}, {{ businessInfo.business_Barangay }}  </p>
     </div>
 </div>
 </div>

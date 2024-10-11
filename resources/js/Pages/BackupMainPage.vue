@@ -21,7 +21,7 @@ export default {
     </div>
     <div class="flex flex-col items-center">
       <div class="flex flex-row">
-        <div class=" m-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden h-full m-5 sm:rounded-lg ">
           <BackupButton />
         </div>
         <svg width="100" height="600" xmlns="http://www.w3.org/2000/svg"> 
