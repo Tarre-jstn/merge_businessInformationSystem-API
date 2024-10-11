@@ -12,6 +12,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ImportController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -45,6 +47,21 @@ Route::get('/sale-products', [ProductController::class, 'sale_products'])->name(
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+
+Route::get('/backup', function () {
+    Artisan::call('db:export');
+    return response()->download(storage_path('app/backups/backup.sql'))->deleteFileAfterSend(true);
+});
+
+
+Route::post('/import', [ImportController::class, 'import']);
+
+
+
+/*Route::get('/categories', [CategoryController::class, 'index']);
+Route::post('/categories', [CategoryController::class, 'store']);
+Route::put('/categories/{category}', [CategoryController::class, 'update']);
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);*/
 
 Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
 Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');
