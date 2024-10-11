@@ -49,6 +49,8 @@ const textAreas = reactive({
 
 const next = ref(false);
 const lengthArray = ref(null);
+let profile_img = ref('');
+const profilePicture = ref(null);
 
 function logout(button){
     Inertia.post(route('logout'), {button});
@@ -70,6 +72,14 @@ function showMore(){
 async function getWebsiteInfo(){
     try{
 
+        const response = await axios.get('/showUser');
+        if (response.data) {
+            profile_img= response.data.profile_img;
+        }
+        profilePicture.value = response.data.profile_img 
+        ? `/storage/user_profile/${response.data.profile_img}` 
+        : '/storage/user_profile/default-profile.png';
+
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: 1}
         });
@@ -81,8 +91,7 @@ async function getWebsiteInfo(){
         
         console.log('Website data: ',getWebsiteInfo1.data);
 
-        const imgBusinessUrl = `/storage/${getBusinessInfo.data.business_image}`;
-        businessInfo.businessImage.value = imgBusinessUrl;
+        businessInfo.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
         businessInfo.businessName.value = getBusinessInfo.data.business_Name;
         businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
         businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
@@ -160,9 +169,9 @@ function goTochatPage(){
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
                     </div> 
                     <div class="w-[50px] h-[50px]">
-                        <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
-                        <img v-else-if="businessInfo.businessImage.value" :src='businessInfo.businessImage.value' alt="Logo" />
-                        <img v-else src='/storage/business_logos/default-profile.png'/>
+                        <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
+                        <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />
+                        <img v-else src='/storage/user_profile/default-profile.png'/>
                     </div>
                     
                 </div>
