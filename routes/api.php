@@ -13,6 +13,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ImportController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -46,6 +48,16 @@ Route::get('/sale-products', [ProductController::class, 'sale_products'])->name(
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+
+
+
+Route::get('/backup', function () {
+    Artisan::call('db:export');
+    return response()->download(storage_path('app/backups/backup.sql'))->deleteFileAfterSend(true);
+});
+
+
+Route::post('/import', [ImportController::class, 'import']);
 
 
 

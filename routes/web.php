@@ -10,6 +10,9 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\BackupController;
+
+//Route::get('/backup', [BackupController::class, 'createBackup']);
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -72,6 +75,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings', function () {
         return Inertia::render('Settings');
     })->name('settings');
+    Route::get('/backup', function () {
+        return Inertia::render('Backup');
+    })->name('backup');
 
     Route::get('/preview-homepage', function () {
         return Inertia::render('Preview_Homepage');
