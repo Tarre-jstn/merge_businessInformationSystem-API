@@ -24,6 +24,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/dashboard', function () {
+        return Inertia::render('Home');
+    })->name('dashboard');
+
     Route::get('/homepage', function () {
         return Inertia::render('Customer/Homepage');
     })->name('homepage');
@@ -39,11 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account', function () {
         return Inertia::render('Customer/Account');
     })->name('account_settings');
-  
-    Route::get('/homepage', function () {
-        return Inertia::render('Customer/Homepage');
-    })->name('homepage');
-
+    
     Route::get('/website', function () {
         return Inertia::render('Website');
     })->name('website');
@@ -142,6 +143,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/showUser', [ProfileController::class, 'show'])
     ->name('showUser');
 
+    Route::get('/auth_user', [GetIdController::class, 'checkUserAuth']);
     Route::put('/update_user/{id}', [ProfileController::class, 'update']);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

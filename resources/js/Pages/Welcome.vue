@@ -102,10 +102,11 @@ async function getWebsiteInfo(){
             params: {user_id: 1}
         });
 
-        const getUserInfo = await axios.get('/api/auth_user', {
-            params: {user_id: 1}
+        const getUserInfo = await axios.get('/auth_user', {
+            
         });
-        let user_type=getUserInfo.data.user_type;
+         user_type.value=getUserInfo.data.user_type;
+         console.log("user type", user_type.value);
 
         
         const getWebsiteInfo1 = await axios.get('/api/website', {
@@ -209,22 +210,22 @@ const formatUrl = (url) => {
                     <div class="flex flex-col">
                         <nav v-if="canLogin" class="-mx-3 flex flex-1 justify-end">
                         
-                            <Link
+                            <a
                             v-if="$page.props.auth.user && user_type==='owner'"
-                            :href="route('home')"
+                            :href="route('dashboard')"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
                             Dashboard
-                            </Link>
-                            <Link
+                        </a>
+                            <a
                             v-else-if="$page.props.auth.user && user_type==='customer'"
                             :href="route('homepage')"
                             class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
                         >
-                            Dashboard
-                            </Link>
+                            Log In
+                    </a>
 
-                        <template v-else>
+                        <template v-else-if="!$page.props.auth.user">
                             <Link
                                 :href="route('login')"
                                 class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"

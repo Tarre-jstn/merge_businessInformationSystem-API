@@ -20,13 +20,12 @@ class GetIdController extends Controller
 
     public function checkUserAuth(Request $request){
 
-        if(Auth::check()){
-            $user = User::where('user_id', Auth::id())->first();
+        $user = User::where('id', Auth::id())->first();
             if (!$user) {
                 return response()->json(['error' => 'User record not found'], 404);
             }
             return response()->json($user);
-        }
+        
         
     }
 
