@@ -10,6 +10,9 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Spatie\Analytics\Facades\Analytics;
+use Spatie\Analytics\Period;
+use App\Http\Controllers\AnalyticsController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -19,6 +22,15 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// //Pwede idelete
+// Route::get('data', function(){
+//     $analyticsData = Analytics::fetchVisitorsAndPageViews(Period::days(7));
+//     dd($analyticsData);
+// });
+
+Route::get('/analytics', [AnalyticsController::class, 'index']);
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
