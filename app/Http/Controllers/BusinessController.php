@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-
+use App\Events\BusinessNameUpdated;
 
 
 class BusinessController extends Controller
@@ -115,7 +115,16 @@ class BusinessController extends Controller
             'business_Tiktok'=>'nullable|string|max:255'
         ]);
 
-        $business = Business::find($id);
+        $business = Business::findOrFail($id);
+        $oldName = $business->business_Name;
+
+        // Update business details here
+        $business->update($request->all());
+
+        // If the business name has changed, trigger the event
+        if ($oldName !== $request->input('business_Name')) {
+            event(new BusinessNameUpdated($oldName, $business->business_Name));
+        }
 
         if ($request->hasFile('business_image')) {
             // Handle the file upload
