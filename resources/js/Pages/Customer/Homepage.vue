@@ -1,12 +1,14 @@
 <script setup>
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref } from 'vue';
+import Chatbot from '@/Components/Chatbot.vue';
 
 const businessInfo = {
     businessImage: ref(''),
     businessName: ref(''),
     business_Email: ref(''),
     business_Contact_Number: ref(''),
+    business_Telephone_Number: ref(''),
     business_Address: ref(''),
     business_Facebook: ref(''),
     business_X: ref(''),
@@ -61,7 +63,7 @@ onMounted(()=>{
 
 async function getWebsiteInfo(){
     try{
-
+  
         const response = await axios.get('/showUser');
         if (response.data) {
             profilePicture.value = response.data.profile_img 
@@ -90,6 +92,7 @@ async function getWebsiteInfo(){
         businessInfo.businessName.value = getBusinessInfo.data.business_Name;
         businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
         businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
+        businessInfo.business_Telephone_Number.value = getBusinessInfo.data.business_Telephone_Number;
         businessInfo.business_Address.value = getBusinessInfo.data.business_Address;
 
         businessInfo.business_Province.value = getBusinessInfo.data.business_Province;
@@ -171,7 +174,7 @@ const formatUrl = (url) => {
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a>Home</a>
-                    <a class="text-white text-[18px] cursor-pointer">Chat with Us</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('chat_with_us')">Chat with Us</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
@@ -389,6 +392,7 @@ const formatUrl = (url) => {
         <p class="text-white">Address: {{ businessInfo.business_Address }} </p>
         <p class="text-white">{{ businessInfo.business_Province }}, 
             {{ businessInfo.business_City }}, {{ businessInfo.business_Barangay }}  </p>
+        <p class="text-white">Telephone No.: {{ businessInfo.business_Telephone_Number }} </p>
     </div>
 </div>
 </div>
@@ -401,7 +405,10 @@ const formatUrl = (url) => {
     <p class="text-[17px] text-white mt-2"><i class="fa fa-copyright"></i> {{ textAreas.businessName }} All rights reserved</p>
 </div>
 </div>
-    </section>
+
+<Chatbot />
+
+</section>
 </template>
 <style>
 .icon-color {

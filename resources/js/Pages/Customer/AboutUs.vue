@@ -7,6 +7,7 @@ const businessInfo = {
     businessName: ref(''),
     business_Email: ref(''),
     business_Contact_Number: ref(''),
+    business_Telephone_Number: ref(''),
     business_Address: ref(''),
     business_Facebook: ref(''),
     business_X: ref(''),
@@ -14,12 +15,23 @@ const businessInfo = {
     business_Tiktok: ref(''),
     businessDescription: ref(''),
     businessDetails: ref(''), 
-    homePageImage: ref('')
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref('')
 }
 
 let profile_img = ref('');
 const profilePicture = ref(null);
 let isLoading = ref(true);
+
+const formatUrl = (url) => {
+    // Check if the URL starts with http:// or https://
+    if (!/^https?:\/\//i.test(url)) {
+        // Prepend https:// if it doesn't
+        return `https://${url}`;
+    }
+    return url;
+};
 
 function account(){
     Inertia.visit(route('account_settings'));
@@ -65,7 +77,12 @@ async function getWebsiteInfo(){
         businessInfo.businessName.value = getBusinessInfo.data.business_Name;
         businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
         businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
+        businessInfo.business_Telephone_Number.value = getBusinessInfo.data.business_Telephone_Number;
         businessInfo.business_Address.value = getBusinessInfo.data.business_Address;
+
+        businessInfo.business_Province.value = getBusinessInfo.data.business_Province;
+        businessInfo.business_City.value = getBusinessInfo.data.business_City;
+        businessInfo.business_Barangay.value = getBusinessInfo.data.business_Barangay;
 
         businessInfo.business_Facebook.value = getBusinessInfo.data.business_Facebook;
         businessInfo.business_X.value = getBusinessInfo.data.business_X;
@@ -160,7 +177,7 @@ async function getWebsiteInfo(){
 </div>
 </section>
 
-    <section>
+<section>
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
 
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
@@ -173,10 +190,10 @@ async function getWebsiteInfo(){
     <div class="mt-5">
         <p class=" text-xl text-white">{{ textAreas.website_footNote }}</p>
         <div class="mt-[20px]">
-        <a :href="businessInfo.business_Facebook.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
-        <a :href="businessInfo.business_X.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
-        <a :href="businessInfo.business_Instagram.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
-        <a :href="businessInfo.business_Tiktok.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+        <a :href="formatUrl(businessInfo.business_Facebook.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
+        <a :href="formatUrl(businessInfo.business_X.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
+        <a :href="formatUrl(businessInfo.business_Instagram.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
+        <a :href="formatUrl(businessInfo.business_Tiktok.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
         </div>
     </div>
 
@@ -189,6 +206,9 @@ async function getWebsiteInfo(){
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>
         <p class="text-white">Contact No.: {{ businessInfo.business_Contact_Number }} </p>
         <p class="text-white">Address: {{ businessInfo.business_Address }} </p>
+        <p class="text-white">{{ businessInfo.business_Province }}, 
+            {{ businessInfo.business_City }}, {{ businessInfo.business_Barangay }}  </p>
+            <p class="text-white">Telephone No.: {{ businessInfo.business_Telephone_Number }} </p>
     </div>
 </div>
 </div>
@@ -200,8 +220,9 @@ async function getWebsiteInfo(){
 <div class="ml-[60px] mr-auto w-full">
     <p class="text-[17px] text-white mt-2"><i class="fa fa-copyright"></i> {{ textAreas.businessName }} All rights reserved</p>
 </div>
-</div>
-    </section>
+        </div>
+
+</section>
 </template>
 <style>
 .icon-color {

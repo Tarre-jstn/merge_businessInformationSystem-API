@@ -150,8 +150,6 @@ class BusinessController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-    
     /**
      * Remove the specified resource from storage.
      */
@@ -162,7 +160,6 @@ class BusinessController extends Controller
             'success' => (bool) $business->delete()
         ];
     }
-
 
     public function showBusiness(Request $request){
         $user_id = $request->query('user_id');

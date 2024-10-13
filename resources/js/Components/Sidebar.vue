@@ -68,7 +68,6 @@ async function getWebsiteInfo(){
                     <BuildingLibraryIcon class="size-6"/>
                     <span class="ml-3">Finance</span>
                 </Link></li>
-
                 <li class="flex items-center mb-4"><Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
                     <Cog6ToothIcon class="size-6"/>
                     <span class="ml-2">Business Information</span>
@@ -102,6 +101,7 @@ async function getWebsiteInfo(){
 }
 
 nav ul {
+
     margin-top: 1rem;
     display: flex;
     flex-direction: column; 

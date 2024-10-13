@@ -9,7 +9,15 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BotmanController;
 use Inertia\Inertia;
+use BotMan\BotMan\BotMan;
+use BotMan\BotMan\Drivers\DriverManager;
+use BotMan\BotMan\Messages\Incoming\Answer;
+
+
+DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
+
 use App\Http\Controllers\BackupController;
 
 //Route::get('/backup', [BackupController::class, 'createBackup']);
@@ -52,6 +60,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account', function () {
         return Inertia::render('Customer/Account');
     })->name('account_settings');
+
+    Route::get('/chat_with_us', function () {
+        return Inertia::render('Customer/Chats');
+    })->name('chat_with_us');
 
     Route::get('/chats', function () {
         return Inertia::render('Chats');
@@ -145,10 +157,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/auth_user', [GetIdController::class, 'checkUserAuth']);
     Route::put('/update_user/{id}', [ProfileController::class, 'update']);
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     
+
    
 });
 

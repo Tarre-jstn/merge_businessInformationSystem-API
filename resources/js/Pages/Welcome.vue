@@ -1,8 +1,9 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref } from 'vue';
 
+const{props} = usePage();
 defineProps({
     canLogin: {
         type: Boolean,
@@ -87,26 +88,28 @@ onMounted(()=>{
 async function getWebsiteInfo(){
     try{
 
-        const response = await axios.get('/showUser');
-        if (response.data) {
-            profilePicture.value = response.data.profile_img 
-        ? `/storage/user_profile/${response.data.profile_img}` 
-        : '/storage/user_profile/default-profile.png';
-            isLoading.value=false;
-        }
-        profilePicture.value = response.data.profile_img 
-        ? `/storage/user_profile/${response.data.profile_img}` 
-        : '/storage/user_profile/default-profile.png';
+        // const response = await axios.get('/showUser');
+        // if (response.data) {
+        //     profilePicture.value = response.data.profile_img 
+        // ? `/storage/user_profile/${response.data.profile_img}` 
+        // : '/storage/user_profile/default-profile.png';
+        //     isLoading.value=false;
+        // }
+        // profilePicture.value = response.data.profile_img 
+        // ? `/storage/user_profile/${response.data.profile_img}` 
+        // : '/storage/user_profile/default-profile.png';
 
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: 1}
         });
 
+        if(props.auth.user){
         const getUserInfo = await axios.get('/auth_user', {
             
         });
          user_type.value=getUserInfo.data.user_type;
          console.log("user type", user_type.value);
+    }
 
         
         const getWebsiteInfo1 = await axios.get('/api/website', {
