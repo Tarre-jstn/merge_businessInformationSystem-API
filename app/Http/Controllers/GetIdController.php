@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Business;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class GetIdController extends Controller
 {
@@ -15,6 +16,17 @@ class GetIdController extends Controller
         } else {
             return response()->json(['error' => 'Not authenticated'], 401);
         }
+    }
+
+    public function checkUserAuth(Request $request){
+
+        $user = User::where('id', Auth::id())->first();
+            if (!$user) {
+                return response()->json(['error' => 'User record not found'], 404);
+            }
+            return response()->json($user);
+        
+        
     }
 
     public function getBusinessId(Request $request)

@@ -27,7 +27,7 @@ window.addEventListener('resize', () => {
                 <div class="max-w-auto mx-auto px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 dark:border-gray-200">
                     <div class="flex justify-between h-16">
                         <div class="flex">
-                            <h2 class="font-semibold text-xl text-black dark:text-black leading-tight content-center">Wala pa</h2>
+                            <h2 class="font-semibold text-xl text-black dark:text-black leading-tight content-center">Information System</h2>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -94,6 +94,13 @@ window.addEventListener('resize', () => {
 
                     <div class="pt-2 pb-3 space-y-1">
                         <ResponsiveNavLink :href="route('settings')" :active="route().current('settings')">Settings</ResponsiveNavLink>
+                    </div>
+                    <div class="pt-2 pb-3 space-y-1">
+                        <ResponsiveNavLink :href="route('backup')" :active="route().current('backup')">Backup</ResponsiveNavLink>
+                    </div>
+
+                    <div class="pt-2 pb-3 space-y-1">
+                        <ResponsiveNavLink :href="route('BusinessInfo')" :active="route().current('BusinessInfo')">BusinessInfo</ResponsiveNavLink>
                     </div>
 
                     <div class="pt-2 pb-3 space-y-1">

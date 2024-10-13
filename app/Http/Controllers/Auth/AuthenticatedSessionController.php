@@ -36,16 +36,20 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
-        if($user->user_type == 'owner'){
-            return redirect()->intended(route('dashboard', absolute: false));
-        }else if($user->user_type == 'customer'){
+        if($user->user_type === 'owner'){
+            return redirect()->intended(route('home', absolute: false));
+        }else if($user->user_type === 'customer'){
             return redirect()->intended(route('homepage', absolute: false));
         }
 
         return back()->withErrors('Login failed. Please try again.');
     }
 
-    
+    public function show(Request $request){
+        $user = Auth::user();
+        return $user;
+    }
+
     /**
      * Destroy an authenticated session.
      */

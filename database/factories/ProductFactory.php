@@ -20,7 +20,7 @@ class ProductFactory extends Factory
             'seniorPWD_discountable' => $this->faker->randomElement(['yes', 'no']),
             'name' => $this->faker->word,
             'brand' => $this->faker->word,
-            'price' => $this->faker->randomFloat(2, 1, 100),
+            'price' => $this->faker->numberBetween(0, 999999),
             'category' => $this->faker->word,
             'stock' => $this->faker->numberBetween(0, 100),
             'sold' => $this->faker->numberBetween(0, 100),

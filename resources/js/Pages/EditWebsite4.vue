@@ -18,9 +18,12 @@ const textAreas = {
     business_Facebook: ref(''),
     business_X: ref(''),
     business_Instagram: ref(''),
-    business_Tiktok: ref('')
+    business_Tiktok: ref(''),
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref('')
 }
-
+let isLoading = ref(true);
 onMounted(()=>{
     getWebsiteInfo();
 });
@@ -44,13 +47,19 @@ async function getWebsiteInfo(){
         });
         console.log(getWebsiteInfo.data);
 
-        const imgUrl = `/storage/${getBusinessInfo.data.website_image}`;
-        textAreas.businessImage.value=imgUrl;
-        // textAreas.businessImage.value = getBusinessInfo.data.business_image;
+        if(getBusinessInfo.data.business_image){
+        businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+        isLoading.value = false;
+    }
+    // textAreas.businessImage.value = getBusinessInfo.data.business_image;
         textAreas.businessName.value = getBusinessInfo.data.business_Name;
         textAreas.business_Email.value = getBusinessInfo.data.business_Email;
         textAreas.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
+        
         textAreas.business_Address.value = getBusinessInfo.data.business_Address;
+        textAreas.business_Province.value = getBusinessInfo.data.business_Province;
+        textAreas.business_City.value = getBusinessInfo.data.business_City;
+        textAreas.business_Barangay.value = getBusinessInfo.data.business_Barangay;
 
         textAreas.business_Facebook.value = getBusinessInfo.data.business_Facebook;
         textAreas.business_X.value = getBusinessInfo.data.business_X;
@@ -117,7 +126,9 @@ async function save(){
             <!-- FootNote -->
             <div class="mr-auto mt-40 ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
                 <div class="max-w-[50px]">
-                    <img :src='textAreas.businessImage.value' class="w-full h-full object-cover rounded-full"/>
+                    <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
+                    <img v-else-if="textAreas.businessImage.value" :src='textAreas.businessImage.value' alt="Logo"  class="w-[50px] h-[50px] object-cover rounded-full" />
+                    <img v-else src='/storage/business_logos/default-profile.png'/>
                 </div>
 
                 <div class="mt-5">
@@ -128,10 +139,10 @@ async function save(){
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>
                     </div>
                     <div class="mt-[20px]">
-                    <a :href="textAreas.business_Facebook.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
-                    <a :href="textAreas.business_X.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a :href="textAreas.business_Instagram.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
-                    <a :href="textAreas.business_Tiktok.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+                    <a :href="formatUrl(textAreas.business_Facebook.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a :href="formatUrl(textAreas.business_X.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a :href="formatUrl(textAreas.business_Instagram.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
+                    <a :href="formatUrl(textAreas.business_Tiktok.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
                     </div>
                 </div>
             
@@ -144,6 +155,8 @@ async function save(){
                     <p class="text-white mt-[10px]">Email: {{ textAreas.business_Email }} </p>
                     <p class="text-white">Contact No.: {{ textAreas.business_Contact_Number }} </p>
                     <p class="text-white">Address: {{ textAreas.business_Address }} </p>
+                    <p class="text-white">{{ textAreas.business_Province }}, 
+                        {{ textAreas.business_City }}, {{ textAreas.business_Barangay }}  </p>
                 </div>
             </div>
         </div>

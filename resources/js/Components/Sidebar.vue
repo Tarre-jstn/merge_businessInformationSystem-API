@@ -1,13 +1,41 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon } from '@heroicons/vue/24/solid'
+import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon, Cog6ToothIcon, ArrowDownTrayIcon  } from '@heroicons/vue/24/solid'
+import { onMounted, ref } from 'vue';
+
+let businessImage = ref('');
+let businessName = ref('');
+let isLoading = ref(true);
+onMounted(()=>{
+    getWebsiteInfo();
+    });
+
+async function getWebsiteInfo(){
+    const response_userId = await axios.get('/user-id');
+        const userId = response_userId.data.user_id;
+        console.log(userId);
+
+        const getBusinessInfo = await axios.get('/api/business_info', {
+            params: {user_id: userId}
+        });
+        console.log(getBusinessInfo.data);
+
+        if(getBusinessInfo.data.business_image){
+        businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+        isLoading.value = false;
+    }
+        businessName.value = getBusinessInfo.data.business_Name;
+        
+    }
 </script>
 
 <template>
     <div class="sidebar fixed sm:relative sm:translate-x-0 -translate-x-full">
         <div class="logo">
-            <img src="https://picsum.photos/200" alt="Logo" />
-            <h1>F.C. Products</h1>
+            <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
+            <img v-else-if="businessImage" :src='businessImage' alt="Logo" />
+            <img v-else src='/storage/business_logos/default-profile.png'/>
+            <h1>{{businessName}}</h1>
         </div>
         <nav>
             <ul>
@@ -40,13 +68,14 @@ import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltI
                     <BuildingLibraryIcon class="size-6"/>
                     <span class="ml-3">Finance</span>
                 </Link></li>
-
-                <li class="flex items-center mb-4"><Link :href="route('settings')" :class="{ active: route().current('settings') }">
-                    <i class="icon-settings"></i>
-                    <span class="ml-3">Additional Settings</span>
-                </Link></li>
                 <li class="flex items-center mb-4"><Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
-                    <span class="ml-3">BusinessInfo</span>
+                    <Cog6ToothIcon class="size-6"/>
+                    <span class="ml-2">Business Information</span>
+                </Link></li>
+
+                <li class="flex items-center mb-4"><Link :href="route('backup-main')" :class="{ active: route().current('backup-main') }">
+                    <ArrowDownTrayIcon class="size-6"/>
+                    <span class="ml-2">Backup and<br>Restore</span>
                 </Link></li>
             </ul>
         </nav>
@@ -72,7 +101,8 @@ import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltI
 }
 
 nav ul {
-    margin-top: 2rem;
+
+    margin-top: 1rem;
     display: flex;
     flex-direction: column; 
     align-items: center; 
@@ -99,7 +129,7 @@ nav ul li a {
 
 nav ul li a svg {
     margin-right: 10px;
-    margin-left:50px; 
+    margin-left:37px; 
     width: 30px;
     height: 30px;
 }
@@ -132,8 +162,8 @@ nav ul li a:hover {
     align-items: center; 
 }
 .logo img {
-    width: 200px;
-    height: 200px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     margin-bottom: 10px; 
 }

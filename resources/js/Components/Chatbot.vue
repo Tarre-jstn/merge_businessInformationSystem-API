@@ -102,7 +102,8 @@ export default {
           this.businessCity = businessData.business_City || 'Unknown City';
           this.businessBarangay = businessData.business_Barangay || 'Unknown Barangay';
           this.businessAddress = businessData.business_Address || 'Unknown Address';
-          this.businessPhoneNumber = businessData.business_Phone_Number || 'Unknown Phone Number';
+          this.businessPhoneNumber = businessData.business_Contact_Number || 'Unknown Phone Number';
+          this.businessTelephoneNumber = businessData.business_Telephone_Number || 'Unknown Phone Number';
           this.businessFacebook = businessData.business_Facebook || 'Unknown Facebook';
           this.businessX = businessData.business_X || 'Unknown X';
           this.businessInstagram = businessData.business_Instagram || 'Unknown Instagram ';
@@ -463,9 +464,11 @@ export default {
 }
 
 .chat-circle {
-  width: 60px;
-  height: 60px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
+  border-color: black;
+  border: 2px solid black;
   display: flex;
   align-items: center;
   justify-content: center;

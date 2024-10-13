@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { Inertia } from '@inertiajs/inertia';
 import axios from 'axios';
 import { Head } from '@inertiajs/vue3';
 
@@ -19,22 +20,44 @@ let userInfo = ref({
     contact_number: ''
 });
 
+const businessInfo = {
+    businessImage: ref(''),
+    businessName: ref(''),
+    business_Email: ref(''),
+    business_Contact_Number: ref(''),
+    business_Telephone_Number: ref(''),
+    business_Address: ref(''),
+    business_Facebook: ref(''),
+    business_X: ref(''),
+    business_Instagram: ref(''),
+    business_Tiktok: ref(''),
+    businessDescription: ref(''),
+    businessDetails: ref(''), 
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref(''),
+    website_footNote: ref('')
+}
+
+
 let businessImage = ref('');
+let isLoading = ref(true);
 
 const profilePicture = ref(null);
+
+const formatUrl = (url) => {
+    // Check if the URL starts with http:// or https://
+    if (!/^https?:\/\//i.test(url)) {
+        // Prepend https:// if it doesn't
+        return `https://${url}`;
+    }
+    return url;
+};
+
 async function getWebsiteInfo(){
     try{
         const response_userId = await axios.get('/user-id');
         const userId = response_userId.data.user_id;
-        console.log(userId);
-
-        const getBusinessInfo = await axios.get('/api/business_info', {
-            params: {user_id: userId}
-        });
-        console.log(getBusinessInfo.data);
-        const businessId = getBusinessInfo.data.business_id;
-
-        businessImage.value =`/storage/${getBusinessInfo.data.business_image}`;
     }catch(error){
         console.error('There was an error fetching the data:', error);
     }
@@ -52,13 +75,40 @@ try {
             name: response.data.name,
             email: response.data.email,
             address: response.data.address,
-            contact_number: response.data.contact_number
+            contact_number: response.data.contact_number,
+            
     };
+
+    const getBusinessInfo = await axios.get('/api/business_info', {
+            params: {user_id: 1}
+        });
+
+        
+        businessInfo.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+        businessInfo.businessName.value = getBusinessInfo.data.business_Name;
+        businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
+        businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
+        businessInfo.business_Telephone_Number.value = getBusinessInfo.data.business_Telephone_Number;
+        businessInfo.business_Address.value = getBusinessInfo.data.business_Address;
+
+        businessInfo.business_Province.value = getBusinessInfo.data.business_Province;
+        businessInfo.business_City.value = getBusinessInfo.data.business_City;
+        businessInfo.business_Barangay.value = getBusinessInfo.data.business_Barangay;
+
+        businessInfo.business_Facebook.value = getBusinessInfo.data.business_Facebook;
+        businessInfo.business_X.value = getBusinessInfo.data.business_X;
+        businessInfo.business_Instagram.value = getBusinessInfo.data.business_Instagram;
+        businessInfo.business_Tiktok.value = getBusinessInfo.data.business_Tiktok;
+
 
         // Set profile picture or default if not available
         profilePicture.value = response.data.profile_img 
         ? `/storage/user_profile/${response.data.profile_img}` 
         : '/storage/user_profile/default-profile.png';
+
+        if(userInfo.value.profile_img){
+            isLoading.value=false;
+        }
 
     } else {
         console.error("No business data found or invalid format.");
@@ -108,7 +158,7 @@ try {
     },
     });
     if (response.data.success) {
-    alert('Business profile updated successfully');
+    alert('User profile updated successfully');
     } else {
     console.error("Update failed:", response.data);
     alert('Please input only .jpg .png or .jpeg');
@@ -129,10 +179,10 @@ try {
                 <img :src='businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a>Home</a>
+                    <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]">Products & Services</a>
-                    <a class="text-white text-[18px]">About Us</a>
+                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
+                    <a class="text-white text-[18px]" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
                     <div class="flex flex-col">
                         <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
@@ -246,6 +296,67 @@ try {
 
         </div>
     </div>
-</template>
 
+    <section>
+        <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
+
+            <div class="w-full">
+                <hr class="border-white mx-auto w-11/12">
+            </div>
+<div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
+<!-- FootNote -->
+<div class="mr-auto mt-40 ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
+    <div class="max-w-[50px]">
+        <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
+    </div>
+
+    <div class="mt-5">
+        <p class=" text-xl text-white">{{ businessInfo.website_footNote }}</p>
+        <div class="mt-[20px]">
+        <a :href="formatUrl(businessInfo.business_Facebook.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
+        <a :href="formatUrl(businessInfo.business_X.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
+        <a :href="formatUrl(businessInfo.business_Instagram.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
+        <a :href="formatUrl(businessInfo.business_Tiktok.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+    </div>
+
+</div>
+
+<!-- Contact Us -->
+<div class="mt-[100px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
+    <div class="mt-2 flex flex-col ">
+        <p class="text-white font-bold text-[50px]">Contact Us</p>
+        <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>
+        <p class="text-white">Contact No.: {{ businessInfo.business_Contact_Number }} </p>
+        <p class="text-white">Address: {{ businessInfo.business_Address }} </p>
+        <p class="text-white">{{ businessInfo.business_Province }}, 
+            {{ businessInfo.business_City }}, {{ businessInfo.business_Barangay }}  </p>
+            <p class="text-white">Telephone No.: {{ businessInfo.business_Telephone_Number }} </p>
+    </div>
+</div>
+</div>
+
+<div class="mt-[60px] w-full">
+    <hr class="border-white mx-auto w-11/12">
+</div>
+
+<div class="ml-[60px] mr-auto w-full">
+    <p class="text-[17px] text-white mt-2"><i class="fa fa-copyright"></i> {{ businessInfo.businessName }} All rights reserved</p>
+</div>
+        </div>
+
+</section>
+</template>
+<style>
+.icon-color {
+    background-color: #306091; 
+}
+.fa.fa-twitter{
+	font-family:sans-serif;
+}
+.fa.fa-twitter::before{
+	content:"𝕏";
+	font-size:1.2em;
+}
+</style>
 

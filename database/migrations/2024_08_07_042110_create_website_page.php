@@ -18,7 +18,6 @@ return new class extends Migration
             // $table->foreign('business_id')->references('business_id')->on('business')->onDelete('cascade');
             // $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreignId('business_id')->references('business_id')->on('businesses')->onDelete('cascade');
-            $table->foreignId('product_id')->nullable()->references('id')->on('products')->onDelete('cascade');
             $table->string('website_description')->nullable();
             $table->string('website_details')->nullable();
             $table->string('website_image')->nullable();
@@ -26,6 +25,8 @@ return new class extends Migration
             $table->string('about_us2')->nullable();
             $table->string('about_us3')->nullable();
             $table->string('website_footNote')->nullable();
+            $table->enum('featured_section',['true','false'])->default('true');
+            $table->enum('onSale_section',['true','false'])->default('true');
             $table->timestamps();
     
         });

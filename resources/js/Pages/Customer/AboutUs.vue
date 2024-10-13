@@ -7,6 +7,7 @@ const businessInfo = {
     businessName: ref(''),
     business_Email: ref(''),
     business_Contact_Number: ref(''),
+    business_Telephone_Number: ref(''),
     business_Address: ref(''),
     business_Facebook: ref(''),
     business_X: ref(''),
@@ -14,10 +15,27 @@ const businessInfo = {
     business_Tiktok: ref(''),
     businessDescription: ref(''),
     businessDetails: ref(''), 
-    homePageImage: ref('')
+    business_Province: ref(''),
+    business_City: ref(''),
+    business_Barangay: ref('')
 }
 
+let profile_img = ref('');
+const profilePicture = ref(null);
+let isLoading = ref(true);
 
+const formatUrl = (url) => {
+    // Check if the URL starts with http:// or https://
+    if (!/^https?:\/\//i.test(url)) {
+        // Prepend https:// if it doesn't
+        return `https://${url}`;
+    }
+    return url;
+};
+
+function account(){
+    Inertia.visit(route('account_settings'));
+}
 const textAreas = {
     about_us1: ref(''),
     about_us2: ref(''),
@@ -36,6 +54,14 @@ onMounted(()=>{
 async function getWebsiteInfo(){
     try{
 
+        const response = await axios.get('/showUser');
+        if (response.data) {
+            profilePicture.value = response.data.profile_img 
+        ? `/storage/user_profile/${response.data.profile_img}` 
+        : '/storage/user_profile/default-profile.png';
+            isLoading.value=false;
+        }
+
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: 1}
         });
@@ -47,12 +73,16 @@ async function getWebsiteInfo(){
         
         console.log('Website data: ',getWebsiteInfo1.data);
 
-        const imgBusinessUrl = `/storage/${getBusinessInfo.data.business_image}`;
-        businessInfo.businessImage.value = imgBusinessUrl;
+        businessInfo.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
         businessInfo.businessName.value = getBusinessInfo.data.business_Name;
         businessInfo.business_Email.value = getBusinessInfo.data.business_Email;
         businessInfo.business_Contact_Number.value = getBusinessInfo.data.business_Contact_Number;
+        businessInfo.business_Telephone_Number.value = getBusinessInfo.data.business_Telephone_Number;
         businessInfo.business_Address.value = getBusinessInfo.data.business_Address;
+
+        businessInfo.business_Province.value = getBusinessInfo.data.business_Province;
+        businessInfo.business_City.value = getBusinessInfo.data.business_City;
+        businessInfo.business_Barangay.value = getBusinessInfo.data.business_Barangay;
 
         businessInfo.business_Facebook.value = getBusinessInfo.data.business_Facebook;
         businessInfo.business_X.value = getBusinessInfo.data.business_X;
@@ -84,14 +114,22 @@ async function getWebsiteInfo(){
             <div class="ml-[50px] w-[50px] h-[50px]">
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
-                <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
+            <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
                     <a class="text-white text-[18px]">Chat with Us</a>
                     <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
-                    <a class="text-black text-[18px]" :href="route('aboutUs_page')">About Us</a>
+                    <a class="text-black text-[18px]":href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <button @click="logout('register')" class="text-white">Register</button>
-                    <button @click="logout('logout')" class="cursor-pointer bg-white border border-white rounded-sm py-1 px-3">Log Out</button>
+                    <div class="flex flex-col">
+                        <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
+                        <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
+                    </div> 
+                    <div class="w-[50px] h-[50px]">
+                        <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
+                        <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />
+                        <img v-else src='/storage/user_profile/default-profile.png'/>
+                    </div>
+                    
                 </div>
         </div>
 
@@ -139,7 +177,7 @@ async function getWebsiteInfo(){
 </div>
 </section>
 
-    <section>
+<section>
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
 
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
@@ -152,10 +190,10 @@ async function getWebsiteInfo(){
     <div class="mt-5">
         <p class=" text-xl text-white">{{ textAreas.website_footNote }}</p>
         <div class="mt-[20px]">
-        <a :href="businessInfo.business_Facebook.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
-        <a :href="businessInfo.business_X.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
-        <a :href="businessInfo.business_Instagram.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
-        <a :href="businessInfo.business_Tiktok.value" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
+        <a :href="formatUrl(businessInfo.business_Facebook.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-facebook-f"></i></a>
+        <a :href="formatUrl(businessInfo.business_X.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa fa-twitter"></i></a>
+        <a :href="formatUrl(businessInfo.business_Instagram.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-instagram"></i></a>
+        <a :href="formatUrl(businessInfo.business_Tiktok.value)" class="w-[30px] h-[40px] bg-white rounded-xl mr-[5px] p-2 cursor-pointer"><i class="fa-brands fa-tiktok"></i></a>
         </div>
     </div>
 
@@ -168,6 +206,9 @@ async function getWebsiteInfo(){
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>
         <p class="text-white">Contact No.: {{ businessInfo.business_Contact_Number }} </p>
         <p class="text-white">Address: {{ businessInfo.business_Address }} </p>
+        <p class="text-white">{{ businessInfo.business_Province }}, 
+            {{ businessInfo.business_City }}, {{ businessInfo.business_Barangay }}  </p>
+            <p class="text-white">Telephone No.: {{ businessInfo.business_Telephone_Number }} </p>
     </div>
 </div>
 </div>
@@ -179,8 +220,9 @@ async function getWebsiteInfo(){
 <div class="ml-[60px] mr-auto w-full">
     <p class="text-[17px] text-white mt-2"><i class="fa fa-copyright"></i> {{ textAreas.businessName }} All rights reserved</p>
 </div>
-</div>
-    </section>
+        </div>
+
+</section>
 </template>
 <style>
 .icon-color {

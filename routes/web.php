@@ -18,6 +18,10 @@ use BotMan\BotMan\Messages\Incoming\Answer;
 
 DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
 
+use App\Http\Controllers\BackupController;
+
+//Route::get('/backup', [BackupController::class, 'createBackup']);
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -28,8 +32,9 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
     Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
+        return Inertia::render('Home');
     })->name('dashboard');
 
     Route::get('/homepage', function () {
@@ -47,10 +52,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/account', function () {
         return Inertia::render('Customer/Account');
     })->name('account_settings');
-
+    
     Route::get('/website', function () {
         return Inertia::render('Website');
     })->name('website');
+
+    Route::get('/account', function () {
+        return Inertia::render('Customer/Account');
+    })->name('account_settings');
+
+    Route::get('/chat_with_us', function () {
+        return Inertia::render('Customer/Chats');
+    })->name('chat_with_us');
 
     Route::get('/chats', function () {
         return Inertia::render('Chats');
@@ -71,6 +84,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/settings', function () {
         return Inertia::render('Settings');
     })->name('settings');
+
+    Route::get('/backup-main', function () {
+        return Inertia::render('BackupMainPage');
+    })->name('backup-main');
+
+    Route::get('/backup', function () {
+        return Inertia::render('Backup');
+    })->name('backup');
 
     Route::get('/preview-homepage', function () {
         return Inertia::render('Preview_Homepage');
@@ -100,20 +121,43 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('EditWebsite4');
     })->name('editWebsite4');
 
+    Route::get('/preview-homepage', function () {
+        return Inertia::render('Preview_Homepage');
+    })->name('preview_homepage');
+
+    Route::get('/products_page', function () {
+        return Inertia::render('Customer/Products');
+    })->name('products_page');
+
+    Route::get('/editWebsite1', function () {
+        return Inertia::render('EditWebsite1');
+    })->name('editWebsite1');
+
+    Route::get('/editWebsite2', function () {
+        return Inertia::render('EditWebsite2');
+    })->name('editWebsite2');
+
+    Route::get('/editWebsite3', function () {
+        return Inertia::render('EditWebsite3');
+    })->name('editWebsite3');
+
+    Route::get('/editWebsite4', function () {
+        return Inertia::render('EditWebsite4');
+    })->name('editWebsite4');
+
+    Route::get('/BusinessInfo', function () {
+        return Inertia::render('BusinessInfo');
+    })->name('BusinessInfo');
+
     Route::get('/user-id', [GetIdController::class, 'getUserId']);
     Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
 
     Route::get('/showUser', [ProfileController::class, 'show'])
     ->name('showUser');
 
+    Route::get('/auth_user', [GetIdController::class, 'checkUserAuth']);
     Route::put('/update_user/{id}', [ProfileController::class, 'update']);
 
-    
-    Route::get('/BusinessInfo', function () {
-        return Inertia::render('BusinessInfo');
-    })->name('BusinessInfo');
-
-    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
