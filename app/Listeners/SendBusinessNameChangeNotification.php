@@ -14,21 +14,28 @@ class SendBusinessNameChangeNotification
         $customers = User::where('user_type', 'customer')->get();
 
         foreach ($customers as $customer) {
-            // Compose the email body using plain HTML
-            $emailBody = "
-                <html>
-                    <body>
-                        <h2>Business Name Change Notification</h2>
-                        <p>The business <strong>{$event->oldName}</strong> has changed its name to <strong>{$event->newName}</strong>.</p>
-                        <p>If you have any questions, feel free to reach out to them.</p>
-                    </body>
-                </html>";
+            // Create the email content based on the changed fields
+            $emailBody = "<html><body>";
+            $emailBody .= "<h2>Business Information Updated</h2>";
+            $emailBody .= "<p><strong>{$event->newName}</strong> has updated their business information.</p>";
 
-            // Use Mail::html() instead of Mail::send()
-            Mail::html($emailBody, function ($message) use ($customer) {
+            foreach ($event->changes as $field => $change) {
+                if ($field === 'business_Address') {
+                    $emailBody .= "<p>Business Address changed from <strong>{$change['old']}</strong> to <strong>{$change['new']}</strong>.</p>";
+                } else {
+                    $fieldLabel = ucfirst(str_replace('_', ' ', $field));
+                    $emailBody .= "<p>{$fieldLabel} changed from <strong>{$change['old']}</strong> to <strong>{$change['new']}</strong>.</p>";
+                }
+            }
+
+            $emailBody .= "</body></html>";
+
+            // Send the email
+            Mail::html($emailBody, function ($message) use ($customer, $event) {
                 $message->to($customer->email)
-                        ->subject('Business Name Change Notification');
+                    ->subject("Business Information Change Notification for {$event->newName}");
             });
         }
     }
 }
+

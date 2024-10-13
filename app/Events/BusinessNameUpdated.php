@@ -12,16 +12,19 @@ class BusinessNameUpdated
 
     public $oldName;
     public $newName;
+    public $changes; // Changes array
 
     /**
      * Create a new event instance.
      *
      * @param string $oldName
      * @param string $newName
+     * @param array $changes
      */
-    public function __construct($oldName, $newName)
+    public function __construct($oldName, $newName, $changes = [])
     {
         $this->oldName = $oldName;
         $this->newName = $newName;
+        $this->changes = $changes;
     }
 }
