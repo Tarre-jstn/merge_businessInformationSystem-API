@@ -2,6 +2,7 @@
 import { text } from '@fortawesome/fontawesome-svg-core';
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref, reactive } from 'vue';
+import{usePage } from '@inertiajs/vue3';
 
 const businessInfo = {
     businessImage: ref(''),
@@ -19,6 +20,7 @@ const businessInfo = {
     business_City: ref(''),
     business_Barangay: ref('')
 }
+const {props} = usePage();
 let profile_img = ref('');
 const profilePicture = ref(null);
 
@@ -31,58 +33,78 @@ const formatUrl = (url) => {
     return url;
 };
 
-function account(){
-    Inertia.visit(route('account_settings'));
-}
 const textAreas = reactive({
-    card1: '',
-    card1_img: '',
-    card1_desc: '',
-    card2: '',
-    card2_img: '',
-    card2_desc: '',
-    card3: '',
-    card3_img: '',
-    card3_desc: '',
-    card4: '',
-    card4_img: '',
-    card4_desc: '',
-    card5: '',
-    card5_img: '',
-    card5_desc: '',
-    card6: '',
-    card6_img: '',
-    card6_desc: '',
-    card7: '',
-    card7_img: '',
-    card7_desc: '',
-    card8: '',
-    card8_img: '',
-    card8_desc: '',
-    card9: '',
-    card9_img: '',
-    card9_desc: '',
+    products: [],
     website_footNote: ''
 });
+
+let currentPage = ref(0);  
+
+const PRODUCTS_PER_PAGE = 9;
+
+// const textAreas = reactive({
+//     card1: '',
+//     card1_img: '',
+//     card1_desc: '',
+//     card2: '',
+//     card2_img: '',
+//     card2_desc: '',
+//     card3: '',
+//     card3_img: '',
+//     card3_desc: '',
+//     card4: '',
+//     card4_img: '',
+//     card4_desc: '',
+//     card5: '',
+//     card5_img: '',
+//     card5_desc: '',
+//     card6: '',
+//     card6_img: '',
+//     card6_desc: '',
+//     card7: '',
+//     card7_img: '',
+//     card7_desc: '',
+//     card8: '',
+//     card8_img: '',
+//     card8_desc: '',
+//     card9: '',
+//     card9_img: '',
+//     card9_desc: '',
+//     website_footNote: ''
+// });
 const onSale_toggle=ref('');
-const next = ref(false);
+let next = ref(false);
 const lengthArray = ref(null);
 let isLoading = ref(true);
+let buttonVisible = ref(true);
+let productToDisplay = ref([]);
+let userLogIn = ref(false);
 
 function logout(button){
     Inertia.post(route('logout'), {button});
 }
-
+function account(){
+    Inertia.visit(route('account_settings'));
+}
 onMounted(()=>{
     getWebsiteInfo();
 })
 
+function chunkArray(array, chunkSize) {
+            const result = [];
+            for (let i = 0; i < array.length; i += chunkSize) {
+                result.push(array.slice(i, i + chunkSize));
+            }
+            return result;
+        }
+
 function showMore(){
-    next.value=true;
-    if(lengthArray.value<9){
-        alert(`There are only ${lengthArray.value} to be displayed`);
+    currentPage.value+=1;
+    if(lengthArray.value<=9){
+        alert(`There are only ${lengthArray.value} products to be displayed`);
+        buttonVisible.value=false;
     }else{
-    getWebsiteInfo();
+        fetchProducts();
     }
 }
 
@@ -95,6 +117,9 @@ async function getWebsiteInfo(){
         ? `/storage/user_profile/${response.data.profile_img}` 
         : '/storage/user_profile/default-profile.png';
             isLoading.value=false;
+        }
+        if(props.auth.user){
+            userLogIn.value=true;
         }
 
         const getBusinessInfo = await axios.get('/api/business_info', {
@@ -127,41 +152,47 @@ async function getWebsiteInfo(){
         onSale_toggle.value = getWebsiteInfo1.data.onSale_section;
         businessInfo.website_footNote.value = getWebsiteInfo1.data.website_footNote;
 
-        const getProductsInfo = await axios.get('/api/listed-products', {
-            params: {business_id: 1}
-        });
+        await fetchProducts();
 
-        const listedProducts = getProductsInfo.data
-        lengthArray.value = listedProducts.length;
-        
-        listedProducts.forEach((product, index) => {
-            const imgPath = product.product_img.replace('products/', '');
-            
-            if(!next.value){
-                    if(index<9){
-                    textAreas[`card${index+1}`] = product.product_name;
-                    textAreas[`card${index+1}_img`] = imgPath;
-                    textAreas[`card${index+1}_desc`]=product.product_desc;
-                    }
-
-            }else{
-
-                for(let i=1;i<=9;i++){
-                    textAreas[`card${i}`] = '';
-                    textAreas[`card${i}_img`] = '';
-                    textAreas[`card${i}_desc`]='';
-                }
-                if(index>=9&&index<=17){
-                textAreas[`card${index-8}`] = product.product_name;
-                textAreas[`card${index-8}_img`] = imgPath;
-                textAreas[`card${index-8}_desc`]=product.product_desc;
-                }
-            }
-        });
     
     }catch(error){
         console.error('There was an error fetching the data:', error);
     }
+}
+
+async function fetchProducts() {
+        const getProductsInfo = await axios.get('/api/listed-products', {
+            params: {business_id: 1}
+        });
+        console.log('Fetched Products: ', getProductsInfo.data); 
+        const listedProducts = getProductsInfo.data
+        lengthArray.value = listedProducts.length;
+        console.log("listedProducts: ", listedProducts);
+
+        if(lengthArray.value > 0){
+            const start = currentPage.value * PRODUCTS_PER_PAGE;
+            const end = start + PRODUCTS_PER_PAGE;
+
+            productToDisplay.value = listedProducts.slice(start, end);
+            console.log("productToDisplay products: ",productToDisplay.value);
+
+            if (productToDisplay.value && productToDisplay.value.length > 0) {
+            productToDisplay.value.forEach(element => {
+                textAreas.products.push({
+                    name: element.product_name,
+                    img: element.product_img.replace('products/', ''),
+                    desc: element.product_desc
+                })
+                
+            });
+        } else {
+                console.error('No products to display, productToDisplay is:', productToDisplay.value);
+            }
+            if(textAreas.products.length >= lengthArray.value){
+                buttonVisible.value=false;
+            }
+            
+        }
 }
 
 function goTochatPage(){
@@ -175,16 +206,20 @@ function goTochatPage(){
             <div class="ml-[50px] w-[50px] h-[50px]">
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
-            <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
+                <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a class="text-white text-[18px] cursor-pointer" :href="route('homepage')">Home</a>
-                    <a class="text-white text-[18px] cursor-pointer">Chat with Us</a>
-                    <a class="text-black text-[18px] cursor-pointer">Products & Services</a>
-                    <a class="text-white text-[18px] cursor-pointer":href="route('aboutUs_page')">About Us</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('chat_with_us')">Chat with Us</a>
+                    <a class="text-black text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <div class="flex flex-col">
+                    <div v-if="userLogIn===true" class="flex flex-col">
                         <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
-                    </div> 
+                    </div>
+                    <div v-else-if="userLogIn===false" class="space-x-[40px] mr-[40px]">
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('login')">Log In</a>
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('register')">Register</a>
+                    </div>
                     <div class="w-[50px] h-[50px]">
                         <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
                         <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />
@@ -212,87 +247,21 @@ function goTochatPage(){
 </div>
 </div>
 
-<div class=" mt-[30px] mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">
-    
-    <div class="block flex flex-row gap-9">
-    <!-- card 1 -->
-        <div v-if="textAreas.card1_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            
-            <img :src="`/storage/products/${textAreas.card1_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card1}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card1_desc}}</p>
-        </div>
-
-     <!-- card 2 -->
-     <div v-if="textAreas.card2_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card2_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card2}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card2_desc}}</p>
-        </div>
-    
-
-    <!-- card 3 -->
-    <div v-if="textAreas.card3_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card3_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card3}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card3_desc}}</p>
-        </div>
+<div class="mt-[30px] mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg mt-[10px] px-4 pt-[200px]">
+    <div v-for="(row, rowIndex) in chunkArray(textAreas.products, 3)" :key="rowIndex" class="flex justify-between gap-4">            
+        <div v-for="(product, index) in row" :key="index" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
+                    <img :src="`/storage/products/${product.img}`" class="w-full h-4/5 object-cover" />
+                    <p class="text-black text-[18px] mt-[10px] text-center">{{ product.name }}</p>
+                    <p class="text-black text-[14px] text-center">{{ product.desc }}</p>
+                </div>
     </div>
-
-    <div class="block flex flex-row gap-9">
-    <!-- card 4 -->
-    <div v-if="textAreas.card4_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card4_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card4}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card4_desc}}</p>
-        </div>
-
-    <!-- card 5 -->
-    <div v-if="textAreas.card5_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card5_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card5}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card5_desc}}</p>
-        </div>
-
-    <!-- card 6 -->
-    <div v-if="textAreas.card6_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card6_img}`" class="w-full h-4/5 object-cover"/>
-            
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card6}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card6_desc}}</p>
-          
-        </div> 
-    </div>
-
-    <div class="block flex flex-row gap-9">
-
-        <!-- card 7 -->
-        <div v-if="textAreas.card7_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card7_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card7}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card7_desc}}</p>
-        </div> 
-
-        <!-- card 8 -->
-        <div v-if="textAreas.card8_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card8_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card8}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card8_desc}}</p>
-        </div> 
-
-        <!-- card 9 -->
-        <div v-if="textAreas.card9_img" class="flex flex-col bg-white w-[340px] h-[360px] p-4 rounded-lg shadow-lg border border-gray-200">
-            <img :src="`/storage/products/${textAreas.card9_img}`" class="w-full h-4/5 object-cover"/>
-            <p class="text-black text-[18px] mt-[10px] text-center">{{textAreas.card9}}</p>
-            <p class="text-black text-[14px] text-center">{{textAreas.card9_desc}}</p>
-        </div> 
-
-    </div>
-    <div>
-        <button @click="showMore" class="cursor-pointer bg-white border border-white rounded-sm py-6 px-9">Show More</button>
+    <div class="block mx-auto">
+        <button v-if="buttonVisible===true" @click="showMore" class="cursor-pointer bg-white border border-white rounded-sm py-6 px-9">Show More</button>
         
     </div>
 </div>
+
+
         </div>
     </section>
 
@@ -307,8 +276,8 @@ function goTochatPage(){
         <!-- FootNote -->
         <div class="mr-auto mt-[100px] ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
             <div class="max-w-[50px]">
-                <img :src='businessImage' class="w-full h-full object-cover rounded-full"/>
-            </div>
+        <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
+    </div>
 
             <div class="mt-5">
                 <p class=" text-xl text-white">{{website_footNote }}</p>

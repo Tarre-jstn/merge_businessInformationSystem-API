@@ -268,7 +268,7 @@ export default {
           case 6:
           this.messages.push({
               id: new Date().getTime(),
-              text: `We sell ${this.productDescription}  `,
+              text: `${this.productDescription}  `,
               sender: 'bot',
             });
             setTimeout(() => {

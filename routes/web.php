@@ -31,39 +31,42 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/showUser', [ProfileController::class, 'show'])
+->name('showUser');
+
+Route::get('/homepage', function () {
+    return Inertia::render('Customer/Homepage');
+})->name('homepage');
+
+Route::get('/sale', function () {
+    return Inertia::render('Customer/SaleProducts');
+})->name('sale');
+
+Route::get('/chat_with_us', function () {
+    return Inertia::render('Customer/Chats');
+})->name('chat_with_us');
+
+Route::get('/products_page', function () {
+    return Inertia::render('Customer/Products');
+})->name('products_page');
+
+Route::get('/aboutUs_page', function () {
+    return Inertia::render('Customer/AboutUs');
+})->name('aboutUs_page');
+
 Route::middleware(['auth', 'verified'])->group(function () {
-
-    Route::get('/dashboard', function () {
-        return Inertia::render('Home');
-    })->name('dashboard');
-
-    Route::get('/homepage', function () {
-        return Inertia::render('Customer/Homepage');
-    })->name('homepage');
-
-    Route::get('/sale', function () {
-        return Inertia::render('Customer/SaleProducts');
-    })->name('sale');
-
-    Route::get('/home', function () {
-        return Inertia::render('Home');
-    })->name('home');
 
     Route::get('/account', function () {
         return Inertia::render('Customer/Account');
     })->name('account_settings');
     
+    Route::get('/home', function () {
+        return Inertia::render('Home');
+    })->name('home');
+
     Route::get('/website', function () {
         return Inertia::render('Website');
     })->name('website');
-
-    Route::get('/account', function () {
-        return Inertia::render('Customer/Account');
-    })->name('account_settings');
-
-    Route::get('/chat_with_us', function () {
-        return Inertia::render('Customer/Chats');
-    })->name('chat_with_us');
 
     Route::get('/chats', function () {
         return Inertia::render('Chats');
@@ -97,14 +100,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Preview_Homepage');
     })->name('preview_homepage');
 
-    Route::get('/products_page', function () {
-        return Inertia::render('Customer/Products');
-    })->name('products_page');
-
-    Route::get('/aboutUs_page', function () {
-        return Inertia::render('Customer/AboutUs');
-    })->name('aboutUs_page');
-
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');
     })->name('editWebsite1');
@@ -124,10 +119,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/preview-homepage', function () {
         return Inertia::render('Preview_Homepage');
     })->name('preview_homepage');
-
-    Route::get('/products_page', function () {
-        return Inertia::render('Customer/Products');
-    })->name('products_page');
 
     Route::get('/editWebsite1', function () {
         return Inertia::render('EditWebsite1');
@@ -151,9 +142,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/user-id', [GetIdController::class, 'getUserId']);
     Route::get('/business-id', [GetIdController::class, 'getBusinessId']);
-
-    Route::get('/showUser', [ProfileController::class, 'show'])
-    ->name('showUser');
 
     Route::get('/auth_user', [GetIdController::class, 'checkUserAuth']);
     Route::put('/update_user/{id}', [ProfileController::class, 'update']);
