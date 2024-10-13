@@ -39,23 +39,6 @@ class Invoice extends Model
         'customer_PO_No',
         'customer_OSCA_PWD_ID_No',
 
-        //FOR STORING VAT, DISCOUNTS, ETC. (WITH COMPUTATIONS)
-        'VATable_Sales',
-        'VAT_Exempt_Sales',
-        'Zero_Rated_Sales',
-        'VAT_Amount',
-
-        'VAT_Inclusive',
-        'Less_VAT',
-        'Amount_NET_of_VAT',
-        'Less_SC_PWD_Discount',
-        'Amount_Due',
-        'Add_VAT',
-        
-        //FOR STORING TOTAL AMOUNT DUE (FINAL COMPUTATION)
-        'tax',
-        'total_Amount_Due',
-
         'timestamps'
     
     ];
