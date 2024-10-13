@@ -98,109 +98,90 @@ class BusinessController extends Controller
      * Update the specified resource in storage.
      */
     public function update(int $id, Request $request, Business $Business)
-    {
-        $request->validate([
-            'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'business_Name' => 'required|string|max:255',
-            'business_Email'=> 'required|string|lowercase|email|max:255', 
-            'business_Province' => 'required|string|max:255',
-            'business_City' => 'required|string|max:255',
-            'business_Barangay' => 'required|string|max:255',
-            'business_Address' => 'required|string|max:255',
-            'business_Phone_Number' => 'required|string|max:255',
-            'business_Telephone_Number' => 'required|string|max:255',
-            'business_Facebook'=>'nullable|string|max:255',
-            'business_X'=>'nullable|string|max:255',
-            'business_Instagram'=>'nullable|string|max:255',
-            'business_Tiktok'=>'nullable|string|max:255'
-        ]);
+{
+    $request->validate([
+        'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'business_Name' => 'required|string|max:255',
+        'business_Email'=> 'required|string|lowercase|email|max:255', 
+        'business_Province' => 'required|string|max:255',
+        'business_City' => 'required|string|max:255',
+        'business_Barangay' => 'required|string|max:255',
+        'business_Address' => 'required|string|max:255',
+        'business_Phone_Number' => 'required|string|max:255',
+        'business_Telephone_Number' => 'required|string|max:255',
+        'business_Facebook'=>'nullable|string|max:255',
+        'business_X'=>'nullable|string|max:255',
+        'business_Instagram'=>'nullable|string|max:255',
+        'business_Tiktok'=>'nullable|string|max:255'
+    ]);
 
-        $business = Business::findOrFail($id);
-        $oldData = $business->toArray(); // Store the original data
-        $oldName = $business->business_Name;
+    $business = Business::findOrFail($id);
+    $oldData = $business->toArray(); // Store the original data
+    $oldName = $business->business_Name;
+    $oldImage = $business->business_image; // Store the old image path
     
-        // Update the business data
-        $business->update($request->all());
-    
-        // Collect changes to track
-        $changes = [];
-        if ($oldName !== $request->input('business_Name')) {
-            $changes['business_Name'] = ['old' => $oldName, 'new' => $request->input('business_Name')];
-        }
-    
-        // Check for address changes
-        $oldAddress = "{$oldData['business_Address']}, {$oldData['business_Barangay']}, {$oldData['business_City']}, {$oldData['business_Province']}";
-        $newAddress = "{$business->business_Address}, {$business->business_Barangay}, {$business->business_City}, {$business->business_Province}";
-    
-        if ($oldAddress !== $newAddress) {
-            $changes['business_Address'] = ['old' => $oldAddress, 'new' => $newAddress];
-        }
-    
-        // Add other changes (like phone number, email, etc.)
-        if ($oldData['business_Phone_Number'] !== $business->business_Phone_Number) {
-            $changes['business_Phone_Number'] = ['old' => $oldData['business_Phone_Number'], 'new' => $business->business_Phone_Number];
-        }
-        if ($oldData['business_Telephone_Number'] !== $business->business_Telephone_Number) {
-            $changes['business_Telephone_Number'] = ['old' => $oldData['business_Telephone_Number'], 'new' => $business->business_Telephone_Number];
-        }
-        if ($oldData['business_Email'] !== $business->business_Email) {
-            $changes['business_Email'] = ['old' => $oldData['business_Email'], 'new' => $business->business_Email];
-        }
-        if ($oldData['business_Facebook'] !== $business->business_Facebook) {
-            $changes['business_Facebook'] = ['old' => $oldData['business_Facebook'], 'new' => $business->business_Facebook];
-        }
-        if ($oldData['business_X'] !== $business->business_X) {
-            $changes['business_X'] = ['old' => $oldData['business_X'], 'new' => $business->business_X];
-        }
-        if ($oldData['business_Instagram'] !== $business->business_Instagram) {
-            $changes['business_Instagram'] = ['old' => $oldData['business_Instagram'], 'new' => $business->business_Instagram];
-        }
-        if ($oldData['business_Tiktok'] !== $business->business_Tiktok) {
-            $changes['business_Tiktok'] = ['old' => $oldData['business_Tiktok'], 'new' => $business->business_Tiktok];
-        }
-    
-        // If there are changes, trigger the event
-        if (!empty($changes)) {
-            event(new BusinessNameUpdated($oldName, $business->business_Name, $changes));
-        }
-    
+    // Collect changes to track
+    $changes = [];
 
-        if ($request->hasFile('business_image')) {
-            // Handle the file upload
-            $image = $request->file('business_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            
-            // Save the image to storage/app/public/business_logos
-            $image->storeAs('public/business_logos', $imageName);
-    
-            // Save the image name in the database (just the filename, not the full path)
-            $business->business_image = $imageName;
+    // If the image has been uploaded, check and update
+    if ($request->hasFile('business_image')) {
+        $image = $request->file('business_image');
+        $imageName = time() . '.' . $image->getClientOriginalExtension();
+        $image->storeAs('public/business_logos', $imageName);
+        
+        // Compare with old image and track the change
+        if ($oldImage !== $imageName) {
+            $changes['business_image'] = ['old' => $oldImage, 'new' => $imageName];
+            $business->business_image = $imageName;  // Update the image
         }
-
-        // Update other business fields
-        $business->business_Name = $request->input('business_Name');
-        $business->business_Email = $request->input('business_Email');
-        $business->business_Province = $request->input('business_Province');
-        $business->business_City = $request->input('business_City');
-        $business->business_Barangay = $request->input('business_Barangay');
-        $business->business_Address = $request->input('business_Address');
-        $business->business_Phone_Number = $request->input('business_Phone_Number');
-        $business->business_Telephone_Number = $request->input('business_Telephone_Number');
-        $business->business_Facebook = $request->input('business_Facebook');
-        $business->business_X = $request->input('business_X');
-        $business->business_Instagram = $request->input('business_Instagram');
-        $business->business_Tiktok = $request->input('business_Tiktok');
-
-        // Save the business profile
-        $business->save();
-
-        return response()->json(data: ['success' => true]);
+    }
+    
+    // Compare and track other changes
+    if ($oldName !== $request->input('business_Name')) {
+        $changes['business_Name'] = ['old' => $oldName, 'new' => $request->input('business_Name')];
     }
 
+    $oldAddress = "{$oldData['business_Address']}, {$oldData['business_Barangay']}, {$oldData['business_City']}, {$oldData['business_Province']}";
+    $newAddress = "{$business->business_Address}, {$business->business_Barangay}, {$business->business_City}, {$business->business_Province}";
     
+    if ($oldAddress !== $newAddress) {
+        $changes['business_Address'] = ['old' => $oldAddress, 'new' => $newAddress];
+    }
 
-
+    // Check for other field changes like phone number, email, etc.
+    if ($oldData['business_Phone_Number'] !== $business->business_Phone_Number) {
+        $changes['business_Phone_Number'] = ['old' => $oldData['business_Phone_Number'], 'new' => $business->business_Phone_Number];
+    }
+    if ($oldData['business_Telephone_Number'] !== $business->business_Telephone_Number) {
+        $changes['business_Telephone_Number'] = ['old' => $oldData['business_Telephone_Number'], 'new' => $business->business_Telephone_Number];
+    }
+    if ($oldData['business_Email'] !== $business->business_Email) {
+        $changes['business_Email'] = ['old' => $oldData['business_Email'], 'new' => $business->business_Email];
+    }
+    if ($oldData['business_Facebook'] !== $business->business_Facebook) {
+        $changes['business_Facebook'] = ['old' => $oldData['business_Facebook'], 'new' => $business->business_Facebook];
+    }
+    if ($oldData['business_X'] !== $business->business_X) {
+        $changes['business_X'] = ['old' => $oldData['business_X'], 'new' => $business->business_X];
+    }
+    if ($oldData['business_Instagram'] !== $business->business_Instagram) {
+        $changes['business_Instagram'] = ['old' => $oldData['business_Instagram'], 'new' => $business->business_Instagram];
+    }
+    if ($oldData['business_Tiktok'] !== $business->business_Tiktok) {
+        $changes['business_Tiktok'] = ['old' => $oldData['business_Tiktok'], 'new' => $business->business_Tiktok];
+    }
     
+    // Trigger event if there are any changes
+    if (!empty($changes)) {
+        event(new BusinessNameUpdated($oldName, $business->business_Name, $changes));
+    }
+
+    // Save the updated business profile
+    $business->save();
+
+    return response()->json(['success' => true]);
+}
+
 
 
 

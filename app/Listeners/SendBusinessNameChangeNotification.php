@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\BusinessNameUpdated;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class SendBusinessNameChangeNotification
 {
@@ -22,6 +23,15 @@ class SendBusinessNameChangeNotification
             foreach ($event->changes as $field => $change) {
                 if ($field === 'business_Address') {
                     $emailBody .= "<p>Business Address changed from <strong>{$change['old']}</strong> to <strong>{$change['new']}</strong>.</p>";
+                } elseif ($field === 'business_image') {
+                    // Handle business image change
+                    $oldImageUrl = asset(Storage::url('business_logos/' . $change['old']));
+                    $newImageUrl = asset(Storage::url('business_logos/' . $change['new']));
+                    $emailBody .= "<p>{$event->newName} has changed their logo:</p>";
+                    $emailBody .= "<div style='display:flex; align-items:center;'>";
+                    $emailBody .= "<div style='margin-right:20px;'><strong>Old Image:</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width:100px;'></div>";
+                    $emailBody .= "<div><strong>New Image:</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width:100px;'></div>";
+                    $emailBody .= "</div>";
                 } else {
                     $fieldLabel = ucfirst(str_replace('_', ' ', $field));
                     $emailBody .= "<p>{$fieldLabel} changed from <strong>{$change['old']}</strong> to <strong>{$change['new']}</strong>.</p>";
@@ -38,4 +48,3 @@ class SendBusinessNameChangeNotification
         }
     }
 }
-
