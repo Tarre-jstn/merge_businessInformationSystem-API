@@ -103,6 +103,7 @@ export default {
           this.businessBarangay = businessData.business_Barangay || 'Unknown Barangay';
           this.businessAddress = businessData.business_Address || 'Unknown Address';
           this.businessPhoneNumber = businessData.business_Phone_Number || 'Unknown Phone Number';
+          this.businessTelephonePhoneNumber = businessData.business_Telephone_Number || 'Unknown Telephone Number';
           this.businessFacebook = businessData.business_Facebook || 'Unknown Facebook';
           this.businessX = businessData.business_X || 'Unknown X';
           this.businessInstagram = businessData.business_Instagram || 'Unknown Instagram ';

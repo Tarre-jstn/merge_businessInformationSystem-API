@@ -2,17 +2,12 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
-
 class BusinessNameUpdated
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
-
     public $oldName;
     public $newName;
-    public $changes; // Changes array
+    public $changes;
+    public $oldImage;
 
     /**
      * Create a new event instance.
@@ -20,11 +15,13 @@ class BusinessNameUpdated
      * @param string $oldName
      * @param string $newName
      * @param array $changes
+     * @param string|null $oldImage
      */
-    public function __construct($oldName, $newName, $changes = [])
+    public function __construct($oldName, $newName, $changes, $oldImage = null)
     {
         $this->oldName = $oldName;
         $this->newName = $newName;
         $this->changes = $changes;
+        $this->oldImage = $oldImage;
     }
 }
