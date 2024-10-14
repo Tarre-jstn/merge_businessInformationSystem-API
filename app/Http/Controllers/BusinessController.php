@@ -123,18 +123,28 @@ class BusinessController extends Controller
     // Collect changes to track
     $changes = [];
 
-    // If the image has been uploaded, check and update
+    // If a new image is uploaded
     if ($request->hasFile('business_image')) {
         $image = $request->file('business_image');
         $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $image->storeAs('public/business_logos', $imageName);
-        
-        // Compare with old image and track the change
-        if ($oldImage !== $imageName) {
-            $changes['business_image'] = ['old' => $oldImage, 'new' => $imageName];
-            $business->business_image = $imageName;  // Update the image
+    
+        // Move the old image to the archive folder before uploading the new one
+        if ($oldImage) {
+            $oldImagePath = 'public/business_logos/' . $oldImage;
+            if (Storage::exists($oldImagePath)) {
+                // Move old image to archive folder
+                Storage::move($oldImagePath, 'public/business_logos/archive/' . $oldImage);
+            }
         }
+    
+        // Store the new image in the business_logos folder
+        $image->storeAs('public/business_logos', $imageName);
+    
+        // Update business with the new image name
+        $business->business_image = $imageName;
+        $changes['business_image'] = ['old' => $oldImage, 'new' => $imageName];
     }
+    
     
     // Compare and track other changes
     if ($oldName !== $request->input('business_Name')) {
@@ -171,13 +181,14 @@ class BusinessController extends Controller
         $changes['business_Tiktok'] = ['old' => $oldData['business_Tiktok'], 'new' => $business->business_Tiktok];
     }
     
-    // Trigger event if there are any changes
     if (!empty($changes)) {
+        // Trigger the event, now the old image is safely stored in the archive folder
         event(new BusinessNameUpdated($oldName, $business->business_Name, $changes));
     }
 
     // Save the updated business profile
     $business->save();
+
 
     return response()->json(['success' => true]);
 }
