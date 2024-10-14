@@ -50,11 +50,12 @@ class WebsiteController extends Controller
             'website_description'=>'nullable|string|max:255',
             'website_details' => 'nullable|string|max:255',
             'website_image'=>'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'website_footNote'=>'nullable|string|max:255',
             'about_us1'=>'nullable|string|max:255',
             'about_us2'=>'nullable|string|max:255',
             'about_us3'=>'nullable|string|max:255',
-            'featured_section'=>'required|in:true,false',
-            'onSale_section'=>'required|in:true,false'
+            'featured_section'=>'sometimes|in:true,false',
+            'onSale_section'=>'sometimes|in:true,false'
         ]);
 
         $website = Website::where('business_id', $request->business_id)->first();

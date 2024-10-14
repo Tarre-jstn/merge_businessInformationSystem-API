@@ -272,10 +272,8 @@ try {
             <!-- Right Column (Profile Picture)-->
             <div class="w-full md:w-1/2 flex flex-col items-center mt-[30px]">
                 <div class="relative group">
+                        <img :src='profilePicture' alt="Profile Picture" class="w-[350px] h-[350px] rounded-full border-4 border-black object-cover" />
                     
-                        <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
-                        <img v-else-if="profilePicture" :src='profilePicture' alt="Profile Picture" class="w-[350px] h-[350px] rounded-full border-4 border-black object-cover" />
-                        <img v-else src='/storage/user_profile/default-profile.png'/> 
                         <input
                             type="file"
                             id="profile-upload"

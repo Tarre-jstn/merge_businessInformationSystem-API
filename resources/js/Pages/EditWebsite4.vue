@@ -48,7 +48,7 @@ async function getWebsiteInfo(){
         console.log(getWebsiteInfo.data);
 
         if(getBusinessInfo.data.business_image){
-        businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
+        textAreas.businessImage.value = `/storage/business_logos/${getBusinessInfo.data.business_image}`;
         isLoading.value = false;
     }
     // textAreas.businessImage.value = getBusinessInfo.data.business_image;
@@ -98,8 +98,18 @@ async function save(){
         headers:{
             'Content-Type': 'multipart/form-data'
         }
+        
     });
+    alert("Changes Saved Successfully.");
 }
+const formatUrl = (url) => {
+    // Check if the URL starts with http:// or https://
+    if (!/^https?:\/\//i.test(url)) {
+        // Prepend https:// if it doesn't
+        return `https://${url}`;
+    }
+    return url;
+};
 
 </script>
 
@@ -133,7 +143,7 @@ async function save(){
 
                 <div class="mt-5">
                     <button @click="edit('website_footNote')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
-                    <p class=" text-xl text-white">{{ textAreas.website_footNote }}</p>
+                    <p class=" text-xl text-white">{{ textAreas.website_footNote.value }}</p>
                     <div v-if="editButton==='website_footNote'">
                         <textarea v-model="textAreas.website_footNote.value" class="rows-2 cols-50 border boder-black"></textarea>
                         <button @click="save()" class="bg-white rounded-xl p-1">Save</button>

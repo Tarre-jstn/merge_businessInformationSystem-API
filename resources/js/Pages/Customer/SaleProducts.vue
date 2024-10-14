@@ -221,7 +221,7 @@ async function fetchProducts() {
 
     <section>
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
-            <div class="w-full">
+            <div class="mt-[50px] w-full">
                 <hr class="border-white mx-auto w-11/12">
             </div>
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
@@ -244,7 +244,7 @@ async function fetchProducts() {
 </div>
 
 <!-- Contact Us -->
-<div class="mt-[100px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
+<div class="mt-[50px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
     <div class="mt-2 flex flex-col ">
         <p class="text-white font-bold text-[50px]">Contact Us</p>
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>

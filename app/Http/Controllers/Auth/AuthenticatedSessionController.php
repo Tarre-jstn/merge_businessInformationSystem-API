@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 use function Pest\Laravel\json;
 

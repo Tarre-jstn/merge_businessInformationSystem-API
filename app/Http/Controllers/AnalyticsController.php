@@ -8,6 +8,7 @@ use Google\Client;
 use Google\Service\AnalyticsData\DateRange;
 use Google\Service\AnalyticsData\Metric;
 use Google\Service\AnalyticsData\RunReportRequest;
+use Illuminate\Support\Facades\Log;
 
 use Spatie\Analytics\Facades\Analytics;
 use Spatie\Analytics\Period;
@@ -22,6 +23,23 @@ class AnalyticsController extends Controller
         $client->setAuthConfig(app_path('google-analytics/capstone-website.json'));
         $client->addScope(AnalyticsData::ANALYTICS_READONLY); // Use AnalyticsData for scope
         $this->analytics = new AnalyticsData($client); // Use AnalyticsData for instantiation
+
+        try {
+            // Fetch the access token using the service account's credentials
+            $accessToken = $client->fetchAccessTokenWithAssertion();
+            Log::info('Access Token', ['token' => $accessToken]);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch access token: ' . $e->getMessage());
+        }
+
+        Log::info('System Time', ['timestamp' => now()->timestamp]);
+
+
+        Log::info('Google Client Information', [
+            'project_id' => $client->getConfig('project_id'),  // Log the email
+            'scopes' => $client->getScopes(),              // Log the scopes
+            'access_token' => $client->getAccessToken(),   // Log the access token, if set
+        ]);
     }
 
     public function index(Request $request)
@@ -110,6 +128,13 @@ class AnalyticsController extends Controller
             'retentionRates' => $retentionRates,
         ]);
     } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+
+        Log::error('Google Analytics API error: ', [
+            'message' => $e->getMessage(),
+            'code' => $e->getCode(),
+            'trace' => $e->getTraceAsString(),
+        ]);
         return response()->json(['error' => $e->getMessage()], 500);
     }
 }

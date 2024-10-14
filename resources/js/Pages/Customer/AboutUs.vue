@@ -145,7 +145,7 @@ async function getWebsiteInfo(){
         <!-- section 2/EditWebsite2 -->
 <section>
         
-<div class=" bg-website-main1 flex min-h-screen relative">
+<div class=" bg-website-main flex min-h-screen relative">
         <div class="flex items-center p-3 absolute top-[5px] left-0 right-0 bottom-[500px] m-auto">
         <p class="mt-[10px] text-[70px] tracking-[3px] text-white font-bold flex-grow text-center">About Us</p>
     </div>
@@ -188,10 +188,12 @@ async function getWebsiteInfo(){
 
 <section>
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
-
+            <div class="w-full">
+                <hr class="border-white mx-auto w-11/12">
+            </div>
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
 <!-- FootNote -->
-<div class="mr-auto mt-40 ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
+<div class="mr-auto mt-[100px] ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
     <div class="max-w-[50px]">
         <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
     </div>
@@ -209,7 +211,7 @@ async function getWebsiteInfo(){
 </div>
 
 <!-- Contact Us -->
-<div class="mt-[100px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
+<div class="mt-[50px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
     <div class="mt-2 flex flex-col ">
         <p class="text-white font-bold text-[50px]">Contact Us</p>
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>

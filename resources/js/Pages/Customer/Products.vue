@@ -269,7 +269,7 @@ function goTochatPage(){
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
 
             <!-- Footnote -->
-            <div class="w-full">
+            <div class="mt-[50px] w-full">
                 <hr class="border-white mx-auto w-11/12">
             </div>
         <div class="flex flex-row justify-between ml-8 mr-8 w-full">

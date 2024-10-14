@@ -45,6 +45,12 @@ async function getWebsiteInfo(){
         });
         console.log('Products Info:', getProductsInfo.data);
 
+        const getWebsiteInfo = await axios.get('/api/website', {
+            params: {business_id: businessId}
+        });
+        feature_toggle.value=getWebsiteInfo.data.featured_section;
+        onSale_toggle.value=getWebsiteInfo.data.onSale_section;
+
         const featuredProducts = getProductsInfo.data.slice(0, 6);
         console.log('featuredProducts Info:', featuredProducts);
 

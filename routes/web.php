@@ -63,6 +63,9 @@ Route::get('/aboutUs_page', function () {
 // });
 
 Route::get('/analytics', [AnalyticsController::class, 'index']);
+Route::get('/server-time', function () {
+    return response()->json(['server_time' => now()->toDateTimeString()]);
+});
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
