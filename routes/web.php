@@ -21,6 +21,9 @@ DriverManager::loadDriver(\BotMan\Drivers\Web\WebDriver::class);
 use App\Http\Controllers\BackupController;
 
 //Route::get('/backup', [BackupController::class, 'createBackup']);
+use Spatie\Analytics\Facades\Analytics;
+use Spatie\Analytics\Period;
+use App\Http\Controllers\AnalyticsController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -53,8 +56,19 @@ Route::get('/products_page', function () {
 Route::get('/aboutUs_page', function () {
     return Inertia::render('Customer/AboutUs');
 })->name('aboutUs_page');
+// //Pwede idelete
+// Route::get('data', function(){
+//     $analyticsData = Analytics::fetchVisitorsAndPageViews(Period::days(7));
+//     dd($analyticsData);
+// });
+
+Route::get('/analytics', [AnalyticsController::class, 'index']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/dashboard', function () {
+        return Inertia::render('Home');
+    })->name('dashboard');
 
     Route::get('/account', function () {
         return Inertia::render('Customer/Account');

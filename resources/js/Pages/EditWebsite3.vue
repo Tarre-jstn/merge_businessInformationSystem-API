@@ -160,8 +160,6 @@ function goToEditWebsite4(){
                     Best prices guaranteed everyday.
                 </p>
             </div>
-
-            
             <div class="mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg px-4 pt-[70px] pb-[70px]">
                 
                 <div class="block flex flex-row gap-5">
@@ -266,3 +264,7 @@ input:checked + .slider:before {
 }
 
 </style>
+<<<<<<< HEAD
+=======
+
+>>>>>>> Web_Analytics
