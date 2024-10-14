@@ -74,8 +74,9 @@ Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
 
 Route::get('finance', [FinanceController::class, 'index']);
 Route::post('finance', [FinanceController::class, 'store']);
-Route::put('/finance/{id}', [FinanceController::class, 'update']);
-Route::put('/finance/{id}', [FinanceController::class, 'destroy']);
+Route::post('/finance/{id}', [FinanceController::class, 'update']);
+Route::delete('/finance/{id}', [FinanceController::class, 'destroy']);
+
 
 Route::post('finance_category', [FinanceController::class, 'storeCategory']);
 Route::delete('/finance_category/{id}', [FinanceController::class, 'destroyCategory']);

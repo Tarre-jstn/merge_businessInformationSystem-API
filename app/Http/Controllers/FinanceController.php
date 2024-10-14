@@ -47,6 +47,9 @@ class FinanceController extends Controller
 
     public function update(Request $request, $id)
     {
+
+        \Log::info('Incoming request data:', $request->all());
+        
         $validated = $request->validate([
             'description' => 'required|string|max:255',
             'date' => 'required|date',
@@ -58,7 +61,6 @@ class FinanceController extends Controller
 
         $finance->update($validated);
 
-        $finance->save();
         return response()->json(['finance' => $finance], 200);
     }
 

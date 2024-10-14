@@ -92,25 +92,30 @@ const updateFinance = async () => {
         const formData = new FormData();
 
         
+        // for (const key in editFinance.value) {
+        //     if (editFinance.value[key] !== null) {
+        //         formData.append(key, editFinance.value[key]);
+        //     }
+        // }
+
         for (const key in editFinance.value) {
             if (editFinance.value[key] !== null) {
+                console.log(`Appending ${key}:`, editFinance.value[key]);
                 formData.append(key, editFinance.value[key]);
             }
         }
 
-
         const response = await axios.post(`/api/finance/${editFinance.value.id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'X-HTTP-Method-Override': 'PUT',
             }
         });
 
         
         const index = finances.value.findIndex(finance => finance.id === editFinance.value.id);
-        finance.value[index] = response.data.finance;
+        finances.value[index] = response.data.finance;
         showEditFinanceModal.value = false;
-        resetEditProduct();
+        resetEditFinance();
     } catch (error) {
         if (error.response && error.response.data) {
             console.error("Validation errors:", error.response.data);
@@ -121,29 +126,29 @@ const updateFinance = async () => {
 };
 
 const deleteFinance = async (id) => {
-    if (confirm("Are you sure you want to delete this product?")) {
+    if (confirm("Are you sure you want to delete this finance?")) {
         try {
             await axios.delete(`/api/finance/${id}`);
             finances.value = finances.value.filter(finance => finance.id !== id);
         } catch (error) {
-            console.error("Error deleting product:", error);
+            console.error("Error deleting finance:", error);
         }
     }
 };
 
 const editFinanceDetails = (finance) => {
     editFinance.value = { ...finance };
-    showEditProductModal.value = true;
+    showEditFinanceModal.value = true;
 };
 
 const cancelAddFinance = () => {
-    showAddProductModal.value = false;
-    resetNewProduct();
+    showAddFinanceModal.value = false;
+    resetNewFinance();
     imagePreviewUrl.value = null;
 };
 
 const resetNewFinance = () => {
-    newProduct.value = {
+    newFinance.value = {
         description: '',
         date: '',
         category: '',
@@ -164,7 +169,7 @@ const filteredFinances = computed(() => {
     if (!searchQuery.value) {
         return finances.value;
     }
-    return finances.value.filter(product => {
+    return finances.value.filter(finances => {
         const searchTerm = searchQuery.value.toLowerCase();
         return (
             finances.description.toLowerCase().includes(searchTerm) ||
@@ -215,6 +220,25 @@ function sortByDate() {
 }
 
 
+const startDate = ref('');
+const endDate = ref('');
+const invoices = ref([]);
+
+const fetchInvoicesByDate = async () => {
+  try {
+    const response = await axios.get('/api/invoices-by-date', {
+      params: {
+        start_date: startDate.value,
+        end_date: endDate.value
+      }
+    });
+    invoices.value = response.data;
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+  }
+};
+
+
 fetchFinances();
 </script>
 
@@ -234,7 +258,7 @@ fetchFinances();
                                 <input
                                     v-model="searchQuery"
                                     type="text"
-                                    placeholder="Search products..."
+                                    placeholder="Search finances..."
                                     class="pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
                                 />
                             </div>
@@ -283,10 +307,10 @@ fetchFinances();
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ finance.amount }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex items-center justify-center space-x-4">
-                                            <button @click="editProductDetails(finance)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
+                                            <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
                                                 <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                             </button>
-                                            <button @click="deleteProduct(finance.id)" class="bg-red-500 text-white py-2 px-3 rounded-full">
+                                            <button @click="deleteFinance(finance.id)" class="bg-red-500 text-white py-2 px-3 rounded-full">
                                                 <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
                                             </button>
                                         </div>
@@ -302,7 +326,22 @@ fetchFinances();
                     <button @click="showFinanceCategoriesModal = true" class="bg-gray-500 text-white py-2 px-4 rounded">Categories</button>
                 </div>
             </div>
+
+
+            <!-- <div>
+                <input type="date" v-model="startDate" />
+                <input type="date" v-model="endDate" />
+                <button @click="fetchFinancesByDate">Search</button>
+
+                <ul v-if="finances.length">
+                <li v-for="finance in finances" :key="finances.finance">
+                    {{ finance.description }}
+                    {{ finance.date }}
+                </li>
+                </ul>
+            </div> -->
         </div>
+
 
         <div v-if="showAddFinanceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
             <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl relative">
@@ -318,13 +357,13 @@ fetchFinances();
                             <!-- Price Field -->
                             <div>
                                 <label for="price" class="block text-xs font-medium text-gray-700">Description<span class="text-red-500">*</span></label>
-                                <input type="number" id="price" v-model="newFinance.description" class="input-field text-xs p-1" required />
+                                <input type="text" id="price" v-model="newFinance.description" class="input-field text-xs p-1" required />
                             </div>
                             <!-- Category Field -->
                             <div>
                                 <label for="category" class="block text-xs font-medium text-gray-700">Category <span class="text-red-500">*</span></label>
                                 <select id="category" v-model="newFinance.category" class="input-field text-xs p-1" required>
-                                    <option v-for="category in listedFinanceCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
+                                    <option v-for="category in financeListedCategories" :key="category.id" :value="category.category">{{ category.category }}</option>
                                 </select>
                             </div>
                             <!-- Stock Field -->
@@ -345,7 +384,7 @@ fetchFinances();
             </div>
         </div>
 
-        <div v-if="showEditProductModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+        <div v-if="showEditFinanceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
             <div class="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl relative">
                 <h3 class="text-lg font-semibold text-center mb-3">Edit Finance</h3>
 
@@ -355,18 +394,18 @@ fetchFinances();
                             <!-- Name Field -->
                             <div class="col-span-2">
                                 <label for="name" class="block text-xs font-medium text-gray-700">Date<span class="text-red-500">*</span></label>
-                                <input type="text" id="name" v-model="editFinance.date" class="input-field w-full text-xs p-1" required />
+                                <input type="date" id="name" v-model="editFinance.date" class="input-field w-full text-xs p-1" required />
                             </div>
                             <!-- Price Field -->
                             <div>
                                 <label for="price" class="block text-xs font-medium text-gray-700">Description<span class="text-red-500">*</span></label>
-                                <input type="number" id="price" v-model="editFinance.description" class="input-field text-xs p-1" required />
+                                <input type="text" id="price" v-model="editFinance.description" class="input-field text-xs p-1" required />
                             </div>
                             <!-- Category Field -->
                             <div>
                                 <label for="edit_category" class="block text-xs font-medium text-gray-700">Category <span class="text-red-500">*</span></label>
                                 <select id="edit_category" v-model="editFinance.category" class="input-field text-xs p-1" required>
-                                    <option v-for="category in financeListedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
+                                    <option v-for="category in financeListedCategories" :key="category.id" :value="category.category">{{ category.category }}</option>
                                 </select>
                             </div>
                             <!-- Stock Field -->

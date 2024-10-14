@@ -57,17 +57,7 @@ const closeModal = () => {
 };
 
 const saveFinanceCategories = async () => {
-    try {
-        const allCategories = [...financeCategories.value];
-
-        for (const category of allCategories) {
-            await axios.put(`/api/finance_category/${category.id}`, category);
-        }
-
         closeModal();
-    } catch (error) {
-        console.error("Error saving categories:", error);
-    }
 };
 </script>
 
