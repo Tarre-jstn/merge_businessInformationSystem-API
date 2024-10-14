@@ -76,7 +76,7 @@ Route::get('finance', [FinanceController::class, 'index']);
 Route::post('finance', [FinanceController::class, 'store']);
 Route::post('/finance/{id}', [FinanceController::class, 'update']);
 Route::delete('/finance/{id}', [FinanceController::class, 'destroy']);
-
+Route::get('finance_by_date', [FinanceController::class, 'getFinanceByDate']);
 
 Route::post('finance_category', [FinanceController::class, 'storeCategory']);
 Route::delete('/finance_category/{id}', [FinanceController::class, 'destroyCategory']);

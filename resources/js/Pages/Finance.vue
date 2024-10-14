@@ -169,13 +169,13 @@ const filteredFinances = computed(() => {
     if (!searchQuery.value) {
         return finances.value;
     }
-    return finances.value.filter(finances => {
+    return finances.value.filter(finance => {
         const searchTerm = searchQuery.value.toLowerCase();
         return (
-            finances.description.toLowerCase().includes(searchTerm) ||
-            finances.date.toLowerCase().includes(searchTerm) ||
-            finances.category.toLowerCase().includes(searchTerm) || 
-            finances.amount.toLowerCase().includes(searchTerm)
+            finance.description.toLowerCase().includes(searchTerm) ||
+            finance.date.toLowerCase().includes(searchTerm) ||
+            finance.category.toLowerCase().includes(searchTerm) || 
+            finance.amount.toLowerCase().includes(searchTerm)
         );
     });
 });
@@ -219,25 +219,42 @@ function sortByDate() {
     });
 }
 
-
+const isDateFiltered = ref(false);
 const startDate = ref('');
 const endDate = ref('');
-const invoices = ref([]);
+const financesByDate = ref([]);
 
-const fetchInvoicesByDate = async () => {
-  try {
-    const response = await axios.get('/api/invoices-by-date', {
-      params: {
-        start_date: startDate.value,
-        end_date: endDate.value
-      }
-    });
-    invoices.value = response.data;
-  } catch (error) {
-    console.error("Error fetching invoices:", error);
-  }
+const fetchFinancesByDate = async () => {
+    try {
+        const response = await axios.get('/api/finance_by_date', {
+            params: {
+                start_date: startDate.value,
+                end_date: endDate.value
+            }
+        });
+        financesByDate.value = response.data;
+        isDateFiltered.value = true; // Set flag to true after fetching by date
+    } catch (error) {
+        console.error("Error fetching finances by date:", error);
+    }
 };
 
+const clearFetchFinancesByDate = async () => {
+
+    startDate.value = '';
+    endDate.value = '';
+    financesByDate.value = '';
+    isDateFiltered.value = false;
+};
+watch([startDate, endDate], async ([newStartDate, newEndDate]) => {
+    if (newStartDate && newEndDate) {
+        await fetchFinancesByDate();
+    } else {
+        // Reset financesByDate and isDateFiltered if dates are cleared
+        financesByDate.value = [];
+        isDateFiltered.value = false;
+    }
+});
 
 fetchFinances();
 </script>
@@ -245,32 +262,58 @@ fetchFinances();
 <template>
     <AuthenticatedLayout>
         <div class="py-5">
+
             <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
+                
+                
+                <div>
+                    <input type="date" v-model="startDate" />
+                    <input type="date" v-model="endDate" />
+                    <button @click="clearFetchFinancesByDate">Clear</button>
+
+                </div>
+            
+
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900 dark:text-gray-100">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="text-2xl font-semibold">Finances</h2>
-                            <div class="relative w-64">
-                                <font-awesome-icon
-                                    :icon="['fas', 'magnifying-glass']"
-                                    class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                                />
-                                <input
-                                    v-model="searchQuery"
-                                    type="text"
-                                    placeholder="Search finances..."
-                                    class="pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
-                                />
+
+                            <div class="flex">
+                                <div>
+                                    <div class="relative w-64">
+                                    <font-awesome-icon
+                                        :icon="['fas', 'magnifying-glass']"
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                    />
+                                    <input
+                                        v-model="searchQuery"
+                                        type="text"
+                                        placeholder="Search finances..."
+                                        class="pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
+                                    />
+                                    </div>
+                                </div>
+
+
+                                
+                                <div>OR SEARCH BY DATE
+                                    <input type="date" v-model="startDate" />
+                                    <input type="date" v-model="endDate" />
+                                    <button @click="clearFetchFinancesByDate">Clear</button>
+
+                                </div>
                             </div>
+
                         </div>
                         <div class="overflow-auto" style="max-height: 430px;">
                             <table class="min-w-full bg-white dark:bg-gray-800 text-xs">
                                 <thead>
                                 <tr>
                                      <th 
-                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
+                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer whitespace-nowrap"
                                         @click="sortByDate">
-                                        <div class="flex items-center space-x-1">
+                                        <div class="items-center text-center space-x-1">
                                             <font-awesome-icon 
                                                 :icon="['fas', 'angle-down']" 
                                                 :class="DateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
@@ -280,9 +323,9 @@ fetchFinances();
                                         </div>
                                     </th>
                                     <th 
-                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer"
+                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer"
                                         @click="sortByDescription">
-                                        <div class="flex items-center space-x-1">
+                                        <div class="items-center text-center space-x-1">
                                             <font-awesome-icon 
                                                 :icon="['fas', 'angle-down']"
                                                 :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
@@ -291,20 +334,40 @@ fetchFinances();
                                             <span>Decription</span>
                                         </div>
                                     </th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Category</th>
+                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 ">Category</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Amount</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr v-if="filteredFinances.length === 0">
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="12">No finances available.</td>
+                                <tr v-if="filteredFinances.length === 0 || (financesByDate.length === 0 && isDateFiltered)">
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="5">No finances available.</td>
                                 </tr>
-                                <tr v-for="finance in filteredFinances" :key="finance.id">
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ finance.date }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ finance.description }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ finance.category }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ finance.amount }}</td>
+
+                                
+
+                                <tr v-for="finance in financesByDate" :key="finance.id" v-if="isDateFiltered" >
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.date }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.description }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.category }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                        <div class="flex items-center justify-center space-x-4">
+                                            <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
+                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                            </button>
+                                            <button @click="deleteFinance(finance.id)" class="bg-red-500 text-white py-2 px-3 rounded-full">
+                                                <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr
+                                >
+                                <tr v-for="finance in filteredFinances" :key="finance.id" v-if="!isDateFiltered">
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.date }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.description }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.category }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex items-center justify-center space-x-4">
                                             <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
@@ -328,18 +391,8 @@ fetchFinances();
             </div>
 
 
-            <!-- <div>
-                <input type="date" v-model="startDate" />
-                <input type="date" v-model="endDate" />
-                <button @click="fetchFinancesByDate">Search</button>
 
-                <ul v-if="finances.length">
-                <li v-for="finance in finances" :key="finances.finance">
-                    {{ finance.description }}
-                    {{ finance.date }}
-                </li>
-                </ul>
-            </div> -->
+            
         </div>
 
 

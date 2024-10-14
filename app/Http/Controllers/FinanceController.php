@@ -5,6 +5,7 @@ use App\Models\Finance;
 use App\Models\FinanceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Carbon\carbon;
 class FinanceController extends Controller
 {
     public function index()
@@ -108,6 +109,25 @@ class FinanceController extends Controller
             Log::error('Error deleting finance: ' . $e->getMessage());
             return response()->json(['error' => 'Unable to delete product'], 500);
         }
+    }
+
+    public function getFinanceByDate(Request $request)
+    {
+        \Log::info('Incoming request data FOR FINANCE BY DATE:', $request->all());
+
+        if (!$request->has(['start_date', 'end_date'])) {
+            return response()->json(['error' => 'Start date and end date are required'], 400);
+        }
+
+        
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+    
+        $financesByDate = Finance::whereBetween('date', [$startDate, $endDate])
+                        ->orderBy('date')
+                        ->get();
+    
+        return response()->json($financesByDate);
     }
 
 }
