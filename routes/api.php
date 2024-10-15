@@ -15,7 +15,7 @@ use App\Models\Product;
 use App\Models\Invoice;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\csrfController;
+use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,19 +31,30 @@ Route::get('/all-business', function(){
     return Business::all();
 });
 
+
+Route::get('/business_info', [BusinessController::class, 'showBusiness']);
+
+Route::post('/website', [WebsiteController::class, 'store']);
+Route::get('/website', [WebsiteController::class, 'info']);
+Route::post('/website-update', [WebsiteController::class, 'update']);
+=======
 Route::get('/all-invoices', function(){
     return Invoice::all();
 });
+
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);
 Route::get('products/{id}', [ProductController::class, 'show']);
 Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+
+Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
+
 //Dedicated for seniorPWD_discoubtable
 Route::put('/products/{id}/discountable', [ProductController::class, 'updateDiscountable']);
 
-Route::get('/business_info', [BusinessController::class, 'show']);
+
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
@@ -62,10 +73,12 @@ Route::get('invoice_additional',[InvoiceAdditionalController::class,'index']);
 Route::post('invoice_additional',[InvoiceAdditionalController::class,'store']);
 Route::get('/invoice_additional/{invoice_system_id}', [InvoiceAdditionalController::class, 'show']);
 
+
 Route::post('invoice_computation',[InvoiceComputationController::class,'store']);
 Route::get('/invoice_computation/{invoice_system_id}',[InvoiceComputationController::class,'show']);
 
 Route::get('invoice_print/{invoice_id}', [InvoiceController::class, 'invoice_print']);
+
 
 /*Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);

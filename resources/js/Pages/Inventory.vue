@@ -250,6 +250,10 @@ const handleEditImageUpload = (event) => {
     } else {
         alert('Please upload a valid image file (jpg, jpeg, png).');
         editProduct.value.image = null; 
+
+    }
+};
+
     }
 };
 
@@ -271,9 +275,6 @@ const updateDiscountable = async (productId, discountableStatus) => {
         }
     }
 };
-
-
-
 const sortOrder = ref('asc'); // Default sort order
 
 function sortByName() {
@@ -354,12 +355,14 @@ fetchListedCategories();
                                             <span>Name</span>
                                         </div>
                                     </th>
+
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Stock</th>
                                     <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Sold</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
+
                                     <th 
                                         class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
                                         @click="sortByExpDate">
@@ -372,6 +375,7 @@ fetchListedCategories();
                                             <span>Exp. Date</span>
                                         </div>
                                     </th>
+
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Senior/PWD Discountable</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
                                 </tr>
@@ -381,7 +385,11 @@ fetchListedCategories();
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="12">No products available.</td>
                                 </tr>
                                 <tr v-for="product in filteredProducts" :key="product.id">
+
+                                    <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.id }}</td>
+
                                     <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.id }}</td>
+
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex items-center justify-center">
                                             <img :src="'/storage/' + product.image" alt="Product Image" class="w-12 h-12 object-cover"/>
@@ -389,6 +397,11 @@ fetchListedCategories();
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.name }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.brand }}</td>
+
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.price }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.category }}</td>
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.stock }}</td>
+
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.price }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.category }}</td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.stock }}</td>
@@ -401,8 +414,13 @@ fetchListedCategories();
                                             }">{{ product.status }}</span>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
+
+                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 space-x-1">
+                                        <div class="flex items-center">
+
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
                                         <div class="flex items-left justify-center">
+
                                             <label class="switch">
                                                 <input type="checkbox" v-model="product.seniorPWD_discountable" true-value="yes" false-value="no" @change="updateDiscountable(product.id, product.seniorPWD_discountable)" />
                                                 <span class="slider round"></span>
@@ -411,7 +429,11 @@ fetchListedCategories();
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+
+                                        <div class="flex space-x-4">
+
                                         <div class="flex items-center justify-center space-x-4">
+
                                             <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
                                                 <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                             </button>
@@ -471,6 +493,18 @@ fetchListedCategories();
                                 <label for="stock" class="block text-xs font-medium text-gray-700">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
                             </div>
+
+                            <!-- Sold Field -->
+                            <div>
+                                <label for="sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <input type="number" id="sold" v-model="newProduct.sold" class="input-field text-xs p-1" />
+                            </div>
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="brand" class="block text-xs font-medium text-gray-700">Brand <span class="text-red-500">*</span></label>
+                                <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
+                            </div>
+
                             <!-- Status Field -->
                             <div>
                                 <label for="status" class="block text-xs font-medium text-gray-700">Status <span class="text-red-500">*</span></label>
@@ -480,11 +514,13 @@ fetchListedCategories();
                                     <option value="Out of Stock">Out of Stock</option>
                                 </select>
                             </div>
+
                             <!-- Brand Field -->
                             <div>
                                 <label for="brand" class="block text-xs font-medium text-gray-700">Brand <span class="text-red-500">*</span></label>
                                 <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
                             </div>
+
                         </div>
                         <!-- Description -->
                         <div class="col-span-3">
@@ -492,6 +528,39 @@ fetchListedCategories();
                             <textarea id="description" v-model="newProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
                         <!-- Expiry Date, Discountable, and Featured -->
+
+                        <div class="col-span-2 grid grid-cols-3 gap-3">
+                            <div>
+                                <label for="expDate" class="block text-xs font-medium text-gray-700">Expiry Date <span class="text-red-500">*</span></label>
+                                <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
+                            </div>
+                            <!-- Discountable Toggle -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Senior/PWD Discountable:</label>
+                                <div class="flex items-center space-x-2">
+                                    <label class="switch">
+                                        <input type="checkbox" v-model="newProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="text-xs text-gray-700">{{ newProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
+                                </div>
+                            </div>
+                            <!-- Featured Toggle -->
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700">Featured:</label>
+                                <div class="flex items-center space-x-2">
+                                    <label class="switch">
+                                        <input type="checkbox" v-model="newProduct.featured" true-value="true" false-value="false"/>
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <span class="text-xs text-gray-700">{{ newProduct.featured === 'true' ? 'True' : 'False' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- On Sale Toggle (Separate Row) -->
+                        <div class="col-span-2">
+                            <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+
                     <div class="col-span-2 grid grid-cols-3 gap-3">
                         <!-- Expiry Date -->
                         <div>
@@ -550,6 +619,7 @@ fetchListedCategories();
                                     </span>
                                 </span>
                             </label>
+
                             <div class="flex items-center space-x-2">
                                 <label class="switch">
                                     <input type="checkbox" v-model="newProduct.on_sale" true-value="yes" false-value="no"/>
@@ -558,7 +628,9 @@ fetchListedCategories();
                                 <span class="text-xs text-gray-700">{{ newProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
                             </div>
                         </div>
+
                     </div>
+
                         <!-- On Sale Price (Visible only if 'On Sale' is selected) -->
                         <div class="col-span-3" v-if="newProduct.on_sale === 'yes'">
                             <label for="on_sale_price" class="block text-xs font-medium text-gray-700">On Sale Price (PHP):</label>
@@ -566,7 +638,11 @@ fetchListedCategories();
                         </div>
                         <!-- Action Buttons -->
                         <div class="col-span-3 flex justify-end mt-3 space-x-2">
+
+                            <button @click="showAddProductModal = false" class="button-cancel text-xs">Cancel</button>
+
                             <button @click="cancelAddProduct" class="button-cancel text-xs">Cancel</button>
+
                             <button type="submit" class="button-ok text-xs">OK</button>
                         </div>
                     </div>
@@ -612,6 +688,18 @@ fetchListedCategories();
                                 <label for="edit_stock" class="block text-xs font-medium text-gray-700">Stock *</label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
                             </div>
+
+                            <!-- Sold Field -->
+                            <div>
+                                <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
+                            </div>
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
+                                <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
+                            </div>
+
                             <!-- Status Field -->
                             <div>
                                 <label for="edit_status" class="block text-xs font-medium text-gray-700">Status *</label>
@@ -621,12 +709,14 @@ fetchListedCategories();
                                     <option value="Out of Stock">Out of Stock</option>
                                 </select>
                             </div>
+
+
                             <!-- Brand Field -->
                             <div>
                                 <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
                                 <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
                             </div>
-                            
+
                         </div>
                         <!-- Description -->
                         <div class="col-span-3">
@@ -641,6 +731,9 @@ fetchListedCategories();
                             </div>
                             <!-- Discountable Toggle -->
                             <div>
+
+                                <label class="block text-xs font-medium text-gray-700"> Senior/PWD Discountable:</label>
+
                                 <label class="block text-xs font-medium text-gray-700"> Senior/PWD Discountable:
                                     <span class="relative group ml-1">
                                     <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
@@ -650,6 +743,7 @@ fetchListedCategories();
                                     </span>
                                 </span>
                                 </label>
+
                                 <div class="flex items-center space-x-2">
                                     <label class="switch">
                                         <input type="checkbox" v-model="editProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
@@ -660,6 +754,9 @@ fetchListedCategories();
                             </div>
                             <!-- Featured Toggle -->
                             <div>
+
+                                <label class="block text-xs font-medium text-gray-700">Featured:</label>
+
                                 <label class="block text-xs font-medium text-gray-700">Featured:
                                     <span class="relative group ml-1">
                                     <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
@@ -669,6 +766,7 @@ fetchListedCategories();
                                     </span>
                                 </span>
                                 </label>
+
                                 <div class="flex items-center space-x-2">
                                     <label class="switch">
                                         <input type="checkbox" v-model="editProduct.featured" true-value="true" false-value="false"/>
@@ -680,6 +778,9 @@ fetchListedCategories();
                         </div>
                         <!-- On Sale Toggle (Separate Row) -->
                         <div class="col-span-2">
+
+                            <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+
                             <label class="block text-xs font-medium text-gray-700">On Sale:
                                 <span class="relative group ml-1">
                                     <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
@@ -712,6 +813,8 @@ fetchListedCategories();
             </div>
         </div>
 
+
+        <CategoriesModal v-if="showCategoriesModal" @close-categories-modal="showCategoriesModal = false" />
         <CategoriesModal v-if="showCategoriesModal" 
                         @close-categories-modal="showCategoriesModal = false" 
                         @category-added="fetchListedCategories" />
@@ -827,6 +930,15 @@ input[type="file"] {
     height: 200px;
 }
 
+}
+
+.image-upload {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+}
 .image-upload svg,
 .image-upload img {
     position: absolute;
