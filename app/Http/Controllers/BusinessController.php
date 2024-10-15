@@ -99,6 +99,22 @@ class BusinessController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'business_Name' => 'required|string|max:255',
+            'business_Email' => 'required|string|lowercase|email|max:255',
+            'business_Province' => 'required|string|max:255',
+            'business_City' => 'required|string|max:255',
+            'business_Barangay' => 'required|string|max:255',
+            'business_Address' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
+            'business_Telephone_Number' => 'required|string|max:255',
+            'business_Facebook' => 'nullable|string|max:255',
+            'business_X' => 'nullable|string|max:255',
+            'business_Instagram' => 'nullable|string|max:255',
+            'business_Tiktok' => 'nullable|string|max:255'
+        ]);
+        
         $business = Business::findOrFail($id);
         $oldData = $business->toArray();
         $oldName = $business->business_Name;
