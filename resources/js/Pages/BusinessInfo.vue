@@ -44,6 +44,7 @@ const fetchCities = async (provinceCode) => {
     try {
         const response = await axios.get(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities`);
         filteredCities.value = response.data;
+        console.log('Fetched cities:', filteredCities.value);
     } catch (error) {
         console.error('Error fetching cities:', error);
     }
@@ -54,6 +55,7 @@ const fetchBarangays = async (cityCode) => {
     try {
         const response = await axios.get(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays`);
         filteredBarangays.value = response.data;
+        console.log('Fetched barangays:', filteredBarangays.value);
     } catch (error) {
         console.error('Error fetching barangays:', error);
     }
@@ -86,7 +88,6 @@ const fetchBusinessData = async () => {
                 ? `/storage/business_logos/${businessData.business_image}` 
                 : '/storage/business_logos/default_logo.png';
 
-            // Fetch cities and barangays for the selected province and city
             const province = provinces.value.find(p => p.name === business.value.province);
             if (province) {
                 await fetchCities(province.code);
@@ -102,23 +103,27 @@ const fetchBusinessData = async () => {
     }
 };
 
-
-// Watch for Changes
+// Watch for Province Changes
 watch(() => business.value.province, async (newProvince) => {
-    const selectedProvince = provinces.value.find(p => p.name === newProvince);
-    if (selectedProvince) {
-        await fetchCities(selectedProvince.code);
-        business.value.city = '';
-        business.value.barangay = '';
-        filteredBarangays.value = [];
+    if (newProvince) {
+        const selectedProvince = provinces.value.find(p => p.name === newProvince);
+        if (selectedProvince) {
+            await fetchCities(selectedProvince.code);
+            business.value.city = '';
+            business.value.barangay = '';
+            filteredBarangays.value = [];
+        }
     }
 });
 
+// Watch for City Changes
 watch(() => business.value.city, async (newCity) => {
-    const selectedCity = filteredCities.value.find(c => c.name === newCity);
-    if (selectedCity) {
-        await fetchBarangays(selectedCity.code);
-        business.value.barangay = '';
+    if (newCity) {
+        const selectedCity = filteredCities.value.find(c => c.name === newCity);
+        if (selectedCity) {
+            await fetchBarangays(selectedCity.code);
+            business.value.barangay = '';
+        }
     }
 });
 
@@ -129,33 +134,32 @@ onMounted(async () => {
     loading.value = false;
 });
 
+// Handle Profile Picture Change
+const onProfilePictureChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        profilePicture.value = URL.createObjectURL(file);
+        business.value.image = file;
+    } else {
+        profilePicture.value = '/storage/business_logos/default_logo.png';
+        business.value.image = null;
+    }
+};
 
-    // Handle profile picture change
-    const onProfilePictureChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            profilePicture.value = URL.createObjectURL(file);
-            business.value.image = file;
-        } else {
-            profilePicture.value = '/storage/business_logos/default_logo.png';
-            business.value.image = null;
-        }
-    };
-
-    const updateBusiness = async () => {
-    console.log("Business data before update:", business.value); 
+// Update Business
+const updateBusiness = async () => {
     if (
         !business.value.name ||
         !business.value.email ||
-        business.value.province === 'none' ||
-        business.value.city === 'none' ||
-        business.value.barangay === 'none' ||
+        !business.value.province ||
+        !business.value.city ||
+        !business.value.barangay ||
         !business.value.address ||
         !business.value.phone_number ||
         !business.value.telephone_number 
     ) {
         alert('Please fill out all required fields');
-        return; 
+        return;
     }
 
     if (!business.value.business_id) {
@@ -164,45 +168,29 @@ onMounted(async () => {
     }
 
     const formData = new FormData();
-    formData.append('business_Name', business.value.name.trim());
-    formData.append('business_Email', business.value.email.trim());
-    formData.append('business_Province', business.value.province);
-    formData.append('business_City', business.value.city);
-    formData.append('business_Barangay', business.value.barangay);
-    formData.append('business_Address', business.value.address.trim());
-    formData.append('business_Phone_Number', business.value.phone_number.trim());
-    formData.append('business_Telephone_Number', business.value.telephone_number.trim());
-    formData.append('business_Facebook', business.value.facebook);
-    formData.append('business_X', business.value.x);
-    formData.append('business_Instagram', business.value.instagram);
-    formData.append('business_Tiktok', business.value.tiktok);
-
-    if (business.value.image instanceof File) {
-        formData.append('business_image', business.value.image);
-    }
-
-    for (let pair of formData.entries()) {
-        console.log(`${pair[0]}: ${pair[1]}`);
-    }
+    Object.keys(business.value).forEach(key => {
+        formData.append(key, business.value[key]);
+    });
 
     try {
         const response = await axios.post(`/api/Business/${business.value.business_id}`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'X-HTTP-Method-Override': 'PUT'
-        },
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'X-HTTP-Method-Override': 'PUT'
+            },
         });
         if (response.data.success) {
-        alert('Business profile updated successfully');
+            alert('Business profile updated successfully');
         } else {
-        console.error("Update failed:", response.data);
+            console.error("Update failed:", response.data);
         }
     } catch (error) {
-        console.error("Error updating business data:", JSON.stringify(error.response?.data, null, 2));
+        console.error("Error updating business data:", error);
         alert('Failed to update business profile');
     }
-    };
+};
 </script>
+
 
     <template>
         <AuthenticatedLayout>
@@ -246,11 +234,7 @@ onMounted(async () => {
                                 <label for="province" class="block text-gray-700 text-sm font-bold mb-2">
                                     Province
                                 </label>
-                                <select
-                                    id="province"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    v-model="business.province"
-                                >
+                                <select v-model="business.province">
                                     <option value="">Select Province</option>
                                     <option v-for="province in provinces" :key="province.code" :value="province.name">
                                         {{ province.name }}
@@ -263,11 +247,7 @@ onMounted(async () => {
                                 <label for="city" class="block text-gray-700 text-sm font-bold mb-2">
                                     Municipality/City
                                 </label>
-                                <select
-                                    id="city"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    v-model="business.city"
-                                >
+                                <select v-model="business.city">
                                     <option value="">Select City</option>
                                     <option v-for="city in filteredCities" :key="city.code" :value="city.name">
                                         {{ city.name }}
@@ -280,11 +260,7 @@ onMounted(async () => {
                                 <label for="barangay" class="block text-gray-700 text-sm font-bold mb-2">
                                     Barangay
                                 </label>
-                                <select
-                                    id="barangay"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    v-model="business.barangay"
-                                >
+                                <select v-model="business.barangay">
                                     <option value="">Select Barangay</option>
                                     <option v-for="barangay in filteredBarangays" :key="barangay.code" :value="barangay.name">
                                         {{ barangay.name }}
