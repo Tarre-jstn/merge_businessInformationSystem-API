@@ -11,78 +11,65 @@ use Illuminate\Support\Facades\Cache;
 class SendBusinessNameChangeNotification
 {
     public function handle(BusinessNameUpdated $event)
-    {
-        $cacheKey = 'business_update_' . $event->business->business_id;
-        if (Cache::has($cacheKey)) {
-            return; // Exit the listener if this event has been handled recently
+{
+    $cacheKey = 'business_update_' . $event->business->business_id;
+    if (Cache::has($cacheKey)) {
+        return;
+    }
+    Cache::put($cacheKey, true, 10);
+
+    $customers = User::where('user_type', 'customer')->get();
+    $businessLogoUrl = asset(Storage::url('business_logos/' . $event->business->business_image));
+
+    foreach ($customers as $customer) {
+        $emailBody = "<html><body style='font-family: Roboto, sans-serif; color: #333;'>";
+        $emailBody .= "<div style='padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: auto; background-color: #f9f9f9;'>";
+
+        $emailBody .= "<div style='display: flex; align-items: center; margin-bottom: 20px;'>";
+        $emailBody .= "<img src='{$businessLogoUrl}' alt='Business Logo' style='width: 80px; height: 80px; border-radius: 50%; margin-right: 20px;'>";
+        $emailBody .= "<h2 style='color: #0056b3;'>{$event->newName} Information Updated</h2>";
+        $emailBody .= "</div>";
+
+        $emailBody .= "<p style='font-size: 16px;'><strong>{$event->newName}</strong> has updated their business information. Please see the details below:</p>";
+
+        $imageChange = '';
+
+        foreach ($event->changes as $field => $change) {
+            if ($field === 'business_Address') {
+                $emailBody .= "<p style='font-size: 14px;'><strong>Business Address</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
+            } elseif ($field === 'business_image' && !$event->ignoreImageChange) {
+                $oldImageUrl = isset($change['old']) ? asset(Storage::url('business_logos/archive/' . $change['old'])) : 'No previous logo';
+                $newImageUrl = isset($change['new']) ? asset(Storage::url('business_logos/' . $change['new'])) : 'No new logo';
+
+                if ($oldImageUrl || $newImageUrl) {
+                    $imageChange = "<p style='font-size: 14px;'><strong>Logo has been updated:</strong></p>";
+                    $imageChange .= "<div style='display: flex; align-items: center;'>";
+                    $imageChange .= $oldImageUrl ? "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd;'></div>" : '';
+                    $imageChange .= $newImageUrl ? "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd;'></div>" : '';
+                    $imageChange .= "</div>";
+                }
+            } else {
+                $fieldLabel = ucfirst(str_replace('_', ' ', $field));
+                $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
+            }
         }
 
-        Cache::put($cacheKey, true, 10); // Cache for 10 seconds to avoid double-sending
+        if (!empty($imageChange)) {
+            $emailBody .= "<hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>";
+            $emailBody .= $imageChange;
+        }
 
-        // Fetch all customers
-        $customers = User::where('user_type', 'customer')->get();
-        // Determine whether to use the existing logo or a default one
-        $currentImage = $event->changes['business_image']['new'] ?? $event->oldImage ?? 'default_logo.png';
-        $businessLogoUrl = asset(Storage::url('business_logos/' . $currentImage));
+        $emailBody .= "</div></body></html>";
 
-        foreach ($customers as $customer) {
-            // Create the email content based on the changed fields
-            $emailBody = "<html><body style='font-family: Roboto, sans-serif; color: #333;'>";
-            $emailBody .= "<div style='padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: auto; background-color: #f9f9f9;'>";
-
-            // Header Section with Logo and Title
-            $emailBody .= "<div style='display: flex; align-items: center; margin-bottom: 20px;'>";
-            $emailBody .= "<img src='{$businessLogoUrl}' alt='Business Logo' style='width: 80px; height: 80px; border-radius: 50%; margin-right: 20px;'>";
-            $emailBody .= "<h2 style='color: #0056b3;'>{$event->newName} Information Updated</h2>";
-            $emailBody .= "</div>";
-
-            // Business info updated message
-            $emailBody .= "<p style='font-size: 16px;'><strong>{$event->newName}</strong> has updated their business information. Please see the details below:</p>";
-
-            // Track changes and build the email body
-            $imageChange = ''; // Temporary variable to hold image change HTML
-
-            foreach ($event->changes as $field => $change) {
-                if ($field === 'business_Address') {
-                    $emailBody .= "<p style='font-size: 14px;'><strong>Business Address</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
-                } elseif ($field === 'business_image') {
-                    // Store image change information separately to append it later
-                    $oldImageUrl = isset($change['old']) ? asset(Storage::url('business_logos/archive/' . $change['old'])) : 'No previous logo';
-                    $newImageUrl = isset($change['new']) ? asset(Storage::url('business_logos/' . $change['new'])) : 'No new logo';
-
-                    if ($oldImageUrl || $newImageUrl) {
-                        $imageChange = "<p style='font-size: 14px;'><strong>Logo has been updated:</strong></p>";
-                        $imageChange .= "<div style='display: flex; align-items: center;'>";
-                        $imageChange .= $oldImageUrl ? "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd;'></div>" : '';
-                        $imageChange .= $newImageUrl ? "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd;'></div>" : '';
-                        $imageChange .= "</div>";
-                    }
-                } else {
-                    // Handle all other changes
-                    $fieldLabel = ucfirst(str_replace('_', ' ', $field));
-                    $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
-                }
-            }
-
-            // Append the image change details to the bottom of the email body, if there was an image change
-            if (!empty($imageChange)) {
-                $emailBody .= "<hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>";
-                $emailBody .= $imageChange;
-            }
-
-            $emailBody .= "</div>"; // Close main email div
-            $emailBody .= "</body></html>";
-
-            // Send the email
-            try {
-                Mail::html($emailBody, function ($message) use ($customer, $event) {
-                    $message->to($customer->email)
-                        ->subject("Business Information Change Notification for {$event->newName}");
-                });
-            } catch (\Exception $e) {
-                // Log the error if mail sending fails
-                \Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
-            }
+        try {
+            Mail::html($emailBody, function ($message) use ($customer, $event) {
+                $message->to($customer->email)
+                    ->subject("Business Information Change Notification for {$event->newName}");
+            });
+        } catch (\Exception $e) {
+            \Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
         }
     }
+}
+
 }
