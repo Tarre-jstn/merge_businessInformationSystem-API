@@ -30,6 +30,7 @@ class BusinessController extends Controller
 {
     try{
     $request->validate([
+        'business_id' => 'required|exists:businesses,business_id',
         'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'user_id' => 'required|numeric|exists:users,id',
         'business_Name' => 'required|string|max:255',
@@ -40,6 +41,12 @@ class BusinessController extends Controller
         'business_X'=>'nullable|url',
         'business_Instagram'=>'nullable|url',
         'business_Tiktok'=>'nullable|url'
+        'business_TIN'=> 'required|numeric',
+        'business_Facebook'=>'required|string|max:255',
+        'business_X'=>'required|string|max:255',
+        'business_Instagram'=>'required|string|max:255',
+        'business_Tiktok'=>'required|string|max:255'
+
     ]);
 
     $business_image=null;

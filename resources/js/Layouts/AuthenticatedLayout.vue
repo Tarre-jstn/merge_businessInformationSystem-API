@@ -24,10 +24,10 @@ window.addEventListener('resize', () => {
         <div :class="{ 'ml-0 sm:ml-0': !isSmallScreen }" class="flex-1 min-h-screen bg-gray-100 dark:bg-gray-100 transition-all duration-300">
             <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                 <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 dark:border-gray-200">
+                <div class="max-w-auto mx-auto px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-200 dark:border-gray-200">
                     <div class="flex justify-between h-16">
                         <div class="flex">
-                            <h2 class="font-semibold text-xl text-black dark:text-black leading-tight content-center">Wala pa</h2>
+                            <h2 class="font-semibold text-xl text-black dark:text-black leading-tight content-center">Information System</h2>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -85,7 +85,7 @@ window.addEventListener('resize', () => {
                     </div>
 
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('receipt')" :active="route().current('receipt')">Receipt</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('invoice')" :active="route().current('invoice')">Receipt</ResponsiveNavLink>
                     </div>
 
                     <div class="pt-2 pb-3 space-y-1">

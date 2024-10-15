@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('business_Address');
             $table->string('business_Contact_Number');
             $table->string('business_Email');
+            $table->unsignedBigInteger('business_TIN');
             $table->string('business_Facebook')->nullable();
             $table->string('business_X')->nullable();
             $table->string('business_Instagram')->nullable();
