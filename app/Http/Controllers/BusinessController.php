@@ -103,15 +103,15 @@ class BusinessController extends Controller
         $oldData = $business->toArray(); // Store the original data
         $oldName = $business->business_Name;
         $oldImage = $business->business_image; // Store the old image path
-    
+
         // Collect changes to track
         $changes = [];
-    
+
         // If a new image is uploaded
         if ($request->hasFile('business_image')) {
             $image = $request->file('business_image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
-        
+
             // Move the old image to the archive folder before uploading the new one
             if ($oldImage) {
                 $oldImagePath = 'public/business_logos/' . $oldImage;
@@ -120,24 +120,24 @@ class BusinessController extends Controller
                     Storage::move($oldImagePath, 'public/business_logos/archive/' . $oldImage);
                 }
             }
-        
+
             // Store the new image in the business_logos folder
             $image->storeAs('public/business_logos', $imageName);
-        
+
             // Update business with the new image name
             $business->business_image = $imageName;
             $changes['business_image'] = ['old' => $oldImage, 'new' => $imageName];
         }
-        
+
         // Compare and track other changes
         if ($oldName !== $request->input('business_Name')) {
             $changes['business_Name'] = ['old' => $oldName, 'new' => $request->input('business_Name')];
             $business->business_Name = $request->input('business_Name'); // Update the model
         }
-    
+
         $oldAddress = "{$oldData['business_Address']}, {$oldData['business_Barangay']}, {$oldData['business_City']}, {$oldData['business_Province']}";
         $newAddress = "{$request->input('business_Address')}, {$request->input('business_Barangay')}, {$request->input('business_City')}, {$request->input('business_Province')}";
-    
+
         if ($oldAddress !== $newAddress) {
             $changes['business_Address'] = ['old' => $oldAddress, 'new' => $newAddress];
             // Update address fields in the model
@@ -146,7 +146,7 @@ class BusinessController extends Controller
             $business->business_City = $request->input('business_City');
             $business->business_Province = $request->input('business_Province');
         }
-    
+
         // Check for other field changes like phone number, email, etc.
         $fieldsToCheck = [
             'business_Phone_Number',
@@ -157,7 +157,7 @@ class BusinessController extends Controller
             'business_Instagram',
             'business_Tiktok',
         ];
-    
+
         foreach ($fieldsToCheck as $field) {
             if ($oldData[$field] !== $request->input($field)) {
                 $changes[$field] = ['old' => $oldData[$field], 'new' => $request->input($field)];
@@ -165,19 +165,21 @@ class BusinessController extends Controller
                 $business->{$field} = $request->input($field);
             }
         }
-   
+
         // Trigger event if there are any changes
         if (!empty($changes)) {
-            // Trigger the event, now passing the old image as the fourth argument
-            event(new BusinessNameUpdated($oldName, $business->business_Name, $changes, $oldImage));
+            Log::info('Event dispatching...');
+            event(new BusinessNameUpdated($business, $oldName, $business->business_Name, $changes, $oldImage));
+        } else {
+            Log::info('No changes detected, event not triggered'); // Add this for clarity
         }
 
-    
         // Save the updated business profile
         $business->save();
-    
+
         return response()->json(['success' => true]);
     }
+
     
 
 

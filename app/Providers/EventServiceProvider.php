@@ -16,8 +16,7 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         BusinessNameUpdated::class => [
             SendBusinessNameChangeNotification::class,
-        ],
-        
+        ],    
     ];
 
     
