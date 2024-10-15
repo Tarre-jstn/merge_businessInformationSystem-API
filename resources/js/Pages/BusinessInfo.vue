@@ -1,103 +1,135 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
-   
-    // Business and other reactive properties
-    const business = ref({
-        business_id: null,
-        name: '',
-        email: '',
-        province: '',
-        city: '',
-        barangay: '',
-        address: '',
-        phone: '',
-        telephone: '',
-        facebook: '',
-        x: '',
-        instagram: '',
-        tiktok: '',
-        image: null,
-    });
 
-    // Profile picture
-    const profilePicture = ref(null);
+// Reactive Data
+const business = ref({
+    business_id: null,
+    name: '',
+    email: '',
+    province: '',
+    city: '',
+    barangay: '',
+    address: '',
+    phone: '',
+    telephone: '',
+    facebook: '',
+    x: '',
+    instagram: '',
+    tiktok: '',
+    image: null,
+});
 
-    // Predefined provinces, cities, and barangays
-    const provinces = ref(['Bulacan', 'Pampanga', 'Tarlac']);
-    const citiesByProvince = ref({
-        Bulacan: ['Malolos', 'Meycauayan', 'San Jose del Monte'],
-        Pampanga: ['Angeles', 'San Fernando'],
-        Tarlac: ['Tarlac City', 'Concepcion'],
-    });
-    const barangaysByCity = ref({
-        Malolos: ['Mojon', 'Tikay', 'Santor'],
-        Meycauayan: ['Iba', 'Pajo'],
-        'San Jose del Monte': ['Kaypian', 'Sapang Palay'],
-        Angeles: ['Balibago', 'Pulungbulu'],
-        'San Fernando': ['Dolores', 'Sindalan'],
-        'Tarlac City': ['San Sebastian', 'Matatalaib'],
-        Concepcion: ['San Nicolas', 'Parang'],
-    });
+const profilePicture = ref(null);
+const provinces = ref([]);
+const filteredCities = ref([]);
+const filteredBarangays = ref([]);
+const loading = ref(true);
 
-    // Filtered data
-    const filteredCities = ref([]);
-    const filteredBarangays = ref([]);
+// Fetch Provinces
+const fetchProvinces = async () => {
+    try {
+        const regions = ['01', '02', '03', '05', '13'];
+        const response = await axios.get('https://psgc.gitlab.io/api/provinces');
+        provinces.value = response.data.filter(province => regions.includes(province.regionCode.slice(0, 2)));
+    } catch (error) {
+        console.error("Error fetching provinces:", error);
+    }
+};
 
-    // Filter cities based on selected province
-    const filterCities = () => {
+// Fetch Cities
+const fetchCities = async (provinceCode) => {
+    try {
+        const response = await axios.get(`https://psgc.gitlab.io/api/provinces/${provinceCode}/cities-municipalities`);
+        filteredCities.value = response.data;
+    } catch (error) {
+        console.error('Error fetching cities:', error);
+    }
+};
 
-        filteredBarangays.value = [];
-        filteredCities.value = citiesByProvince.value[business.value.province] || [];
-    };
+// Fetch Barangays
+const fetchBarangays = async (cityCode) => {
+    try {
+        const response = await axios.get(`https://psgc.gitlab.io/api/cities-municipalities/${cityCode}/barangays`);
+        filteredBarangays.value = response.data;
+    } catch (error) {
+        console.error('Error fetching barangays:', error);
+    }
+};
 
-    const filterBarangays = () => {
-        filteredBarangays.value = barangaysByCity.value[business.value.city] || [];
-    };
+// Fetch Business Data
+const fetchBusinessData = async () => {
+    try {
+        const response = await axios.get('/api/Business');
+        if (response.data && response.data.length > 0) {
+            const businessData = response.data[0];
+            Object.assign(business.value, {
+                business_id: businessData.business_id,
+                name: businessData.business_Name,
+                email: businessData.business_Email,
+                province: businessData.business_Province,
+                city: businessData.business_City,
+                barangay: businessData.business_Barangay,
+                address: businessData.business_Address,
+                phone_number: businessData.business_Phone_Number,
+                telephone_number: businessData.business_Telephone_Number,
+                facebook: businessData.business_Facebook,
+                x: businessData.business_X,
+                instagram: businessData.business_Instagram,
+                tiktok: businessData.business_Tiktok,
+                image: businessData.business_image,
+            });
 
+            profilePicture.value = businessData.business_image 
+                ? `/storage/business_logos/${businessData.business_image}` 
+                : '/storage/business_logos/default_logo.png';
 
-    // Fetch business data on mount
-    onMounted(async () => {
-        try {
-            const response = await axios.get('/api/Business');
-            console.log("API Response:", response.data);
-
-            if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-                const businessData = response.data[0];
-                business.value = {
-                    business_id: businessData.business_id,
-                    name: businessData.business_Name,
-                    email: businessData.business_Email,
-                    province: businessData.business_Province,
-                    city: businessData.business_City,
-                    barangay: businessData.business_Barangay,
-                    address: businessData.business_Address,
-                    phone_number: businessData.business_Phone_Number,
-                    telephone_number: businessData.business_Telephone_Number,
-                    facebook: businessData.business_Facebook,
-                    x: businessData.business_X,
-                    instagram: businessData.business_Instagram,
-                    tiktok: businessData.business_Tiktok,
-                    image: businessData.business_image,
-                };
-
-                // Set profile picture
-                profilePicture.value = businessData.business_image 
-                    ? `/storage/business_logos/${businessData.business_image}` 
-                    : '/storage/business_logos/default_logo.png';
-
-                await filterCities();
-                await filterBarangays();
-            } else {
-                console.error("No business data found or invalid format.");
+            // Fetch cities and barangays for the selected province and city
+            const province = provinces.value.find(p => p.name === business.value.province);
+            if (province) {
+                await fetchCities(province.code);
+                const city = filteredCities.value.find(c => c.name === business.value.city);
+                if (city) await fetchBarangays(city.code);
             }
-        } catch (error) {
-            console.error("Error fetching business data:", error);
-            alert('Failed to fetch business profile');
         }
-    });
+    } catch (error) {
+        console.error("Error fetching business data:", error);
+        alert('Failed to fetch business profile');
+    } finally {
+        loading.value = false;
+    }
+};
+
+
+// Watch for Changes
+watch(() => business.value.province, async (newProvince) => {
+    const selectedProvince = provinces.value.find(p => p.name === newProvince);
+    if (selectedProvince) {
+        await fetchCities(selectedProvince.code);
+        business.value.city = '';
+        business.value.barangay = '';
+        filteredBarangays.value = [];
+    }
+});
+
+watch(() => business.value.city, async (newCity) => {
+    const selectedCity = filteredCities.value.find(c => c.name === newCity);
+    if (selectedCity) {
+        await fetchBarangays(selectedCity.code);
+        business.value.barangay = '';
+    }
+});
+
+onMounted(async () => {
+    loading.value = true;
+    await fetchProvinces();
+    await fetchBusinessData();
+    loading.value = false;
+});
+
+
     // Handle profile picture change
     const onProfilePictureChange = (event) => {
         const file = event.target.files[0];
@@ -134,9 +166,9 @@ import { Head } from '@inertiajs/vue3';
     const formData = new FormData();
     formData.append('business_Name', business.value.name.trim());
     formData.append('business_Email', business.value.email.trim());
-    formData.append('business_Province', business.value.province.trim());
-    formData.append('business_City', business.value.city.trim());
-    formData.append('business_Barangay', business.value.barangay.trim());
+    formData.append('business_Province', business.value.province);
+    formData.append('business_City', business.value.city);
+    formData.append('business_Barangay', business.value.barangay);
     formData.append('business_Address', business.value.address.trim());
     formData.append('business_Phone_Number', business.value.phone_number.trim());
     formData.append('business_Telephone_Number', business.value.telephone_number.trim());
@@ -209,18 +241,20 @@ import { Head } from '@inertiajs/vue3';
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Province Dropdown -->
                             <div>
                                 <label for="province" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Province/Region
+                                    Province
                                 </label>
                                 <select
                                     id="province"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="business.province"
-                                    @change="filterCities"
                                 >
                                     <option value="">Select Province</option>
-                                    <option v-for="province in provinces" :key="province" :value="province">{{ province }}</option>
+                                    <option v-for="province in provinces" :key="province.code" :value="province.name">
+                                        {{ province.name }}
+                                    </option>
                                 </select>
                             </div>
 
@@ -233,10 +267,11 @@ import { Head } from '@inertiajs/vue3';
                                     id="city"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="business.city"
-                                    @change="filterBarangays"
                                 >
                                     <option value="">Select City</option>
-                                    <option v-for="city in filteredCities" :key="city" :value="city">{{ city }}</option>
+                                    <option v-for="city in filteredCities" :key="city.code" :value="city.name">
+                                        {{ city.name }}
+                                    </option>
                                 </select>
                             </div>
 
@@ -251,10 +286,14 @@ import { Head } from '@inertiajs/vue3';
                                     v-model="business.barangay"
                                 >
                                     <option value="">Select Barangay</option>
-                                    <option v-for="barangay in filteredBarangays" :key="barangay" :value="barangay">{{ barangay }}</option>
+                                    <option v-for="barangay in filteredBarangays" :key="barangay.code" :value="barangay.name">
+                                        {{ barangay.name }}
+                                    </option>
                                 </select>
                             </div>
                         </div>
+
+
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -334,9 +373,7 @@ import { Head } from '@inertiajs/vue3';
                                 Facebook
                             </label>
                             <div class="flex items-center space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 24 24">
-                                    <path d="M12,2C6.477,2,2,6.477,2,12c0,5.013,3.693,9.153,8.505,9.876V14.65H8.031v-2.629h2.474v-1.749 c0-2.896,1.411-4.167,3.818-4.167c1.153,0,1.762,0.085,2.051,0.124v2.294h-1.642c-1.022,0-1.379,0.969-1.379,2.061v1.437h2.995 l-0.406,2.629h-2.588v7.247C18.235,21.236,22,17.062,22,12C22,6.477,17.523,2,12,2z"></path>
-                                </svg>
+                               
                                 <input type="text" 
                                     placeholder="Facebook @username" 
                                     class="w-full h-10 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -351,9 +388,7 @@ import { Head } from '@inertiajs/vue3';
                                 X
                             </label>
                             <div class="flex items-center space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 48 48">
-                                    <path d="M 6.9199219 6 L 21.136719 26.726562 L 6.2285156 44 L 9.40625 44 L 22.544922 28.777344 L 32.986328 44 L 43 44 L 28.123047 22.3125 L 42.203125 6 L 39.027344 6 L 26.716797 20.261719 L 16.933594 6 L 6.9199219 6 z"></path>
-                                </svg>
+                               
                                 <input type="text" 
                                     placeholder="X @username" 
                                     class="w-full h-10 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -368,9 +403,7 @@ import { Head } from '@inertiajs/vue3';
                                 Instagram
                             </label>
                             <div class="flex items-center space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 48 48">
-                                    <path d="M 16 3 C 8.83 3 3 8.83 3 16 L 3 34 C 3 41.17 8.83 47 16 47 L 34 47 C 41.17 47 47 41.17 47 34 L 47 16 C 47 8.83 41.17 3 34 3 L 16 3 z M 37 11 C 38.1 11 39 11.9 39 13 C 39 14.1 38.1 15 37 15 C 35.9 15 35 14.1 35 13 C 35 11.9 35.9 11 37 11 z M 25 14 C 31.07 14 36 18.93 36 25 C 36 31.07 31.07 36 25 36 C 18.93 36 14 31.07 14 25 C 14 18.93 18.93 14 25 14 z M 25 16 C 20.04 16 16 20.04 16 25 C 16 29.96 20.04 34 25 34 C 29.96 34 34 29.96 34 25 C 34 20.04 29.96 16 25 16 z"></path>
-                                </svg>
+                               
                                 <input type="text" 
                                     placeholder="Instagram @username" 
                                     class="w-full h-10 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -385,9 +418,7 @@ import { Head } from '@inertiajs/vue3';
                                 TikTok
                             </label>
                             <div class="flex items-center space-x-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" viewBox="0 0 48 48">
-                                    <path d="M41,4H9C6.243,4,4,6.243,4,9v32c0,2.757,2.243,5,5,5h32c2.757,0,5-2.243,5-5V9C46,6.243,43.757,4,41,4z M37.006,22.323 c-0.227,0.021-0.457,0.035-0.69,0.035c-2.623,0-4.928-1.349-6.269-3.388c0,5.349,0,11.435,0,11.537c0,4.709-3.818,8.527-8.527,8.527 s-8.527-3.818-8.527-8.527s3.818-8.527,8.527-8.527c0.178,0,0.352,0.016,0.527,0.027v4.202c-0.175-0.021-0.347-0.053-0.527-0.053 c-2.404,0-4.352,1.948-4.352,4.352s1.948,4.352,4.352,4.352s4.527-1.894,4.527-4.298c0-0.095,0.042-19.594,0.042-19.594h4.016 c0.378,3.591,3.277,6.425,6.901,6.685V22.323z"></path>
-                                </svg>
+                              
                                 <input type="text" 
                                     placeholder="TikTok @username" 
                                     class="w-full h-10 shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
