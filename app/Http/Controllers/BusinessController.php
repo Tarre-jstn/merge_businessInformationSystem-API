@@ -29,13 +29,18 @@ class BusinessController extends Controller
 {
     try{
     $request->validate([
+        'business_id' => 'required|exists:businesses,business_id',
         'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'user_id' => 'required|numeric|exists:users,id',
         'business_Name' => 'required|string|max:255',
         'business_Address' => 'required|string|max:255',
         'business_Contact_Number' => 'required|string|max:255',
         'business_Email'=> 'required|string|lowercase|email|max:255|unique:businesses,business_Email',
-        'business_SocialMedia'=>'required|string|max:255'
+        'business_TIN'=> 'required|numeric',
+        'business_Facebook'=>'required|string|max:255',
+        'business_X'=>'required|string|max:255',
+        'business_Instagram'=>'required|string|max:255',
+        'business_Tiktok'=>'required|string|max:255'
     ]);
 
     $business_image=null;
