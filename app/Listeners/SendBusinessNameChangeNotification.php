@@ -26,7 +26,7 @@ class SendBusinessNameChangeNotification
         $emailBody .= "<div style='padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: auto; background-color: #f9f9f9;'>";
 
         $emailBody .= "<div style='display: flex; align-items: center; margin-bottom: 20px;'>";
-        $emailBody .= "<img src='{$businessLogoUrl}' alt='Business Logo' style='width: 80px; height: 80px; border-radius: 50%; margin-right: 20px;'>";
+        $emailBody .= "<img src='{$businessLogoUrl}' alt='Business Logo' style='width: 80px; height: 80px; border-radius: 50%; margin-right: 20px; object-fit: contain; aspect-ratio: 1/1;'>";
         $emailBody .= "<h2 style='color: #0056b3;'>{$event->newName} Information Updated</h2>";
         $emailBody .= "</div>";
 
@@ -44,8 +44,13 @@ class SendBusinessNameChangeNotification
                 if ($oldImageUrl || $newImageUrl) {
                     $imageChange = "<p style='font-size: 14px;'><strong>Logo has been updated:</strong></p>";
                     $imageChange .= "<div style='display: flex; align-items: center;'>";
-                    $imageChange .= $oldImageUrl ? "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd;'></div>" : '';
-                    $imageChange .= $newImageUrl ? "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd;'></div>" : '';
+
+                    // Old Logo
+                    $imageChange .= $oldImageUrl ? "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover; max-width: 100%; max-height: 96px;'></div>" : '';
+
+                    // New Logo
+                    $imageChange .= $newImageUrl ? "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover; max-width: 100%; max-height: 96px;'></div>" : '';
+
                     $imageChange .= "</div>";
                 }
             } else {
@@ -60,6 +65,7 @@ class SendBusinessNameChangeNotification
         }
 
         $emailBody .= "</div></body></html>";
+
 
         try {
             Mail::html($emailBody, function ($message) use ($customer, $event) {

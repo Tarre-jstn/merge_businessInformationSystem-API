@@ -147,6 +147,18 @@ class BusinessController extends Controller
             }
         }
 
+        $oldAddress = "{$oldData['business_Address']}, {$oldData['business_Barangay']}, {$oldData['business_City']}, {$oldData['business_Province']}";
+        $newAddress = "{$request->input('business_Address')}, {$request->input('business_Barangay')}, {$request->input('business_City')}, {$request->input('business_Province')}";
+
+        if ($oldAddress !== $newAddress) {
+            $changes['business_Address'] = ['old' => $oldAddress, 'new' => $newAddress];
+            // Update address fields in the model
+            $business->business_Address = $request->input('business_Address');
+            $business->business_Barangay = $request->input('business_Barangay');
+            $business->business_City = $request->input('business_City');
+            $business->business_Province = $request->input('business_Province');
+        }
+
         if ($oldName !== $request->input('business_Name')) {
             $changes['business_Name'] = ['old' => $oldName, 'new' => $request->input('business_Name')];
             $business->business_Name = $request->input('business_Name');
