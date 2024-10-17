@@ -1,13 +1,46 @@
 <script setup>
+import { defineStore } from 'pinia';
 import { Link } from '@inertiajs/vue3';
-import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon } from '@heroicons/vue/24/solid'
+import { ArchiveBoxIcon, BuildingLibraryIcon, BuildingStorefrontIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon } from '@heroicons/vue/24/solid'
+import { onMounted, ref } from 'vue';
+import axios from 'axios';
+
+const business = ref({
+    business_id: null,
+    name: '',
+    image: null,
+});
+const LogoPic = ref(null);
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('/api/Business');
+        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+            const businessData = response.data[0];
+            business.value = {
+                business_id: businessData.business_id,
+                name: businessData.business_Name,
+                image: businessData.business_image,
+            };
+
+            LogoPic.value = businessData.business_image
+                ? `/storage/business_logos/${businessData.business_image}`
+                : '/storage/business_logos/default_logo.png';
+
+        } else {
+            console.error("No business data found.");
+        }
+    } catch (error) {
+        console.error("Error fetching business data:", error);
+    }
+});
 </script>
 
 <template>
     <div class="sidebar fixed sm:relative sm:translate-x-0 -translate-x-full">
         <div class="logo">
-            <img src="https://picsum.photos/200" alt="Logo" />
-            <h1>F.C. Products</h1>
+            <img :src="LogoPic" alt="Business Logo" class="logo-image" />
+            <h1>{{ business.name }}</h1>
         </div>
         <nav>
             <ul>
@@ -41,13 +74,14 @@ import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltI
                     <span class="ml-3">Finance</span>
                 </Link></li>
 
-                <li class="flex items-center mb-4"><Link :href="route('settings')" :class="{ active: route().current('settings') }">
-                    <i class="icon-settings"></i>
-                    <span class="ml-3">Additional Settings</span>
-                </Link></li>
+                
                 <li class="flex items-center mb-4"><Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
+                    <BuildingStorefrontIcon class="size-6"/>
                     <span class="ml-3">BusinessInfo</span>
                 </Link></li>
+
+
+
             </ul>
         </nav>
     </div>
@@ -123,7 +157,6 @@ nav ul li a:hover {
     color: #202c34;
 }
 
-
 .logo {
     text-align: center;
     padding: 20px;
@@ -131,12 +164,14 @@ nav ul li a:hover {
     flex-direction: column;
     align-items: center; 
 }
-.logo img {
-    width: 200px;
-    height: 200px;
+
+.logo-image {
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    margin-bottom: 10px; 
+    object-fit: cover;
 }
+
 .logo h1 {
     font-size: 1.5em;
     margin: 0; 
