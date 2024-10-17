@@ -3,19 +3,27 @@
         <div class="flex flex-row">
             <div class="max-w-7xl sm:px-6 lg:px-8 py-6 flex flex-col" style="width: 60vw;">
                 <div class="bg-whiteoverflow-hidden shadow-sm sm:rounded-lg" style="background-color: #0F2C4A;">
-                    <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-col"><div style="font-size: 30px;"><b>Welcome to the Home Page!</b></div>
-                        <div class="flex flex-row justify-center"><div class="flex flex-col text-center mr-20"><div style="font-size: 25px;"><b>Total Income (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalIncome }}</div></div>
-                        <div class="flex flex-col text-center"><div style="font-size: 25px;"><b>Total Expenses (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalExpenses }}</div></div></div>
+                    <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-col items-center">
+                        <div class="flex flex-row justify-center"><div class="flex flex-col text-center mr-20"><div style="font-size: 18px;"><b>Total Income (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalIncome }}</div></div>
+                        <div class="flex flex-col text-center"><div style="font-size: 18px;"><b>Total Expenses (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalExpenses }}</div></div></div>
+                        <div class="flex flex-row justify-center">
+                            <button style="background-color: #FFFFFF; ">
+                                <ResponsiveNavLink :href="route('finance')" :active="route().current('finance')" style="color: #0F2C4A; font-size: 12px;">View Finance</ResponsiveNavLink>
+                            </button>
                         </div>
+                    </div>
                 </div>
 
                 <!-- Inventory Table -->
                 <div class="flex flex-row justify-center">
-                    <div class="inventory_table m-4">
+                    <div class="inventory_table m-4 table_container">
+                        <div class="flex flex-row justify-between px-8 py-2">
+                            <div style="font-size: 23px;"><b>Inventory</b></div>
+                                <button>
+                                    <ResponsiveNavLink :href="route('inventory')" :active="route().current('inventory')" style="color: white; font-size: 12px;">View all products</ResponsiveNavLink>
+                                </button>
+                        </div>
                         <table>
-                            <tr style="font-size: 1.375rem;">
-                                <div style="padding: 0.4rem 0.938rem 0.4rem;"><b>Inventory</b></div>
-                            </tr>
                             <tr style="font-size: 1rem; background-color: white">
                                 <th>Product Name</th>
                                 <th>Category</th>
@@ -23,7 +31,7 @@
                                 <th>Sold</th>
                                 <th>Stock</th>
                             </tr>
-                            <tr v-for="product in filteredProducts" :key="product.id">
+                            <tr v-for="product in filteredProducts.slice(0, 3)" :key="product.id">
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.category }}</td>
                                 <td>{{ product.price }}</td>
@@ -31,9 +39,6 @@
                                 <td>{{ product.stock }}</td>
                             </tr>
                         </table>
-                        <button style="margin-left: 12.9vw; margin-top: 2vh;">
-                            <ResponsiveNavLink :href="route('inventory')" :active="route().current('inventory')" style="color: white; font-size: 12px;">View all products</ResponsiveNavLink>
-                        </button>
                     </div>
                 </div>                
                     <!-- Visitors & Views and Retention Rate Charts side by side -->
@@ -381,17 +386,19 @@ button {
     border-radius: 14px;
 }
 td, th {
-    border-top: .5px solid #0F2C4A;
-    border-bottom: .5px solid #0F2C4A;
+    border-top: 0.5px solid #0F2C4A;
+    border-bottom: 0.5px solid #0F2C4A;
     text-align: center;
 }
 
-table {
+.table_container {
     border: 5px solid #0F2C4A;
-    border-collapse: separate;
-    width: 33vw;
-    height: 26vh;
     border-radius: 14px;
+    border-collapse: separate;
+}
+table{
+    width: 1000px;
+    height: 26vh;
 }
 
 /* Responsive design */
