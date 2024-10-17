@@ -3,7 +3,10 @@
         <div class="flex flex-row">
             <div class="max-w-7xl sm:px-6 lg:px-8 py-6 flex flex-col" style="width: 60vw;">
                 <div class="bg-whiteoverflow-hidden shadow-sm sm:rounded-lg" style="background-color: #0F2C4A;">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">Welcome to the Home Page! {{ totalIncome }}, {{ totalExpenses }}</div>
+                    <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-col"><div style="font-size: 30px;"><b>Welcome to the Home Page!</b></div>
+                        <div class="flex flex-row justify-center"><div class="flex flex-col text-center mr-20"><div style="font-size: 25px;"><b>Total Income (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalIncome }}</div></div>
+                        <div class="flex flex-col text-center"><div style="font-size: 25px;"><b>Total Expenses (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalExpenses }}</div></div></div>
+                        </div>
                 </div>
 
                 <!-- Inventory Table -->
@@ -20,7 +23,7 @@
                                 <th>Sold</th>
                                 <th>Stock</th>
                             </tr>
-                            <tr v-for="product in filteredProducts" :key="product.id">
+                            <tr v-for="product in filteredProducts.slice(0, 3)" :key="product.id">
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.category }}</td>
                                 <td>{{ product.price }}</td>
@@ -28,20 +31,21 @@
                                 <td>{{ product.stock }}</td>
                             </tr>
                         </table>
-                        <button style="margin-left: 11vw; margin-top: 1.3vh;">
+                        <button style="margin-left: 12.9vw; margin-top: 2vh;">
                             <ResponsiveNavLink :href="route('inventory')" :active="route().current('inventory')" style="color: white; font-size: 12px;">View all products</ResponsiveNavLink>
                         </button>
                     </div>
                 </div>                
                     <!-- Visitors & Views and Retention Rate Charts side by side -->
-                    <div class="flex flex-row justify-center mt-10 px-8 space-x-6"> 
+                    <div class="flex flex-row justify-center px-8 space-x-6 mt-2"> 
                         <!-- Visitors & Views Chart -->
-                        <div class="custom-chart-width p-4 border border-black rounded-lg" style="width: 30vw; height: 200px;"> 
+                        <div class="custom-chart-width p-4 border border-black rounded-lg" style="width: 30vw; height: 275px;"> 
+
                             <canvas id="visitorsViewsChart" class="w-full" style="height: 150px;"></canvas> 
                         </div>
 
                         <!-- Retention Rate Chart -->
-                        <div class="custom-chart-width p-4 border border-black rounded-lg" style="width: 30vw; height: 200px;"> 
+                        <div class="custom-chart-width p-4 border border-black rounded-lg" style="width: 30vw; height: 275px;"> 
                             <canvas id="retentionRateChart" class="w-full" style="height: 150px;"></canvas> 
                         </div>
                     </div>
@@ -51,21 +55,21 @@
             <div class="flex flex-col">
                 <vue-cal hide-view-selector :time="false" active-view="month" xsmall class="p-6" style="background-color: #0F2C4A; margin-right: 30px; margin-top: 25px; height: 45vh; color: white; font-weight: bold; border-radius: 1rem;">
                     <template #arrow-prev>
-                        <i class="icon material-icons">Previous</i>
+                        <i class="fa-solid fa-arrow-left"></i>
                     </template>
                     <template #arrow-next>
-                        <i class="icon material-icons">Next</i>
+                        <i class="fa-solid fa-arrow-right"></i>
                     </template>
                 </vue-cal>
-                <div>
-                    Social Media
+                <div class="flex flex-col items-center mt-4">
+                    <h3><b>Social Media</b></h3>
                     <div class="flex flex-row">
-                        <button>Facebook</button>
-                        <button>Twitter</button>
+                        <button class=" p-3 mx-3 h-20 min-w-36 bg-blue-800 mt-2"><a :href="business_Facebook" target="_blank"><i class="fa-brands fa-facebook-f"></i><br>Facebook</a></button>
+                        <button class=" p-3 mx-3 h-20 min-w-36 bg-blue-400 mt-2"><a :href="business_X" target="_blank"><i class="fa-brands fa-twitter"></i><br>Twitter</a></button>
                     </div>
                     <div class="flex flex-row">
-                        <button>Instagram</button>
-                        <button>Tiktok</button>
+                        <button class=" p-3 mx-3 h-20 min-w-36 bg-pink-700 mt-2"><a :href="business_Instagram" target="_blank"><i class="fa-brands fa-instagram"></i><br>Instagram</a></button>
+                        <button class=" p-3 mx-3 h-20 min-w-36 bg-black mt-2"><a :href="business_Tiktok" target="_blank"><i class="fa-brands fa-tiktok"></i><br>Tiktok</a></button>
                     </div>
                 </div>
             </div>
@@ -321,29 +325,64 @@ const fetchFinancesByDate = async () => {
             }
         }
 
-        console.log("Finances by date:", financesByDate.value);
-        console.log("Total Income:", totalIncome.value);
-        console.log("Total Expenses:", totalExpenses.value);
+        console.log("Finances by date:", financesByDate);
+        console.log("Total Income:", totalIncome);
+        console.log("Total Expenses:", totalExpenses);
 
     } catch (error) {
         console.error("Error fetching finances by date:", error);
     }
 };
+        const business_Facebook = ref('');
+        const business_X = ref('');
+        const business_Instagram = ref('');
+        const business_Tiktok = ref('');
 
+const fetchsocialmediaLinks = async() =>{
+    try {const response_userId = await axios.get('/user-id');
+        const userId = response_userId.data.user_id;
+        console.log(userId);
+
+        const getBusinessInfo = await axios.get('/api/business_info', {
+            params: {user_id: userId}
+        });
+        console.log(getBusinessInfo.data);
+        const businessId = getBusinessInfo.data.business_id;
+
+        const getWebsiteInfo = await axios.get('/api/website', {
+            params: {business_id: businessId}
+        });
+        console.log(getWebsiteInfo.data);
+
+        business_Facebook.value = getBusinessInfo.data.business_Facebook;
+        business_X.value = getBusinessInfo.data.business_X;
+        business_Instagram.value = getBusinessInfo.data.business_Instagram;
+        business_Tiktok.value = getBusinessInfo.data.business_Tiktok;
+
+        console.log("Social Media Links:", business_Facebook.value, business_X.value, business_Instagram.value, business_Tiktok.value);
+    }catch(error){
+        console.error('There was an error fetching the data:', error);
+    }
+}
+
+fetchsocialmediaLinks();
 fetchFinancesByDate();
 fetchProducts();
 fetchListedCategories();
 </script>
 <style>
 /* Button and Table Styling */
+h3 {
+    font-size: 25px;
+}
 button {
     background-color: #0F2C4A;
     color:#FFFFFF;
     border-radius: 14px;
 }
 td, th {
-    border-top: 1px solid #0F2C4A;
-    border-bottom: 1px solid #0F2C4A;
+    border-top: .5px solid #0F2C4A;
+    border-bottom: .5px solid #0F2C4A;
     text-align: center;
 }
 

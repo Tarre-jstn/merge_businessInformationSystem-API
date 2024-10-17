@@ -40,7 +40,7 @@ class BusinessController extends Controller
         'business_Facebook'=>'nullable|url',
         'business_X'=>'nullable|url',
         'business_Instagram'=>'nullable|url',
-        'business_Tiktok'=>'nullable|url'
+        'business_Tiktok'=>'nullable|url',
         'business_TIN'=> 'required|numeric',
         'business_Facebook'=>'required|string|max:255',
         'business_X'=>'required|string|max:255',
