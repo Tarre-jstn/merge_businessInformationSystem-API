@@ -31,17 +31,15 @@ Route::get('/all-business', function(){
     return Business::all();
 });
 
-
 Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 
 Route::post('/website', [WebsiteController::class, 'store']);
 Route::get('/website', [WebsiteController::class, 'info']);
 Route::post('/website-update', [WebsiteController::class, 'update']);
-=======
+
 Route::get('/all-invoices', function(){
     return Invoice::all();
 });
-
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);
@@ -51,9 +49,8 @@ Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
 Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
 
-//Dedicated for seniorPWD_discoubtable
+//Dedicated for seniorPWD_discountable
 Route::put('/products/{id}/discountable', [ProductController::class, 'updateDiscountable']);
-
 
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
@@ -73,17 +70,10 @@ Route::get('invoice_additional',[InvoiceAdditionalController::class,'index']);
 Route::post('invoice_additional',[InvoiceAdditionalController::class,'store']);
 Route::get('/invoice_additional/{invoice_system_id}', [InvoiceAdditionalController::class, 'show']);
 
-
 Route::post('invoice_computation',[InvoiceComputationController::class,'store']);
 Route::get('/invoice_computation/{invoice_system_id}',[InvoiceComputationController::class,'show']);
 
 Route::get('invoice_print/{invoice_id}', [InvoiceController::class, 'invoice_print']);
-
-
-/*Route::get('/categories', [CategoryController::class, 'index']);
-Route::post('/categories', [CategoryController::class, 'store']);
-Route::put('/categories/{category}', [CategoryController::class, 'update']);
-Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);*/
 
 Route::get('finance', [FinanceController::class, 'index']);
 Route::post('finance', [FinanceController::class, 'store']);
@@ -94,6 +84,4 @@ Route::get('finance_by_date', [FinanceController::class, 'getFinanceByDate']);
 Route::post('finance_category', [FinanceController::class, 'storeCategory']);
 Route::delete('/finance_category/{id}', [FinanceController::class, 'destroyCategory']);
 
-
 Route::apiResource('categories', CategoryController::class);
-

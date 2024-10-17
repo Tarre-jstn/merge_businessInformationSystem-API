@@ -254,8 +254,7 @@ const handleEditImageUpload = (event) => {
     }
 };
 
-    }
-};
+
 
 const updateDiscountable = async (productId, discountableStatus) => {
     try {
@@ -416,7 +415,8 @@ fetchListedCategories();
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
 
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 space-x-1">
-                                        <div class="flex items-center">
+                                        <div class="flex items-center"></div>
+                                    </td>
 
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
                                         <div class="flex items-left justify-center">
@@ -430,7 +430,7 @@ fetchListedCategories();
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
 
-                                        <div class="flex space-x-4">
+                                        <div class="flex space-x-4"></div>
 
                                         <div class="flex items-center justify-center space-x-4">
 
@@ -560,6 +560,8 @@ fetchListedCategories();
                         <!-- On Sale Toggle (Separate Row) -->
                         <div class="col-span-2">
                             <label class="block text-xs font-medium text-gray-700">On Sale:</label>
+                        </div>
+                            
 
                     <div class="col-span-2 grid grid-cols-3 gap-3">
                         <!-- Expiry Date -->
@@ -930,7 +932,7 @@ input[type="file"] {
     height: 200px;
 }
 
-}
+
 
 .image-upload {
     position: relative;
