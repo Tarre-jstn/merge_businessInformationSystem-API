@@ -58,4 +58,34 @@ class InvoiceAdditionalController extends Controller
             return response()->json(['error in generating invoice additional' => $e->getMessage()], 500);
         }
     }
+
+
+    public function updateInvoiceAdditionals(Request $request, $invoice_system_id){
+        try{
+            $validatedData = $request->validate([
+                'invoice_system_id' => 'nullable|exists:invoices,invoice_system_id',
+                'addtl_Costs_Description' => 'nullable|string|max:1000',
+                'aCD_quantity' => 'nullable|string|max:1000',
+                'aCD_Total_Amount' => 'nullable|string|numeric',
+                'aCD_amount' => 'nullable|numeric',
+            ]);
+
+            $invoice_additional = InvoiceAdditional::create([
+                'invoice_system_id' => $request->invoice_system_id,
+                'aCD_quantity' => $request->aCD_quantity,
+                'addtl_Costs_Description' => $request->addtl_Costs_Description,
+                'aCD_amount' => $request->aCD_amount,
+                'aCD_Total_Amount' => $request->aCD_Total_Amount
+            ]);
+
+        }catch (Exception $e){
+            return response()->json(['error in generating invoice additional' => $e->getMessage()], 500);
+        }
+    }
+
+    
+    public function deleteInvoiceAdditionals(Request $request, $invoice_system_id){
+        InvoiceAdditional::where('invoice_system_id', $invoice_system_id)->delete();
+        return response()->json(['message' => 'Invoice deleted successfully']);
+    }
 }

@@ -232,7 +232,7 @@
             </tr>
 
             <tr>
-                <table style="line-height: 18px; font-size:15px">
+                <table style="line-height: 7px; font-size:15px">
                     <tr>
                         <td style="width: 210px;" colspan="1">
                         <span style="font-weight: 700;">VATable Sales: </span> {{ number_format($invoice_computation->VATable_Sales,2) }}
@@ -269,7 +269,7 @@
                         </td>
                         <td style="width: 180px; text-align: center;">{{ number_format($invoice_computation->Add_VAT,2) }}</td> 
                     </tr>
-                    <tr>
+                    <tr style="line-height: 15px;">
                         <td style="width: 210px;" colspan="1">
                         <span style="font-weight: 700;">SC/PWD Discount Percent:</span> {{ number_format($invoice_computation->Less_SC_PWD_Discount_Percent)}}%
                         </td> <!-- Empty cells for spacing -->
@@ -295,8 +295,13 @@
         </table>
         
         <div style="margin-top: 60px; padding-right:20px; text-align: right">
-            <span style="border-bottom: 1px solid black;">{{$invoice->authorized_Representative}}</span><br>
-            Cashier/Authorized Representative
+            <span style="border-bottom: 1px solid black;">{{strtoupper($invoice->customer_Name)}}</span><br>
+            Customer's Signature over Printed Name:
+        </div>
+
+        <div style="margin-top: 60px; padding-right:20px; text-align: right">
+            <span style="border-bottom: 1px solid black;">{{ strtoupper($invoice->authorized_Representative)}}</span><br>
+            Cashier/Authorized Representative's Signature over Printed Name:
         </div>
 
     </div>

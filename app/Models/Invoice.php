@@ -42,10 +42,23 @@ class Invoice extends Model
         'timestamps'
     
     ];
-    
+
     public function business()
     {
         return $this->belongsTo(Business::class, 'business_id', 'business_id');
     }
-    
+
+    public function computation()
+    {
+        return $this->hasOne(InvoiceComputation::class, 'invoice_system_id', 'invoice_system_id');
+    }
+ 
+    public function items()
+    {
+        return $this->hasMany(InvoiceItem::class, 'invoice_system_id', 'invoice_system_id');
+    }
+    public function additionals()
+    {
+        return $this->hasMany(InvoiceAdditional::class, 'invoice_system_id', 'invoice_system_id');
+    }
 }

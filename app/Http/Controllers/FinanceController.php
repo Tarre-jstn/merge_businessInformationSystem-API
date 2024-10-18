@@ -6,6 +6,14 @@ use App\Models\FinanceCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\carbon;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportFinance;
 class FinanceController extends Controller
 {
     public function index()
@@ -74,7 +82,7 @@ class FinanceController extends Controller
             return response()->json(['message' => 'Finance deleted successfully'], 200);
         } catch (\Exception $e) {
             Log::error('Error deleting finance: ' . $e->getMessage());
-            return response()->json(['error' => 'Unable to delete product'], 500);
+            return response()->json(['error' => 'Unable to delete finance'], 500);
         }
     }
 
@@ -123,12 +131,65 @@ class FinanceController extends Controller
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate = Carbon::parse($request->end_date)->endOfDay();
     
+        \Log::info('Received FINANCE start_date: ' . $startDate);
+        \Log::info('Received FINANCE end_date: ' . $endDate);
+
         $financesByDate = Finance::whereBetween('date', [$startDate, $endDate])
                         ->orderBy('date')
                         ->get();
     
         return response()->json($financesByDate);
     }
+
+    public function printFinanceByDatePdf(Request $request)
+    {
+
+        $startDate = Carbon::parse($request->query('startDatePrint'))->startOfDay();
+        $endDate = Carbon::parse($request->query('endDatePrint'))->endOfDay();
+
+        // Retrieve and parse the categories from the query string
+        $categories = $request->query('categories');
+        $selectedCategories = explode(',', $categories); // Convert the comma-separated string into an array
+
+        // Filter the finances based on selected categories and date range
+        $financesByDate = Finance::whereBetween('date', [$startDate, $endDate])
+            ->whereIn('category', $selectedCategories) // Filter by selected categories
+            ->orderBy('date')
+            ->get();
+
+        if ($financesByDate->isEmpty()) {
+            return response()->json(['message' => 'No finances found for the given date range.'], 404);
+        }
+
+        $pdf = Pdf::loadView('financeSummaryByDate', [
+                'finance' => $financesByDate, 
+                'startDate' => $startDate, 
+                'endDate' => $endDate
+            ])
+            ->setPaper([0, 0, 612, 936], 'portrait');
+
+        return $pdf->stream();
+
+    }
+
+
+
+public function exportFinanceByDateExcel(Request $request)
+{
+    $startDate = Carbon::parse($request->query('startDatePrint'))->startOfDay();
+    $endDate = Carbon::parse($request->query('endDatePrint'))->endOfDay();
+
+    // Retrieve and parse the categories from the query string
+    $categories = $request->query('categories');
+    $selectedCategories = explode(',', $categories); // Convert the comma-separated string into an array
+
+    return Excel::download(new ExportFinance($startDate, $endDate, $selectedCategories), 'finance_summary.xlsx');
+}
+
+
+
+
+
 
 }
 

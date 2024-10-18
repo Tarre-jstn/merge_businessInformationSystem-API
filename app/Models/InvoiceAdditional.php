@@ -17,4 +17,9 @@ class InvoiceAdditional extends Model
         'aCD_Total_Amount'
 
     ];
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_system_id', 'invoice_system_id');
+    }
 }

@@ -28,4 +28,8 @@ class InvoiceItem extends Model
 
         'timestamps'
     ];
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_system_id', 'invoice_system_id');
+    }
 }

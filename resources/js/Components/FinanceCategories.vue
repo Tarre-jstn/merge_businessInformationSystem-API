@@ -65,10 +65,10 @@ const saveFinanceCategories = async () => {
 
 
     <div class="fixed inset-0 flex items-center justify-center z-50">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 class="text-2xl mb-4">Categories</h2>
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+            <h2 class="text-2xl text-center align-middle font-semibold mb-4">Categories</h2>
             <div class="mb-4">
-                <h3 class="text-lg font-semibold">Listed Categories</h3>
+                <h3 class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-md text-white font-semibold">Finance Categories</h3>
                 <div class="border p-4 rounded-lg mb-2">
                     <div v-for="category in financeCategories" :key="category.id" class="inline-flex items-center bg-gray-200 text-gray-800 py-1 px-3 rounded-full mr-2 mb-2">
                         {{ category.category }}
@@ -79,12 +79,11 @@ const saveFinanceCategories = async () => {
                             class="ml-2 text-red-500">x</button>
                     </div>
                 </div>
-                <button @click="addFinanceCategory" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Category</button>
-                <p class="text-sm text-gray-500">*Listed Categories will BE SHOWN on the website</p>
-            </div>
-            <div class="flex justify-end">
-                <button @click="closeModal" class="bg-red-500 text-white py-2 px-4 rounded mr-2">Cancel</button>
-                <button @click="saveFinanceCategories" class="bg-green-500 text-white py-2 px-4 rounded">OK</button>
+                <div class="flex justify-between">
+                    <button @click="addFinanceCategory" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Category</button>
+                    <button @click="closeModal" style="background-color:#059669" class=" text-white py-2 px-4 rounded mr-2">Ok</button>
+                </div>
+
             </div>
         </div>
     </div>

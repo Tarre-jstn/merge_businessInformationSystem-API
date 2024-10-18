@@ -23,6 +23,11 @@ class InvoiceComputationController extends Controller
 {
     //
 
+    public function index()
+    {
+        return InvoiceComputation::all();
+    }
+
     public function show($invoice_system_id)
     {
         $invoice = InvoiceComputation::where('invoice_system_id', $invoice_system_id)->first();
@@ -84,6 +89,55 @@ class InvoiceComputationController extends Controller
             return response()->json(['error in generating invoice computation' => $e->getMessage()], 500);
         }
 
+    }
+
+
+    public function updateInvoiceComputation(Request $request, $invoice_system_id){
+        try{
+            // Find the invoice by its invoice_system_id
+            $invoice = InvoiceComputation::where('invoice_system_id', $invoice_system_id)->firstOrFail();
+    
+            // Validate the request data
+            $request->validate([
+                'invoice_id' => [
+                    'nullable',
+                    Rule::unique('invoices', 'invoice_id')->ignore($invoice->invoice_system_id, 'invoice_system_id')     // Correctly use the Rule class
+                ],
+                'invoice_system_id' => 'nullable|exists:invoices,invoice_system_id',
+
+                'VATable_Sales' => 'nullable|numeric',
+                'VAT_Exempt_Sales' => 'nullable|numeric',
+                'Zero_Rated_Sales' => 'nullable|numeric',
+                'VAT_Amount' => 'nullable|numeric',
+
+                'VAT_Inclusive' => 'nullable|numeric',
+                'Less_VAT' => 'nullable|numeric',
+                'Amount_NET_of_VAT' => 'nullable|numeric',
+                'senior_PWD_discountable' => 'nullable|string|max:5',
+                'Less_SC_PWD_Discount' => 'nullable|numeric',
+                'Less_SC_PWD_Discount_Percent' => 'nullable|numeric',
+                'Amount_Due' => 'nullable|numeric',
+                'Add_VAT' => 'nullable|numeric',
+
+                'tax' => 'nullable|numeric',
+                'total_Amount_Due' => 'nullable|numeric',
+    
+            ]);
+        
+            // Update the invoice with the new data
+            if($invoice){
+                $data = $request->all();
+                $invoice->update($data);
+                // $invoice->save();
+        
+                return response()->json($invoice);
+            }
+            }catch(Exception $e){
+                return response()->json(['error in updating invoice computation' => $e->getMessage()], 500);
+            }
+    }
+    public function  deleteInvoiceComputation(Request $request, $invoice_system_id){
+        InvoiceComputation::where('invoice_system_id', $invoice_system_id)->delete();
     }
 
 }

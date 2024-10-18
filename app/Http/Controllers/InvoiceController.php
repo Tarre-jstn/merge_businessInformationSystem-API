@@ -16,7 +16,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
+use Carbon\carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
+use App\Exports\ExportInvoice;
 class InvoiceController extends Controller
 {
     public function index()
@@ -121,42 +124,6 @@ public function show($invoice_id)
         }
     }
 
-    public function update(Request $request, $invoice_system_id) {
-        // Find the invoice by its invoice_system_id
-        $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->firstOrFail();
-
-        // Validate the request data
-        $request->validate([
-            'invoice_id' => [
-                'nullable',
-                Rule::unique('invoices', 'invoice_id')->ignore($invoice->invoice_system_id, 'invoice_system_id')     // Correctly use the Rule class
-            ],
-            'date' => 'required|date',
-            'terms' => 'required|string|max:255',
-            'status' => 'required|string|max:255',
-            'authorized_Representative' => 'required|string|max:255',
-            'payment_Type' => 'required|string|max:255',
-            'customer_Name' => 'required|string|max:255',
-            'customer_Address' => 'required|string|max:255',
-            'customer_TIN' => 'required|integer',
-            'customer_Business_Style' => 'required|string|max:255',
-            'customer_PO_No' => 'required|integer',
-            'customer_OSCA_PWD_ID_No' => 'required|integer',
-
-        ]);
-    
-        // Update the invoice with the new data
-        if($invoice){
-            $data = $request->all();
-            $invoice->update($data);
-            $invoice->save();
-    
-    
-    
-            return response()->json($invoice);
-        }
-    }
-
     public function destroy($invoice_system_id)
     {
         try {
@@ -212,5 +179,132 @@ public function show($invoice_id)
         // Stream the generated PDF to the browser
         return $pdf->stream();
     }
+
+
+    public function update(Request $request, $invoice_system_id) {
+        try{
+        // Find the invoice by its invoice_system_id
+        $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->firstOrFail();
+
+        // Validate the request data
+        $request->validate([
+            'invoice_id' => [
+                'nullable',
+                Rule::unique('invoices', 'invoice_id')->ignore($invoice->invoice_system_id, 'invoice_system_id')     // Correctly use the Rule class
+            ],
+            'date' => 'required|date',
+            'terms' => 'required|string|max:255',
+            'status' => 'required|string|max:255',
+            'authorized_Representative' => 'required|string|max:255',
+            'payment_Type' => 'required|string|max:255',
+            'customer_Name' => 'required|string|max:255',
+            'customer_Address' => 'required|string|max:255',
+            'customer_TIN' => 'required|integer',
+            'customer_Business_Style' => 'required|string|max:255',
+            'customer_PO_No' => 'required|integer',
+            'customer_OSCA_PWD_ID_No' => 'required|integer',
+
+        ]);
+    
+        // Update the invoice with the new data
+        if($invoice){
+            $data = $request->all();
+            $invoice->update($data);
+            // $invoice->save();
+    
+            return response()->json($invoice);
+        }
+        }catch(Exception $e){
+            return response()->json(['error in updating invoice item' => $e->getMessage()], 500);
+        }
+
+    }
+
+    
+    
+
+    public function getInvoiceByDate(Request $request)
+    {
+        \Log::info('Incoming request data FOR FINANCE BY DATE:', $request->all());
+
+        if (!$request->has(['start_date', 'end_date'])) {
+            return response()->json(['error' => 'Start date and end date are required'], 400);
+        }
+
+        
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+    
+        $invoicesByDate = Invoice::whereBetween('date', [$startDate, $endDate])
+                        ->orderBy('date')
+                        ->get();
+    
+        return response()->json($invoicesByDate);
+    }
+
+
+
+
+
+    public function printInvoiceByDate(Request $request)
+    {
+        \Log::info('Received start_date: ' . $request);
+        $startDate = Carbon::parse($request->query('startDatePrint'))->startOfDay();
+        $endDate = Carbon::parse($request->query('endDatePrint'))->endOfDay();
+
+        \Log::info('Received start_date: ' . $startDate);
+        \Log::info('Received end_date: ' . $endDate);
+
+        // $startDate = Carbon::parse($request->query('startDatePrint'))->startOfDay();
+        // $endDate = Carbon::parse($request->query('endDatePrint'))->endOfDay(); // Use the correct parameter here
+
+        $invoicesByDate = Invoice::whereBetween('date', [$startDate, $endDate])
+            ->orderBy('date')
+            ->get();
+
+        $invoice_computation = InvoiceComputation::whereIn('invoice_system_id',$invoicesByDate->pluck('invoice_system_id'))
+            ->get();
+
+        // Log::info('SQL Query: ' . $invoicesByDate->toSql()); // Log the SQL query
+
+
+            if ($invoicesByDate->isEmpty()) {
+                return response()->json(['message' => 'No invoices found for the given date range.'], 404);
+            }
+
+                            
+        $pdf = Pdf::loadView('invoiceSummaryByDate', ['invoice' => $invoicesByDate, 'invoice_computations' => $invoice_computation, 'startDate' => $startDate, 'endDate' => $endDate])
+            ->setPaper([0, 0, 612, 936], 'landscape');
+
+        return $pdf->stream();
+    }
+
+
+    public function printInvoiceByDateExcel(Request $request) 
+{
+    \Log::info('Received start_date: ' . $request->query('startDatePrint'));
+    $startDate = Carbon::parse($request->query('startDatePrint'))->startOfDay();
+    $endDate = Carbon::parse($request->query('endDatePrint'))->endOfDay();
+
+    \Log::info('Received start_date: ' . $startDate);
+    \Log::info('Received end_date: ' . $endDate);
+
+    $invoicesByDate = Invoice::whereBetween('date', [$startDate, $endDate])
+        ->orderBy('date')
+        ->get();
+
+    $invoice_computation = InvoiceComputation::whereIn('invoice_system_id',$invoicesByDate->pluck('invoice_system_id'))
+        ->get();
+        
+    if ($invoicesByDate->isEmpty()) {
+        return response()->json(['message' => 'No invoices found for the given date range.'], 404);
+    }
+
+    return Excel::download(new ExportInvoice($invoicesByDate,$invoice_computation), 'invoices.xlsx');
 }
+
+
+
+}
+
 
