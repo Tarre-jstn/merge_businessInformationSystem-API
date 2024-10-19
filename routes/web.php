@@ -3,6 +3,7 @@
 use App\Http\Controllers\EditWebsiteController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\GetIdController;
 use App\Http\Controllers\UserController;
@@ -73,9 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Inventory');
     })->name('inventory');
 
-    Route::get('/receipt', function () {
-        return Inertia::render('Receipt');
-    })->name('receipt');
+    Route::get('/invoice', function () {
+        return Inertia::render('Invoice');
+    })->name('invoice');
 
     Route::get('/finance', function () {
         return Inertia::render('Finance');
