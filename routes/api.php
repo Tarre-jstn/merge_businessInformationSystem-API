@@ -9,16 +9,21 @@ use App\Http\Controllers\InvoiceAdditionalController;
 use App\Http\Controllers\ProductController;
 use App\Models\InvoiceAdditional;
 use Illuminate\Support\Facades\Log;
-
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\User;
 use App\Models\Business;
 use App\Models\Product;
 use App\Models\Invoice;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\csrfController;
+use App\Http\Controllers\GetIdController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WebsiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatbotController;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ImportController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -36,18 +41,40 @@ Route::get('/all-invoices', function(){
     return Invoice::all();
 });
 
+Route::get('/business_info', [BusinessController::class, 'showBusiness']);
+Route::post('/website', [WebsiteController::class, 'store']);
+Route::get('/website', [WebsiteController::class, 'info']);
+Route::post('/website-update', [WebsiteController::class, 'update']);
+
 Route::get('/products', [ProductController::class, 'index']);
 Route::post('/products', [ProductController::class, 'store']);
-Route::get('products/{id}', [ProductController::class, 'show']);
 Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-//Dedicated for seniorPWD_discoubtable
-Route::put('/products/{id}/discountable', [ProductController::class, 'updateDiscountable']);
+Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
+Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');
+Route::get('/sale-products', [ProductController::class, 'sale_products'])->name('sale_products');
 
-Route::get('/business_info', [BusinessController::class, 'show']);
+Route::get('/Business', [BusinessController::class, 'show']);
+Route::post('/Business', [BusinessController::class, 'store']);
+Route::put('/Business/{id}', [BusinessController::class, 'update']);
+Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
+
+Route::get('/chatbot-response', [ChatbotController::class, 'index']);
+Route::post('/chatbot-response', [ChatbotController::class, 'store']);
+Route::put('/chatbot-response/{id}', [ChatbotController::class, 'update']);
+Route::delete('/chatbot-response/{id}', [ChatbotController::class, 'destroy']);
+
+
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
+
+Route::get('/backup', function () {
+    Artisan::call('db:export');
+    return response()->download(storage_path('app/backups/backup.sql'))->deleteFileAfterSend(true);
+});
+
+Route::post('/import', [ImportController::class, 'import']);
 
 /*Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/categories', [CategoryController::class, 'store']);
@@ -62,6 +89,15 @@ Route::get('finance_by_date', [FinanceController::class, 'getFinanceByDate']);
 
 Route::post('finance_category', [FinanceController::class, 'storeCategory']);
 Route::delete('/finance_category/{id}', [FinanceController::class, 'destroyCategory']);
+
+Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
+Route::get('/listed-products', [ProductController::class, 'listed_products'])->name('listed_products');
+
+Route::get('/Business', [BusinessController::class, 'show']);
+Route::post('/Business', [BusinessController::class, 'store']);
+Route::put('/Business/{id}', [BusinessController::class, 'update']);
+Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
+Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 
 
 Route::apiResource('categories', CategoryController::class);
