@@ -21,6 +21,26 @@ const business = ref({
     image: null,
 });
 
+const phoneError = ref('');
+const telephoneError = ref('');
+
+const validatePhone = () => {
+    if (business.value.phone && /\D/.test(business.value.phone)) {
+        phoneError.value = "Please input only numbers for the Phone field";
+    } else {
+        phoneError.value = '';
+    }
+};
+
+// Validation function for the telephone field
+const validateTelephone = () => {
+    if (business.value.telephone && /\D/.test(business.value.telephone)) {
+        telephoneError.value = "Please input only numbers for the Telephone field";
+    } else {
+        telephoneError.value = '';
+    }
+};
+
 // Profile picture
 const profilePicture = ref(null);
 
@@ -156,6 +176,15 @@ const onProfilePictureChange = (event) => {
 
 // Handle business update
 const updateBusiness = async () => {
+   
+    validatePhone();
+    validateTelephone();
+
+    if (phoneError.value || telephoneError.value) {
+        alert('Please correct the errors before updating the business profile.');
+        return;
+    }
+
     if (!business.value.business_id) {
         alert("Business ID is missing!");
         return;
@@ -196,6 +225,8 @@ const updateBusiness = async () => {
         alert('Failed to update business profile');
     }
 };
+
+
 </script>
 
 
@@ -305,7 +336,9 @@ const updateBusiness = async () => {
                                     id="phone-number"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="business.phone"
+                                    @input="validatePhone"
                                 >
+                                <div v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</div>
                             </div>
                         </div>
 
@@ -318,7 +351,9 @@ const updateBusiness = async () => {
                                 id="telephone-number"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="business.telephone"
+                                @input="validateTelephone"
                             >
+                            <div v-if="telephoneError" class="text-red-500 text-sm">{{ telephoneError }}</div>
                         </div>
 
                         <div>
