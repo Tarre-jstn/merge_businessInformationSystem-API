@@ -84,7 +84,7 @@ window.addEventListener('resize', () => {
                     </div>
 
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('receipt')" :active="route().current('receipt')">Receipt</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('invoice')" :active="route().current('invoice')">Receipt</ResponsiveNavLink>
                     </div>
 
                     <div class="pt-2 pb-3 space-y-1">

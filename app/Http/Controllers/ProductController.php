@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportProduct;
+use App\Imports\ImportProduct;
 use App\Models\Product;
+use App\Exports\ProductsExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Carbon\carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProductsImport;
 
 class ProductController extends Controller
 {
@@ -103,6 +109,95 @@ class ProductController extends Controller
         }
     }
 
+    public function getProductsByDate(Request $request)
+    {
+        \Log::info('Incoming request data FOR PRODUCTS BY DATE:', $request->all());
+
+        if (!$request->has(['start_date', 'end_date'])) {
+            return response()->json(['error' => 'Start date and end date are required'], 400);
+        }
+
+        
+        $startDate = Carbon::parse($request->start_date)->startOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
+    
+        \Log::info('Received PRODUCTS start_date: ' . $startDate);
+        \Log::info('Received PRODUCTS end_date: ' . $endDate);
+
+        $financesByDate = Product::whereBetween('date', [$startDate, $endDate])
+                        ->orderBy('date')
+                        ->get();
+    
+        return response()->json($financesByDate);
+    }
+
+    public function exportProductsXslx(Request $request)
+    {
+        return Excel::download(new ExportProduct, 'products.xlsx');
+    }
+
+
+
+    public function importProductsXlsx(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max file size: 10MB
+        ]);
+    
+        try {
+            Excel::import(new ImportProduct, $request->file('file'));
+            return response()->json(['message' => 'Products imported successfully.']);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+    
+            foreach ($failures as $failure) {
+                $errors[] = "Row {$failure->row()}: {$failure->errors()[0]}";
+            }
+    
+            return response()->json(['message' => 'Import failed', 'errors' => $errors], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+//     public function importProductsXlsx(Request $request)
+// {
+//     $request->validate([
+//         'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max file size: 10MB
+//     ]);
+
+//     try {
+//         Excel::import(new ImportProduct, $request->file('file'));
+//         return response()->json(['message' => 'Products imported successfully.']);
+//     } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+//         $failures = $e->failures();
+//         $errors = [];
+
+//         foreach ($failures as $failure) {
+//             $errors[] = "Row {$failure->row()}: {$failure->errors()[0]}";
+//         }
+
+//         return response()->json(['message' => 'Import failed', 'errors' => $errors], 422);
+//     } catch (\Exception $e) {
+//         return response()->json(['message' => 'Import failed: ' . $e->getMessage()], 500);
+//     }
+// }
+
+
+    // public function importProductsXlsx(Request $request)
+    // {
+    //     // Validate that the request contains a file
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,xls,csv',
+    //     ]);
+
+    //     // Handle the import using the ProductsImport class
+    //     Excel::import(new ImportProduct, $request->file('file'));
+
+    //     return response()->json(['message' => 'Products imported successfully.']);
+    // }
     public function featured_products(Request $request){
        
         $featuredProducts = Product::where('business_id', $request->business_id)

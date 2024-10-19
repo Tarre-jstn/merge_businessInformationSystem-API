@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 class Product extends Model
 {
     use HasFactory;
@@ -27,4 +26,13 @@ class Product extends Model
         'on_sale_price',
         'featured',
     ];
+
+    protected $attributes = [
+        'sold' => 0,
+    ];
+
+    public function getSoldAttribute($value)
+    {
+        return $value ?? 0;
+    }
 }

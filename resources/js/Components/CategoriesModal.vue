@@ -79,7 +79,7 @@ const saveCategories = async () => {
             await axios.put(`/api/categories/${category.id}`, category);
         }
 
-        closeModal();
+        emit('close-categories-modal');
     } catch (error) {
         console.error("Error saving categories:", error);
     }
@@ -88,10 +88,10 @@ const saveCategories = async () => {
 
 <template>
     <div class="fixed inset-0 flex items-center justify-center z-50">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 class="text-2xl mb-4">Categories</h2>
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+            <h2 class="text-2xl text-center align-middle font-semibold mb-4">Categories</h2>
             <div class="mb-4">
-                <h3 class="text-lg font-semibold">Listed Categories</h3>
+                <h3 class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-lg text-white ">Listed Categories</h3>
                 <div class="border p-4 rounded-lg mb-2">
                     <div v-for="category in listedCategories" :key="category.id" class="inline-flex items-center bg-gray-200 text-gray-800 py-1 px-3 rounded-full mr-2 mb-2">
                         {{ category.name }}
@@ -102,7 +102,7 @@ const saveCategories = async () => {
                 <p class="text-sm text-gray-500">*Listed Categories will BE SHOWN on the website</p>
             </div>
             <div class="mb-4">
-                <h3 class="text-lg font-semibold">Unlisted Categories</h3>
+                <h3 class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-lg text-white">Unlisted Categories</h3>
                 <div class="border p-4 rounded-lg mb-2">
                     <div v-for="category in unlistedCategories" :key="category.id" class="inline-flex items-center bg-gray-200 text-gray-800 py-1 px-3 rounded-full mr-2 mb-2">
                         {{ category.name }}
@@ -111,9 +111,9 @@ const saveCategories = async () => {
                 </div>
                 <p class="text-sm text-gray-500">*Unlisted Categories will NOT BE SHOWN on the website</p>
             </div>
-            <div class="flex justify-end">
-                <button @click="closeModal" class="bg-red-500 text-white py-2 px-4 rounded mr-2">Cancel</button>
-                <button @click="saveCategories" class="bg-green-500 text-white py-2 px-4 rounded">OK</button>
+            <div class="flex justify-center">
+                <button @click="closeModal"     style="background-color:#DC2626"class="text-white py-2 px-4 rounded mr-2">Cancel</button>
+                <button @click="saveCategories" style="background-color:#059669"class=" text-white py-2 px-4 rounded">OK</button>
             </div>
         </div>
     </div>

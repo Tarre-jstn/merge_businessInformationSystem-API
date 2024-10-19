@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.0",
         "botman/botman": "^2.8",
         "botman/driver-web": "^1.5",
         "firebase/php-jwt": "^6.10",
@@ -14,6 +15,8 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "maatwebsite/excel": "^3.1",
+        "psr/simple-cache": "2.0",
         "league/flysystem": "^3.29",
         "spatie/laravel-analytics": "^5.4",
         "tightenco/ziggy": "^2.3"
