@@ -176,7 +176,7 @@ try {
         <!-- header -->
         <div class=" bg-business-website-header flex items-center p-5">
             <div class="ml-[50px] w-[50px] h-[50px]">
-                <img :src='businessImage.value' class="w-full h-full object-cover rounded-full"/>
+                <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
