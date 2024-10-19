@@ -1,47 +1,56 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { ArchiveBoxIcon, BuildingLibraryIcon, BuildingStorefrontIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon } from '@heroicons/vue/24/solid';
+import { ArchiveBoxIcon, BuildingLibraryIcon, BuildingStorefrontIcon, ChatBubbleLeftRightIcon, CloudArrowDownIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon } from '@heroicons/vue/24/solid';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
 
+// Business object with reactive data
 const business = ref({
     business_id: null,
     name: '',
     image: null,
 });
+
+// Reference for the business logo picture
 const LogoPic = ref(null);
 
 onMounted(async () => {
   try {
-    const storedLogo = localStorage.getItem('business_logo');
-    console.log('Stored Logo in localStorage:', storedLogo); // Debugging log
-    if (storedLogo) {
-      LogoPic.value = storedLogo;
+    // First, check if data is already in localStorage
+    const storedBusinessName = localStorage.getItem('business_name');
+    const storedBusinessLogo = localStorage.getItem('business_logo');
+
+    // If the business name and logo are already in localStorage, use them
+    if (storedBusinessName && storedBusinessLogo) {
+      business.value.name = storedBusinessName;
+      LogoPic.value = storedBusinessLogo;
+      console.log('Using stored business name and logo:', storedBusinessName, storedBusinessLogo);
+      return;  // Exit early since the data is already stored
     }
 
+    // Fetch data from API if it's not in localStorage
     const response = await axios.get('/api/Business');
-    console.log('API Response:', response.data); // Inspect the API response
+    console.log('API Response:', response.data); // Log the API response
 
     if (response.data && response.data.length > 0) {
       const businessData = response.data[0];
-      console.log('Business Data:', businessData); // Log the business data
+      console.log('Fetched Business Data:', businessData); // Log the fetched business data
 
-      // Update the business ref with values
+      // Set the business name and logo from the API response
       business.value = {
         name: businessData.business_Name || 'Default Business Name',
         image: businessData.business_image || 'default_logo.png',
       };
 
-      console.log('Business after update:', business.value); // Log after update
-
+      // Generate the logo URL
       const logoUrl = `/storage/business_logos/${business.value.image}`;
-      console.log('Generated Logo URL:', logoUrl); // Log the generated logo URL
       LogoPic.value = logoUrl;
 
-      // Store logo URL in localStorage
-      if (logoUrl) {
-        localStorage.setItem('business_logo', logoUrl);
-      }
+      // Store the business name and logo in localStorage for future use
+      localStorage.setItem('business_name', business.value.name);
+      localStorage.setItem('business_logo', logoUrl);
+
+      console.log('Stored business data in localStorage:', business.value.name, logoUrl);
     } else {
       console.error("No business data found.");
     }
@@ -49,8 +58,8 @@ onMounted(async () => {
     console.error("Error fetching business data:", error);
   }
 });
-
 </script>
+
 
 <template>
     <div class="sidebar fixed sm:relative sm:translate-x-0 -translate-x-full">
@@ -101,6 +110,12 @@ onMounted(async () => {
                     <Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
                         <BuildingStorefrontIcon class="size-6"/>
                         <span class="ml-3">Business Info</span>
+                    </Link>
+                </li>
+                <li class="flex items-center mb-4">
+                    <Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
+                        <CloudArrowDownIcon class="size-6"/>
+                        <span class="ml-3">Backup </span>
                     </Link>
                 </li>
             </ul>
@@ -175,8 +190,8 @@ nav ul li a:hover {
     align-items: center; 
 }
 .logo-image {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     object-fit: cover;
 }
