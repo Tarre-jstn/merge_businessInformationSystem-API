@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
 
 class SendBusinessNameChangeNotification
 {
@@ -73,7 +75,8 @@ class SendBusinessNameChangeNotification
                     ->subject("Business Information Change Notification for {$event->newName}");
             });
         } catch (\Exception $e) {
-            \Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
+
+            Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
         }
     }
 }

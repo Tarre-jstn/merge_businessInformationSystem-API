@@ -382,7 +382,3 @@ import { Head } from '@inertiajs/vue3';
             </div>
         </AuthenticatedLayout>
     </template>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main

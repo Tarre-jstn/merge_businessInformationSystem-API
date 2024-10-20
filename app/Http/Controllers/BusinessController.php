@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 use App\Events\BusinessNameUpdated;
 
 
-
 class BusinessController extends Controller
 {
     /**
@@ -107,20 +106,26 @@ class BusinessController extends Controller
         $request->validate([
             'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'business_Name' => 'required|string|max:255',
-            'business_Email'=> 'required|string|lowercase|email|max:255', 
+            'business_Email' => 'required|string|lowercase|email|max:255',
             'business_Province' => 'required|string|max:255',
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
             'business_Contact_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
-            'business_Facebook'=>'nullable|string|max:255',
-            'business_X'=>'nullable|string|max:255',
-            'business_Instagram'=>'nullable|string|max:255',
-            'business_Tiktok'=>'nullable|string|max:255'
+            'business_Facebook' => 'nullable|string|max:255',
+            'business_X' => 'nullable|string|max:255',
+            'business_Instagram' => 'nullable|string|max:255',
+            'business_Tiktok' => 'nullable|string|max:255'
         ]);
+        
+        $business = Business::findOrFail($id);
+        $oldData = $business->toArray();
+        $oldName = $business->business_Name;
+        $oldImage = $business->business_image;
 
-        $business = Business::find($id);
+        $changes = [];
+        $ignoreImageChange = false; // New flag to ignore specific image changes
 
         $oldData = $business->toArray();
         $oldName = $business->business_Name;
@@ -193,6 +198,7 @@ class BusinessController extends Controller
         $business->save();
         return response()->json(['success' => true]);
     }
+
     /**
      * Remove the specified resource from storage.
      */
