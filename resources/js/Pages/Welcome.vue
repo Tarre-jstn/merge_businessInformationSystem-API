@@ -2,6 +2,7 @@
 import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref } from 'vue';
+import Chatbot from '@/Components/Chatbot.vue';
 
 const{props} = usePage();
 defineProps({
@@ -205,8 +206,8 @@ const formatUrl = (url) => {
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a>Home</a>
-                    <a class="text-white text-[18px] cursor-pointer">Chat with Us</a>
+                    <a class="text-black text-[18px] cursor-pointer" :href="route('homepage')">Home</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('chat_with_us')">Chat with Us</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
@@ -467,5 +468,6 @@ const formatUrl = (url) => {
     <p class="text-[17px] text-white mt-2"><i class="fa fa-copyright"></i> {{ textAreas.businessName }} All rights reserved</p>
 </div>
 </div>
+<Chatbot />
     </section>
 </template>

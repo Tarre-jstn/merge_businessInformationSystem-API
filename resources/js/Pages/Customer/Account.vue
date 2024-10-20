@@ -176,7 +176,7 @@ try {
         <!-- header -->
         <div class=" bg-business-website-header flex items-center p-5">
             <div class="ml-[50px] w-[50px] h-[50px]">
-                <img :src='businessImage.value' class="w-full h-full object-cover rounded-full"/>
+                <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
                     <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
@@ -272,10 +272,8 @@ try {
             <!-- Right Column (Profile Picture)-->
             <div class="w-full md:w-1/2 flex flex-col items-center mt-[30px]">
                 <div class="relative group">
+                        <img :src='profilePicture' alt="Profile Picture" class="w-[350px] h-[350px] rounded-full border-4 border-black object-cover" />
                     
-                        <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
-                        <img v-else-if="profilePicture" :src='profilePicture' alt="Profile Picture" class="w-[350px] h-[350px] rounded-full border-4 border-black object-cover" />
-                        <img v-else src='/storage/user_profile/default-profile.png'/> 
                         <input
                             type="file"
                             id="profile-upload"

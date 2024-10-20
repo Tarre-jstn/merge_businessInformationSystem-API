@@ -4,15 +4,19 @@
                 <img :src='businessImage' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a class="text-white text-[18px] cursor-pointer" >Home</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('homepage')">Home</a>
                     <a class="text-black text-[18px] cursor-pointer" :href="route('chat_with_us')">Chat with Us</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <div class="flex flex-col">
+                    <div v-if="userLogIn===true" class="flex flex-col">
                         <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
-                    </div> 
+                    </div>
+                    <div v-else-if="userLogIn===false" class="space-x-[40px] mr-[40px]">
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('login')">Log In</a>
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('register')">Register</a>
+                    </div>
                     <div class="w-[50px] h-[50px]">
                         <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
                         <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />
@@ -117,6 +121,7 @@
   <script>
   import axios from 'axios';
   import {Inertia} from '@inertiajs/inertia';
+  import{usePage } from '@inertiajs/vue3';
   
   export default {
     data() {
@@ -128,7 +133,8 @@
         chatbotImageUrl: '',
         buttonsDisabled: false, // New property to disable buttons
         isLoading: true,
-        website_footNote: ''
+        website_footNote: '',
+        userLogIn: false,
         };
     },
     mounted() {
@@ -161,9 +167,10 @@
             : '/storage/user_profile/default-profile.png';
                 this.isLoading=false;
             }
-            this.profilePicture = response.data.profile_img 
-            ? `/storage/user_profile/${response.data.profile_img}` 
-            : '/storage/user_profile/default-profile.png';
+
+            if(this.$page.props.auth.user){
+            userLogIn.value=true;
+          }
 
             const getBusinessInfo = await axios.get('/api/business_info', {
                 params: {user_id: 1}

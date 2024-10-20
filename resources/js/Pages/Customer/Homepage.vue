@@ -48,6 +48,7 @@ const feature_toggle=ref('');
 const onSale_toggle=ref('');
 let profile_img = ref('');
 const profilePicture = ref(null);
+let userLogIn = ref(false);
 
 function logout(button){
     Inertia.post(route('logout'), {button});
@@ -56,6 +57,11 @@ function logout(button){
 function account(){
     Inertia.visit(route('account_settings'));
 }
+
+function goTochatPage(){
+    Inertia.visit(route('chat_with_us'));
+}
+
 
 onMounted(()=>{
     getWebsiteInfo();
@@ -70,10 +76,8 @@ async function getWebsiteInfo(){
         ? `/storage/user_profile/${response.data.profile_img}` 
         : '/storage/user_profile/default-profile.png';
             isLoading.value=false;
+            userLogIn.value=true;
         }
-        profilePicture.value = response.data.profile_img 
-        ? `/storage/user_profile/${response.data.profile_img}` 
-        : '/storage/user_profile/default-profile.png';
 
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: 1}
@@ -173,15 +177,19 @@ const formatUrl = (url) => {
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
                 <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a>Home</a>
+                    <a class="text-black text-[18px] cursor-pointer" :href="route('homepage')">Home</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('chat_with_us')">Chat with Us</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
                     <a class="text-white text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <div class="flex flex-col">
+                    <div v-if="userLogIn" class="flex flex-col">
                         <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
-                    </div> 
+                    </div>
+                    <div v-else>
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('login')">Log In</a>
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('register')">Register</a>
+                    </div>
                     <div class="w-[50px] h-[50px]">
                         <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
                         <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />

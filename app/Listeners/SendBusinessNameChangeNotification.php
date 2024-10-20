@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
+
 class SendBusinessNameChangeNotification
 {
     public function handle(BusinessNameUpdated $event)
@@ -74,6 +75,7 @@ class SendBusinessNameChangeNotification
                     ->subject("Business Information Change Notification for {$event->newName}");
             });
         } catch (\Exception $e) {
+
             Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
         }
     }

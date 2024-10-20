@@ -35,11 +35,14 @@ class WebsiteController extends Controller
                 return response()->json(['error' => $e->getMessage()], 500);
             }
         }
+    
+
     public function info(Request $request){
         $business_id = $request->query('business_id');
         $website = Website::where('business_id', $business_id)->first();
         return response()->json($website);
     }
+
     public function update(Request $request){
        
         
@@ -47,9 +50,12 @@ class WebsiteController extends Controller
             'website_description'=>'nullable|string|max:255',
             'website_details' => 'nullable|string|max:255',
             'website_image'=>'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'website_footNote'=>'nullable|string|max:255',
             'about_us1'=>'nullable|string|max:255',
             'about_us2'=>'nullable|string|max:255',
-            'about_us3'=>'nullable|string|max:255'
+            'about_us3'=>'nullable|string|max:255',
+            'featured_section'=>'sometimes|in:true,false',
+            'onSale_section'=>'sometimes|in:true,false'
         ]);
 
         $website = Website::where('business_id', $request->business_id)->first();

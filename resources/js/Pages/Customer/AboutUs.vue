@@ -1,6 +1,8 @@
 <script setup>
 import { Inertia } from '@inertiajs/inertia';
 import { onMounted, ref } from 'vue';
+import{usePage } from '@inertiajs/vue3';
+
 
 const businessInfo = {
     businessImage: ref(''),
@@ -19,10 +21,11 @@ const businessInfo = {
     business_City: ref(''),
     business_Barangay: ref('')
 }
-
+const {props} = usePage();
 let profile_img = ref('');
 const profilePicture = ref(null);
 let isLoading = ref(true);
+let userLogIn = ref(false);
 
 const formatUrl = (url) => {
     // Check if the URL starts with http:// or https://
@@ -62,6 +65,9 @@ async function getWebsiteInfo(){
             isLoading.value=false;
         }
 
+        if(props.auth.user){
+            userLogIn.value=true;
+        }
         const getBusinessInfo = await axios.get('/api/business_info', {
             params: {user_id: 1}
         });
@@ -91,8 +97,7 @@ async function getWebsiteInfo(){
 
         businessInfo.businessDescription.value = getWebsiteInfo1.data.website_description;
         businessInfo.businessDetails.value = getWebsiteInfo1.data.website_details;
-        const imgUrl = `/storage/${getWebsiteInfo1.data.website_image}`;
-        businessInfo.homePageImage.value=imgUrl;
+
 
         
        
@@ -114,16 +119,20 @@ async function getWebsiteInfo(){
             <div class="ml-[50px] w-[50px] h-[50px]">
                 <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
             </div>
-            <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
-                    <a class="text-white text-[18px]" :href="route('homepage')">Home</a>
-                    <a class="text-white text-[18px]">Chat with Us</a>
-                    <a class="text-white text-[18px]" :href="route('products_page')">Products & Services</a>
-                    <a class="text-black text-[18px]":href="route('aboutUs_page')">About Us</a>
+                <div class="ml-auto flex items-center space-x-[40px] mr-[40px]">
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('homepage')">Home</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('chat_with_us')">Chat with Us</a>
+                    <a class="text-white text-[18px] cursor-pointer" :href="route('products_page')">Products & Services</a>
+                    <a class="text-black text-[18px] cursor-pointer" :href="route('aboutUs_page')">About Us</a>
                     <p>|</p>
-                    <div class="flex flex-col">
+                    <div v-if="userLogIn===true" class="flex flex-col">
                         <a @click="logout('logout')" class=" cursor-pointer text-white text-[14px] underline">Log Out</a>
                         <a @click="account" class=" cursor-pointer text-white text-[14px] underline">Account</a>
-                    </div> 
+                    </div>
+                    <div v-else-if="userLogIn===false" class="space-x-[40px] mr-[40px]">
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('login')">Log In</a>
+                        <a class="text-white text-[18px] cursor-pointer" :href="route('register')">Register</a>
+                    </div>
                     <div class="w-[50px] h-[50px]">
                         <img v-if="isLoading" src='/storage/user_profile/default-profile.png'/>
                         <img v-else-if="profilePicture" :src='profilePicture' alt="Logo" class="h-full object-cover rounded-full" />
@@ -136,7 +145,7 @@ async function getWebsiteInfo(){
         <!-- section 2/EditWebsite2 -->
 <section>
         
-<div class=" bg-website-main1 flex min-h-screen relative">
+<div class=" bg-website-main flex min-h-screen relative">
         <div class="flex items-center p-3 absolute top-[5px] left-0 right-0 bottom-[500px] m-auto">
         <p class="mt-[10px] text-[70px] tracking-[3px] text-white font-bold flex-grow text-center">About Us</p>
     </div>
@@ -179,10 +188,12 @@ async function getWebsiteInfo(){
 
 <section>
         <div class="bg-website-main flex flex-col min-h-screen" style="min-height: calc(70vh);">
-
+            <div class="w-full">
+                <hr class="border-white mx-auto w-11/12">
+            </div>
 <div class="flex flex-row justify-between mt-[5px] ml-8 mr-8 w-full">
 <!-- FootNote -->
-<div class="mr-auto mt-40 ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
+<div class="mr-auto mt-[100px] ml-8 flex flex-col h-1/2 w-1/2 max-w-md">
     <div class="max-w-[50px]">
         <img :src='businessInfo.businessImage.value' class="w-full h-full object-cover rounded-full"/>
     </div>
@@ -200,7 +211,7 @@ async function getWebsiteInfo(){
 </div>
 
 <!-- Contact Us -->
-<div class="mt-[100px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
+<div class="mt-[50px] ml-auto flex flex-grow-0 w-1/2 max-w-md w-1/2 max-w-md">
     <div class="mt-2 flex flex-col ">
         <p class="text-white font-bold text-[50px]">Contact Us</p>
         <p class="text-white mt-[10px]">Email: {{ businessInfo.business_Email }} </p>
