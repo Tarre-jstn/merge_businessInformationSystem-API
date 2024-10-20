@@ -4,6 +4,7 @@ import { App } from '@inertiajs/inertia-vue3';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 // const textAreas = {
 //     businessName: ref('BUSINESS NAME'),
@@ -18,6 +19,7 @@ const textAreas = {
     businessDetails: ref(''),
     homePageImage: ref('')
 }
+const showSuccessAddModal = ref(false);
 
 onMounted(()=>{
     function insertBreakLines(businessDetails){
@@ -110,6 +112,10 @@ async function save(){
         }
     });
     console.log('Save response:', saveBusinessDesc.data);
+    showSuccessAddModal.value = true;
+    setTimeout(() => {
+        showSuccessAddModal.value = false;
+        }, 1000) 
     
 }
 
@@ -163,6 +169,8 @@ function goToEditWebsite2(){
 
         <div class="ml-1 bg-website-main flex min-h-screen">
             <!-- edit business info wag to iedit kasi business name ito-->
+
+
             <div class="mt-[90px] ml-8 flex-col h-1/2">
                 <div>
                     <button @click="edit('businessName')" class="bg-white border border-white rounded-xl p-1">Edit Text</button>
@@ -204,6 +212,15 @@ function goToEditWebsite2(){
                 </div>
             
             </div>
+            <transition name="modal-fade" >
+            <div v-if="showSuccessAddModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 overflow-y-auto h-full w-full">
+                <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
+                    <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
+                    <h2 class="text-xl font-bold mb-4">Success!</h2>
+                    <p class="mb-4">The Business Information has been successfully Changed!.</p>
+                </div>
+            </div>
+            </transition>
 
             <!-- image -->
             <div class="mt-[50px] ml-auto flex-grow-0 w-1/2 max-w-lg">
@@ -228,4 +245,22 @@ function goToEditWebsite2(){
     </AuthenticatedLayout>
 
 </template>
+<style scoped>
 
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
+</style>

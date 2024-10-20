@@ -15,9 +15,9 @@
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "league/flysystem": "^3.29",
         "maatwebsite/excel": "^3.1",
         "psr/simple-cache": "2.0",
-        "league/flysystem": "^3.29",
         "spatie/laravel-analytics": "^5.4",
         "tightenco/ziggy": "^2.3"
     },

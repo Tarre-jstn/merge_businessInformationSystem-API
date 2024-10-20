@@ -361,8 +361,10 @@ const message = ref('');
 const messageType = ref('');
 const showImportExportModal = ref(false);
 
+const showFileInput = ref(false);
 const handleFileImportUpload = (event) => {
   fileImport.value = event.target.files[0];
+    showFileInput.value=true;
 };
 
 const uploadFileImport = async () => {
@@ -593,6 +595,7 @@ fetchListedCategories();
                         <p class="text-xs text-gray-500">XLSX, XLS, or CSV (MAX. 10MB)</p>
                         </div>
                         <input id="dropzone-file" type="file" class="hidden" ref="file" @change="handleFileImportUpload" accept=".xlsx, .xls, .csv" />
+                        <i v-if="showFileInput" class="fa-solid fa-file text-[30px]"></i>
                     </label>
                     </div>
                     <button @click="uploadFileImport" class="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -612,7 +615,6 @@ fetchListedCategories();
                         v-model="summaryOption.option"
                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
-                        <option value="summaryPdf">PDF (.pdf)</option>
                         <option value="summaryExcel">Excel Sheet (.xlsx)</option>
                     </select>
                     </div>
@@ -776,7 +778,7 @@ fetchListedCategories();
                 <form @submit.prevent="updateProduct">
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
-                            <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Image</label>
+                            <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Image <span class="text-red-500">*</span></label>
                             <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer">
                                 <input type="file" id="edit_image" @change="handleEditImageUpload" class="absolute inset-0 opacity-0 cursor-pointer" />
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" v-if="!editImagePreviewUrl">
@@ -788,29 +790,29 @@ fetchListedCategories();
                         <div class="col-span-2 grid grid-cols-2 gap-3">
                             <!-- Name Field -->
                             <div class="col-span-2">
-                                <label for="edit_name" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Name *</label>
+                                <label for="edit_name" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Name <span class="text-red-500">*</span></label>
                                 <input type="text" id="edit_name" v-model="editProduct.name" class="input-field w-full text-xs p-1" required />
                             </div>
                             <!-- Price Field -->
                             <div>
-                                <label for="edit_price" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Price (PHP) *</label>
+                                <label for="edit_price" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Price (PHP) <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_price" v-model="editProduct.price" class="input-field text-xs p-1" required />
                             </div>
                             <!-- Category Field -->
                             <div>
-                                <label for="edit_category" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Category *</label>
+                                <label for="edit_category" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Category <span class="text-red-500">*</span></label>
                                 <select id="edit_category" v-model="editProduct.category" class="input-field text-xs p-1" required>
                                     <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
                                 </select>
                             </div>
                             <!-- Stock Field -->
                             <div>
-                                <label for="edit_stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Stock *</label>
+                                <label for="edit_stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
                             </div>
                             <!-- Status Field -->
                             <div>
-                                <label for="edit_status" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Status *</label>
+                                <label for="edit_status" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Status <span class="text-red-500">*</span></label>
                                 <select id="edit_status" v-model="editProduct.status" class="input-field text-xs p-1" required>
                                     <option value="Listed">Listed</option>
                                     <option value="Unlisted">Unlisted</option>
@@ -819,19 +821,19 @@ fetchListedCategories();
                             </div>
                             <!-- Brand Field -->
                             <div>
-                                <label for="edit_brand" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Brand</label>
+                                <label for="edit_brand" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Brand <span class="text-red-500">*</span></label>
                                 <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
                             </div>
                         </div>
                         <!-- Description -->
                         <div class="col-span-3">
-                            <label for="edit_description" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Description:</label>
+                            <label for="edit_description" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Description: <span class="text-red-500">*</span></label>
                             <textarea id="edit_description" v-model="editProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
                         <!-- Expiry Date, Discountable, and Featured -->
                         <div class="col-span-2 grid grid-cols-3 gap-3">
                             <div>
-                                <label for="edit_expDate" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Expiry Date</label>
+                                <label for="edit_expDate" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Expiry Date <span class="text-red-500">*</span></label>
                                 <input type="date" id="edit_expDate" v-model="editProduct.expDate" class="input-field text-xs p-1"/>
                             </div>
                             <!-- Discountable Toggle -->

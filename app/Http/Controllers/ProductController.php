@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Log;
 use Carbon\carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductsImport;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Validators\ValidationException; 
+
+
 
 class ProductController extends Controller
 {
@@ -111,7 +115,7 @@ class ProductController extends Controller
 
     public function getProductsByDate(Request $request)
     {
-        \Log::info('Incoming request data FOR PRODUCTS BY DATE:', $request->all());
+        Log::info('Incoming request data FOR PRODUCTS BY DATE:', $request->all());
 
         if (!$request->has(['start_date', 'end_date'])) {
             return response()->json(['error' => 'Start date and end date are required'], 400);
@@ -121,8 +125,8 @@ class ProductController extends Controller
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate = Carbon::parse($request->end_date)->endOfDay();
     
-        \Log::info('Received PRODUCTS start_date: ' . $startDate);
-        \Log::info('Received PRODUCTS end_date: ' . $endDate);
+        Log::info('Received PRODUCTS start_date: ' . $startDate);
+        Log::info('Received PRODUCTS end_date: ' . $endDate);
 
         $financesByDate = Product::whereBetween('date', [$startDate, $endDate])
                         ->orderBy('date')
@@ -147,7 +151,7 @@ class ProductController extends Controller
         try {
             Excel::import(new ImportProduct, $request->file('file'));
             return response()->json(['message' => 'Products imported successfully.']);
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+        } catch (ValidationException $e) {
             $failures = $e->failures();
             $errors = [];
     

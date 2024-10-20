@@ -59,7 +59,7 @@ async function getWebsiteInfo(){
                     <span class="ml-3">Inventory</span>
                 </Link></li> 
 
-                <li class="flex items-center mb-4"><Link :href="route('receipt')" :class="{ active: route().current('receipt') }">
+                <li class="flex items-center mb-4"><Link :href="route('invoice')" :class="{ active: route().current('receipt') }">
                     <ReceiptPercentIcon class="size-6"/>
                     <span class="ml-3">Receipt</span>
                 </Link></li>

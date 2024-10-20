@@ -57,7 +57,7 @@ class FinanceController extends Controller
     public function update(Request $request, $id)
     {
 
-        \Log::info('Incoming request data:', $request->all());
+        Log::info('Incoming request data:', $request->all());
         
         $validated = $request->validate([
             'description' => 'required|string|max:255',
@@ -121,7 +121,7 @@ class FinanceController extends Controller
 
     public function getFinanceByDate(Request $request)
     {
-        \Log::info('Incoming request data FOR FINANCE BY DATE:', $request->all());
+        Log::info('Incoming request data FOR FINANCE BY DATE:', $request->all());
 
         if (!$request->has(['start_date', 'end_date'])) {
             return response()->json(['error' => 'Start date and end date are required'], 400);
@@ -131,8 +131,8 @@ class FinanceController extends Controller
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate = Carbon::parse($request->end_date)->endOfDay();
     
-        \Log::info('Received FINANCE start_date: ' . $startDate);
-        \Log::info('Received FINANCE end_date: ' . $endDate);
+        Log::info('Received FINANCE start_date: ' . $startDate);
+        Log::info('Received FINANCE end_date: ' . $endDate);
 
         $financesByDate = Finance::whereBetween('date', [$startDate, $endDate])
                         ->orderBy('date')

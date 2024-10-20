@@ -1,11 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Inventory from './Pages/Inventory.vue';
 
 const routes = [
     {
-        path: '/inventory',
-        name: 'Inventory',
-        component: Inventory,
     },
 ];
 

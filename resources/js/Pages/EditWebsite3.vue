@@ -4,6 +4,7 @@ import { App } from '@inertiajs/inertia-vue3';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref, watch } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 const textAreas = {
     card1: ref(''),
@@ -20,7 +21,7 @@ const textAreas = {
     card6_img: ref('')
     
 }
-
+const showSuccessAddModal = ref(false);
 const feature_toggle=ref('true');
 const onSale_toggle=ref('true');
 onMounted(()=>{
@@ -116,7 +117,10 @@ async function save(){
             params: {business_id: businessId}
         });
         console.log('Website Info: ',getWebsiteInfo.data);
-        alert("Changes Saved Successfully.");
+        showSuccessAddModal.value = true;
+    setTimeout(() => {
+        showSuccessAddModal.value = false;
+        }, 1000) 
     
 }
 
@@ -166,6 +170,15 @@ function goToEditWebsite4(){
                     Best prices guaranteed everyday.
                 </p>
             </div>
+            <transition name="modal-fade" >
+            <div v-if="showSuccessAddModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 overflow-y-auto h-full w-full">
+                <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
+                    <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
+                    <h2 class="text-xl font-bold mb-4">Success!</h2>
+                    <p class="mb-4">The Business Information has been successfully Changed!.</p>
+                </div>
+            </div>
+            </transition>
             <div class="mx-auto my-auto flex flex-wrap justify-center gap-4 w-full max-w-screen-lg px-4 pt-[70px] pb-[70px]">
                 
                 <div class="block flex flex-row gap-5">
@@ -268,9 +281,24 @@ input:checked + .slider {
 input:checked + .slider:before {
     transform: translateX(20px);
 }
+.icon-color {
+    background-color: #306091; /* Replace with your desired color */
+}
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
+}
 
 </style>
-<<<<<<< HEAD
-=======
-
->>>>>>> Web_Analytics

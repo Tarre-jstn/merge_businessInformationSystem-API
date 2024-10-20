@@ -4,12 +4,14 @@ import { App } from '@inertiajs/inertia-vue3';
 import { Head } from '@inertiajs/vue3';
 import { onMounted, ref } from 'vue';
 import { Inertia } from '@inertiajs/inertia';
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 const textAreas = {
     about_us1: ref(''),
     about_us2: ref(''),
     about_us3: ref('')
 }
+const showSuccessAddModal = ref(false);
 
 onMounted(()=>{
 
@@ -72,7 +74,10 @@ async function save(){
         }
     });
     console.log('Save response:', saveBusinessDesc.data);
-    
+    showSuccessAddModal.value = true;
+    setTimeout(() => {
+        showSuccessAddModal.value = false;
+        }, 1000) 
 }
 
 function goToEditWebsite3(){
@@ -102,6 +107,15 @@ function goToEditWebsite3(){
                 <p class="mt-[10px] text-[50px]  text-white font-bold flex-grow text-center">About Us</p>
             </div>
 
+            <transition name="modal-fade" >
+            <div v-if="showSuccessAddModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 overflow-y-auto h-full w-full">
+                <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
+                    <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
+                    <h2 class="text-xl font-bold mb-4">Success!</h2>
+                    <p class="mb-4">The Business Information has been successfully Changed!.</p>
+                </div>
+            </div>
+            </transition>
             <!-- edit business info wag to iedit kasi business name ito-->
             <div class="ml-[120px] flex flex-row items-center justify-between w-full max-w-screen-lg mt-[200px]">
                 
@@ -178,6 +192,22 @@ function goToEditWebsite3(){
 <style>
 .icon-color {
     background-color: #306091; /* Replace with your desired color */
+}
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-fade-enter-to,
+.modal-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
 }
 </style>
 

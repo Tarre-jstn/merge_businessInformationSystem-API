@@ -2238,8 +2238,8 @@ const showSuccessEditModal = ref(false);
 
         
         <transition name="modal-fade" >
-            <div v-if="showAddInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
+            <div v-if="showAddInvoiceModal" class="fixed ml-[100px] inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-6xl h-4/5 relative overflow-auto flex flex-col">
                 <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Add an Invoice</h3>
 
                     <div class="px-12">
@@ -2501,7 +2501,7 @@ const showSuccessEditModal = ref(false);
                         <form @submit.prevent="addInvoiceComputation" class="w-full border-4 border-black rounded-bl-lg rounded-r-lg shadow-lg">
                             <div class="flex p-14 gap-8">
                                 <div class="w-1/2">
-                                    <div class="mt-2">----------------------------------------------------------------------</div>
+                                    <div class="mt-2">---------------------------------------------------------</div>
                                     <div class="mt-2 mb-2 pl-10">
                                         <label for="total_Amount_Due" class="font-extrabold w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-md font-medium text-white">Total Amount Due</label>
                                         <input ref="totalAmountDue1" type="number" id="total_Amount_Due" @input="count=0, discountValue1=0;" v-model="totalAmountDueHolder" class="w-96 block border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
@@ -2511,7 +2511,7 @@ const showSuccessEditModal = ref(false);
                                         <label for="VAT_Inclusive" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">VAT Inclusive</label>
                                         <input ref="VatInclusive" type="number" id="VAT_Inclusive" v-model="comp_VAT_Inclusive" class="w-96 block border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
                                     </div>
-                                    <div class="mb-11">---------------------------------------------------------------------</div>
+                                    <div class="mb-11">---------------------------------------------------------</div>
 
                                     <div class="mb-2">
                                         <div class="flex flex-row items-center">
