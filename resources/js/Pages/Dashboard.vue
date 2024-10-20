@@ -15,15 +15,14 @@
                 </div>
 
                 <!-- Inventory Table -->
-                <div class="flex flex-row justify-center w-full">
-                    <div class="inventory_table m-4 table_container max-w-4xl">
-                        <div class="flex md:flex-row justify-between px-4 py-2">
+                <div class="flex flex-row justify-center">
+                    <div class="inventory_table m-4 table_container">
+                        <div class="flex flex-row justify-between px-8 py-2">
                             <div style="font-size: 23px;"><b>Inventory</b></div>
                                 <button>
                                     <ResponsiveNavLink :href="route('inventory')" :active="route().current('inventory')" style="color: white; font-size: 12px;">View all products</ResponsiveNavLink>
                                 </button>
                         </div>
-                        <div class="overflow-x-auto w-full">
                         <table>
                             <tr style="font-size: 1rem; background-color: white">
                                 <th>Product Name</th>
@@ -33,7 +32,7 @@
                                 <th>Stock</th>
                             </tr>
                             <tr v-for="product in filteredProducts.slice(0, 3)" :key="product.id">
-                                <td >{{ product.name }}</td>
+                                <td>{{ product.name }}</td>
                                 <td>{{ product.category }}</td>
                                 <td>{{ product.price }}</td>
                                 <td>{{ product.sold }}</td>
@@ -41,18 +40,17 @@
                             </tr>
                         </table>
                     </div>
-                    </div>
                 </div>                
                     <!-- Visitors & Views and Retention Rate Charts side by side -->
                     <div class="flex flex-row justify-center px-8 space-x-6 mt-2"> 
                         <!-- Visitors & Views Chart -->
-                        <div class="custom-chart-width p-4 border border-black rounded-lg w-full" style="height: 275px;"> 
+                        <div class="custom-chart-width p-4 border border-black rounded-lg" style="width: 30vw; height: 275px;"> 
 
                             <canvas id="visitorsViewsChart" class="w-full" style="height: 150px;"></canvas> 
                         </div>
 
                         <!-- Retention Rate Chart -->
-                        <div class="custom-chart-width p-4 border border-black rounded-lg w-full" style="height: 275px;"> 
+                        <div class="custom-chart-width p-4 border border-black rounded-lg" style="width: 30vw; height: 275px;"> 
                             <canvas id="retentionRateChart" class="w-full" style="height: 150px;"></canvas> 
                         </div>
                     </div>
@@ -60,7 +58,7 @@
 
             <!-- Right-side Content -->
             <div class="flex flex-col">
-                <vue-cal hide-view-selector :time="false" active-view="month" xsmall class="p-6 max-h-[400px]" style="background-color: #0F2C4A; margin-right: 30px; margin-top: 25px; color: white; font-weight: bold; border-radius: 1rem;">
+                <vue-cal hide-view-selector :time="false" active-view="month" xsmall class="p-6" style="background-color: #0F2C4A; margin-right: 30px; margin-top: 25px; height: 45vh; color: white; font-weight: bold; border-radius: 1rem;">
                     <template #arrow-prev>
                         <i class="fa-solid fa-arrow-left"></i>
                     </template>
@@ -333,8 +331,8 @@ const fetchFinancesByDate = async () => {
         }
 
         console.log("Finances by date:", financesByDate);
-        console.log("Total Income:", totalIncome.value);
-        console.log("Total Expenses:", totalExpenses.value);
+        console.log("Total Income:", totalIncome);
+        console.log("Total Expenses:", totalExpenses);
 
     } catch (error) {
         console.error("Error fetching finances by date:", error);

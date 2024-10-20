@@ -253,8 +253,11 @@ const handleEditImageUpload = (event) => {
     } else {
         alert('Please upload a valid image file (jpg, jpeg, png).');
         editProduct.value.image = null; 
+
     }
 };
+
+
 
 const updateDiscountable = async (productId, discountableStatus) => {
     try {
@@ -485,6 +488,7 @@ fetchListedCategories();
                                             <span>Name</span>
                                         </div>
                                     </th>
+
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
                                     <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
@@ -532,6 +536,7 @@ fetchListedCategories();
                                             }">{{ product.status }}</span>
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
+
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
                                         <div class="flex items-left justify-center">
                                             <label class="switch">
@@ -540,6 +545,7 @@ fetchListedCategories();
                                             </label>
                                             <span class="ml-3 text-sm text-gray-700">{{ product.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
                                         </div>
+                                    
                                     </td>
                                     <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                         <div class="flex items-center justify-center space-x-4">
@@ -669,6 +675,12 @@ fetchListedCategories();
                                 <label for="stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
                             </div>
+
+                            <!-- Sold Field -->
+                            <div>
+                                <label for="sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <input type="number" id="sold" v-model="newProduct.sold" class="input-field text-xs p-1" />
+                            </div>
                             <!-- Status Field -->
                             <div>
                                 <label for="status" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Status <span class="text-red-500">*</span></label>
@@ -689,7 +701,6 @@ fetchListedCategories();
                             <label for="description" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white"> Description: <span class="text-red-500">*</span></label>
                             <textarea id="description" v-model="newProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
                         </div>
-                        <!-- Expiry Date, Discountable, and Featured -->
                     <div class="col-span-2 grid grid-cols-3 gap-3">
                         <!-- Expiry Date -->
                         <div>
@@ -810,6 +821,17 @@ fetchListedCategories();
                                 <label for="edit_stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
                             </div>
+
+                            <!-- Sold Field -->
+                            <div>
+                                <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
+                            </div>
+                            <!-- Brand Field -->
+                            <div>
+                                <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
+                                <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
+                            </div>
                             <!-- Status Field -->
                             <div>
                                 <label for="edit_status" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Status <span class="text-red-500">*</span></label>
@@ -846,6 +868,7 @@ fetchListedCategories();
                                         </span>
                                     </span>
                                 </label>
+
                                 <div class="flex items-center space-x-2">
                                     <label class="switch">
                                         <input type="checkbox" v-model="editProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
@@ -902,7 +925,6 @@ fetchListedCategories();
                 </form>
             </div>
         </div>
-
 
         <CategoriesModal v-if="showCategoriesModal" 
                         @close-categories-modal="showCategoriesModal = false" 
@@ -1019,6 +1041,15 @@ input[type="file"] {
     height: 200px;
 }
 
+
+
+.image-upload {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+}
 .image-upload svg,
 .image-upload img {
     position: absolute;

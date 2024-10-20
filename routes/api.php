@@ -65,6 +65,13 @@ Route::put('/chatbot-response/{id}', [ChatbotController::class, 'update']);
 Route::delete('/chatbot-response/{id}', [ChatbotController::class, 'destroy']);
 
 
+
+Route::get('/featured-products', [ProductController::class, 'featured_products'])->name('featured_products');
+
+//Dedicated for seniorPWD_discountable
+Route::put('/products/{id}/discountable', [ProductController::class, 'updateDiscountable']);
+
+
 Route::post('/business_info', [BusinessController::class, 'store']);
 Route::put('/business_info/{id}', [BusinessController::class, 'update']);
 Route::delete('/business_info/{id}', [BusinessController::class, 'destroy']);
@@ -80,6 +87,7 @@ Route::post('/import', [ImportController::class, 'import']);
 Route::post('/categories', [CategoryController::class, 'store']);
 Route::put('/categories/{category}', [CategoryController::class, 'update']);
 Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);*/
+
 
 Route::get('finance', [FinanceController::class, 'index']);
 Route::post('finance', [FinanceController::class, 'store']);
@@ -152,3 +160,5 @@ Route::get('products/print/pdf', [FinanceController::class, 'printProductsPdf'])
 Route::post('products/import/xlsx', [ProductController::class, 'importProductsXlsx']);
 
 Route::get('products/print/export/xlsx', [ProductController::class, 'exportProductsXslx']);
+
+
