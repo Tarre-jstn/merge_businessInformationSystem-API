@@ -88,7 +88,7 @@ async function getWebsiteInfo(){
     background-color: #202c34;
     transition: all 0.3s ease;
     z-index: 100;
-    height: 100vh;
+    height: 150vh;
     box-shadow: 2px 0px 12px rgba(0, 0, 0, 0.1);
 }
 
