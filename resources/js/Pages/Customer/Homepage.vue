@@ -360,7 +360,7 @@ const formatUrl = (url) => {
              and to further reach us please refer to our contact information.
             </p>
             <img src="/storage/images/chat_icon.png" 
-            class =" mx-auto mt-[90px] w-[88px] h-[120px] object-cover"
+            class =" mx-auto mt-[90px] w-[88px] h-[120px] object-cover cursor-pointer"
             @click="goTochatPage"/>
             
     </div>

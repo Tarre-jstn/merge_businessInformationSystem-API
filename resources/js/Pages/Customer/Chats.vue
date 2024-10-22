@@ -142,6 +142,8 @@
       this.preloadBusinessData();
       this.initializeChat();
       this.getWebsiteInfo();
+      const { props } = usePage();
+      this.userLogIn = !!props.auth.user;
     },
       methods: {
         logout(button){
@@ -168,7 +170,7 @@
                 this.isLoading=false;
             }
 
-            if(this.$page.props.auth.user){
+            if(usePage().$page.props.auth.user){
             userLogIn.value=true;
           }
 

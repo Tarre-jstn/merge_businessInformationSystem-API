@@ -50,6 +50,11 @@ Route::get('/chat_with_us', function () {
     return Inertia::render('Customer/Chats');
 })->name('chat_with_us');
 
+Route::get('/chat_with_us1', function () {
+    return Inertia::render('Customer/Chats');
+})->middleware('auth')->name('chat_with_us1');
+
+
 Route::get('/products_page', function () {
     return Inertia::render('Customer/Products');
 })->name('products_page');
