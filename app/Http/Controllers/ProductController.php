@@ -36,7 +36,7 @@ class ProductController extends Controller
             'status' => 'required|string|max:255',
             'description' => 'required|string|max:1000',
             'expDate' => 'required|date',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048', // Validate the file input
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:5120', // Validate the file input
             'seniorPWD_discountable' => 'nullable|in:yes,no',
             'on_sale' => 'nullable|in:yes,no',
             'on_sale_price' => 'nullable|numeric',
@@ -74,7 +74,7 @@ class ProductController extends Controller
             'status' => 'required|string|max:255',
             'description' => 'required|string|max:1000',
             'expDate' => 'required|date',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:5120',
             'seniorPWD_discountable' => 'nullable|in:yes,no',
             'on_sale' => 'required|in:yes,no',
             'on_sale_price' => 'required|numeric',
@@ -279,4 +279,3 @@ class ProductController extends Controller
     }
 
 }
-

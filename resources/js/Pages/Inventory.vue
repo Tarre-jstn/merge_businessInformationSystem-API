@@ -15,6 +15,67 @@ const imagePreviewUrl = ref(null);
 const editImagePreviewUrl = ref(null);
 
 
+const validationErrors = ref({
+    name: '',
+    price: '',
+    category: '',
+    stock: '',
+    status: '',
+    brand: '',
+    description: '',
+    expDate: '',
+});
+
+const validateForm = () => {
+    let isValid = true;
+    // Reset validation errors
+    for (const key in validationErrors.value) {
+        validationErrors.value[key] = '';
+    }
+
+    if (!newProduct.value.name) {
+        validationErrors.value.name = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.price) {
+        validationErrors.value.price = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.category) {
+        validationErrors.value.category = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.stock) {
+        validationErrors.value.stock = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.status) {
+        validationErrors.value.status = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.brand) {
+        validationErrors.value.brand = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.description) {
+        validationErrors.value.description = 'This field is required';
+        isValid = false;
+    }
+    if (!newProduct.value.expDate) {
+        validationErrors.value.expDate = 'This field is required';
+        isValid = false;
+    }
+
+    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (newProduct.value.image && !allowedImageTypes.includes(newProduct.value.image.type)) {
+        alert('Accepted file format is jpeg, jpg, or png.');
+        validationErrors.value.image = 'Accepted file format is jpeg, jpg, or png.';
+        isValid = false;
+    }
+
+    return isValid;
+};
+
 
 const editProduct = ref({
     id: null,
@@ -82,6 +143,8 @@ const newProduct = ref({
 
 
 const addProduct = async () => {
+    if (!validateForm()) return;
+
     try {
         const formData = new FormData();
         for (const key in newProduct.value) {
@@ -239,21 +302,54 @@ const filteredProducts = computed(() => {
 
 const handleImageUpload = (event) => {
     const file = event.target.files[0];
+    const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file) {
+        // Check file type
+        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+            alert('Accepted file format is jpeg, jpg, or png.');
+            event.target.value = ''; // Clear the file input
+            newProduct.value.image = null; // Reset the image value
+            return;
+        }
+
+        // Check file size
+        if (file.size > maxFileSize) {
+            alert('The maximum file size for image is 5MB.');
+            event.target.value = ''; // Clear the file input
+            newProduct.value.image = null; // Reset the image value
+            return;
+        }
+
+        // If valid, set the image
         newProduct.value.image = file;
-        imagePreviewUrl.value = URL.createObjectURL(file); 
+        imagePreviewUrl.value = URL.createObjectURL(file);
     }
 };
 
+
 const handleEditImageUpload = (event) => {
     const file = event.target.files[0];
-    if (file && ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-        editProduct.value.image = file;
-        editImagePreviewUrl.value = URL.createObjectURL(file); 
-    } else {
-        alert('Please upload a valid image file (jpg, jpeg, png).');
-        editProduct.value.image = null; 
+    const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file) {
+        // Check file type
+        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
+            alert('Accepted file format is jpeg, jpg, or png.');
+            event.target.value = ''; // Clear the file input
+            editProduct.value.image = null; // Reset the image value
+            return;
+        }
 
+        // Check file size
+        if (file.size > maxFileSize) {
+            alert('The maximum file size for image is 5MB.');
+            event.target.value = ''; // Clear the file input
+            editProduct.value.image = null; // Reset the image value
+            return;
+        }
+
+        // If valid, set the image
+        editProduct.value.image = file;
+        imagePreviewUrl.value = URL.createObjectURL(file);
     }
 };
 
@@ -447,9 +543,6 @@ fetchListedCategories();
 
 <template>
     <AuthenticatedLayout>
-
-
-
         <div  class="py-5">
             <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -643,7 +736,10 @@ fetchListedCategories();
                 <form @submit.prevent="addProduct">
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
-                            <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white">Image <span class="text-red-500">*</span></label>
+                            <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white">
+                                Image (file type: jpg, jpeg, png) <span class="text-red-500">*</span>
+                                <span class="text-xs text-gray-500 block">Maximum file size is 5MB.</span>
+                            </label>
                             <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer">
                                 <input type="file" id="image" @change="handleImageUpload" class="absolute inset-0 opacity-0 cursor-pointer" />
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -657,11 +753,13 @@ fetchListedCategories();
                             <div class="col-span-2">
                                 <label for="name" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white">Name <span class="text-red-500">*</span></label>
                                 <input type="text" id="name" v-model="newProduct.name" class="input-field w-full text-xs p-1" required />
+                                <span v-if="validationErrors.name" class="text-red-500 text-xs">{{ validationErrors.name }}</span>
                             </div>
                             <!-- Price Field -->
                             <div>
                                 <label for="price" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Price (PHP) <span class="text-red-500">*</span></label>
                                 <input type="number" id="price" v-model="newProduct.price" class="input-field text-xs p-1" required />
+                                <span v-if="validationErrors.price" class="text-red-500 text-xs">{{ validationErrors.price }}</span>
                             </div>
                             <!-- Category Field -->
                             <div>
@@ -669,11 +767,13 @@ fetchListedCategories();
                                 <select id="category" v-model="newProduct.category" class="input-field text-xs p-1" required>
                                     <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
                                 </select>
+                                <span v-if="validationErrors.category" class="text-red-500 text-xs">{{ validationErrors.category }}</span>
                             </div>
                             <!-- Stock Field -->
                             <div>
                                 <label for="stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
+                                <span v-if="validationErrors.stock" class="text-red-500 text-xs">{{ validationErrors.stock }}</span>
                             </div>
 
                             <!-- Sold Field -->
@@ -689,23 +789,27 @@ fetchListedCategories();
                                     <option value="Unlisted">Unlisted</option>
                                     <option value="Out of Stock">Out of Stock</option>
                                 </select>
+                                <span v-if="validationErrors.status" class="text-red-500 text-xs">{{ validationErrors.status }}</span>
                             </div>
                             <!-- Brand Field -->
                             <div>
                                 <label for="brand" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Brand <span class="text-red-500">*</span></label>
                                 <input type="text" id="brand" v-model="newProduct.brand" class="input-field text-xs p-1"/>
+                                <span v-if="validationErrors.brand" class="text-red-500 text-xs">{{ validationErrors.brand }}</span>
                             </div>
                         </div>
                         <!-- Description -->
                         <div class="col-span-3">
                             <label for="description" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white"> Description: <span class="text-red-500">*</span></label>
                             <textarea id="description" v-model="newProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
+                            <span v-if="validationErrors.description" class="text-red-500 text-xs">{{ validationErrors.description }}</span>
                         </div>
                     <div class="col-span-2 grid grid-cols-3 gap-3">
                         <!-- Expiry Date -->
                         <div>
                             <label for="expDate" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Expiry Date <span class="text-red-500">*</span></label>
                             <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
+                            <span v-if="validationErrors.expDate" class="text-red-500 text-xs">{{ validationErrors.expDate }}</span>
                         </div>
                         <!-- Discountable Toggle -->
                         <div class="flex flex-col space-y-2">
@@ -789,7 +893,10 @@ fetchListedCategories();
                 <form @submit.prevent="updateProduct">
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
-                            <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Image <span class="text-red-500">*</span></label>
+                            <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white">
+                                Image (file type: jpg, jpeg, png) <span class="text-red-500">*</span>
+                                <span class="text-xs text-gray-500 block">Maximum file size is 5MB.</span>
+                            </label>
                             <div class="image-upload relative w-full h-40 border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 cursor-pointer">
                                 <input type="file" id="edit_image" @change="handleEditImageUpload" class="absolute inset-0 opacity-0 cursor-pointer" />
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" v-if="!editImagePreviewUrl">
@@ -826,11 +933,6 @@ fetchListedCategories();
                             <div>
                                 <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
                                 <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
-                            </div>
-                            <!-- Brand Field -->
-                            <div>
-                                <label for="edit_brand" class="block text-xs font-medium text-gray-700">Brand</label>
-                                <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
                             </div>
                             <!-- Status Field -->
                             <div>
