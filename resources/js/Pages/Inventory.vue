@@ -76,6 +76,59 @@ const validateForm = () => {
     return isValid;
 };
 
+const validationErrorsEdit = ref({
+    name: '',
+    price: '',
+    category: '',
+    stock: '',
+    status: '',
+    brand: '',
+    description: '',
+    expDate: '',
+});
+
+const validateEditForm = () => {
+    let isValid = true;
+    // Reset validation errors
+    for (const key in validationErrorsEdit.value) {
+        validationErrorsEdit.value[key] = '';
+    }
+
+    if (!editProduct.value.name) {
+        validationErrorsEdit.value.name = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.price) {
+        validationErrorsEdit.value.price = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.category) {
+        validationErrorsEdit.value.category = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.stock) {
+        validationErrorsEdit.value.stock = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.status) {
+        validationErrorsEdit.value.status = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.brand) {
+        validationErrorsEdit.value.brand = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.description) {
+        validationErrorsEdit.value.description = 'This field is required';
+        isValid = false;
+    }
+    if (!editProduct.value.expDate) {
+        validationErrorsEdit.value.expDate = 'This field is required';
+        isValid = false;
+    }
+
+    return isValid;
+};
 
 const editProduct = ref({
     id: null,
@@ -174,6 +227,8 @@ const validateProduct = (product) => {
 };
 
 const updateProduct = async () => {
+    if (!validateEditForm()) return;
+
     try {
         const formData = new FormData();
 
@@ -349,7 +404,7 @@ const handleEditImageUpload = (event) => {
 
         // If valid, set the image
         editProduct.value.image = file;
-        imagePreviewUrl.value = URL.createObjectURL(file);
+        editImagePreviewUrl.value = URL.createObjectURL(file);
     }
 };
 
@@ -910,11 +965,13 @@ fetchListedCategories();
                             <div class="col-span-2">
                                 <label for="edit_name" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Name <span class="text-red-500">*</span></label>
                                 <input type="text" id="edit_name" v-model="editProduct.name" class="input-field w-full text-xs p-1" required />
+                                <span v-if="validationErrorsEdit.name" class="text-red-500 text-xs">{{ validationErrorsEdit.name }}</span>
                             </div>
                             <!-- Price Field -->
                             <div>
                                 <label for="edit_price" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Price (PHP) <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_price" v-model="editProduct.price" class="input-field text-xs p-1" required />
+                                <span v-if="validationErrorsEdit.price" class="text-red-500 text-xs">{{ validationErrorsEdit.price }}</span>
                             </div>
                             <!-- Category Field -->
                             <div>
@@ -922,11 +979,13 @@ fetchListedCategories();
                                 <select id="edit_category" v-model="editProduct.category" class="input-field text-xs p-1" required>
                                     <option v-for="category in listedCategories" :key="category.id" :value="category.name">{{ category.name }}</option>
                                 </select>
+                                <span v-if="validationErrorsEdit.category" class="text-red-500 text-xs">{{ validationErrorsEdit.category }}</span>
                             </div>
                             <!-- Stock Field -->
                             <div>
                                 <label for="edit_stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
+                                <span v-if="validationErrorsEdit.stock" class="text-red-500 text-xs">{{ validationErrorsEdit.stock }}</span>
                             </div>
 
                             <!-- Sold Field -->
@@ -942,23 +1001,27 @@ fetchListedCategories();
                                     <option value="Unlisted">Unlisted</option>
                                     <option value="Out of Stock">Out of Stock</option>
                                 </select>
+                                <span v-if="validationErrorsEdit.status" class="text-red-500 text-xs">{{ validationErrorsEdit.status }}</span>
                             </div>
                             <!-- Brand Field -->
                             <div>
                                 <label for="edit_brand" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Brand <span class="text-red-500">*</span></label>
                                 <input type="text" id="edit_brand" v-model="editProduct.brand" class="input-field text-xs p-1"/>
+                                <span v-if="validationErrorsEdit.brand" class="text-red-500 text-xs">{{ validationErrorsEdit.brand }}</span>
                             </div>
                         </div>
                         <!-- Description -->
                         <div class="col-span-3">
                             <label for="edit_description" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Description: <span class="text-red-500">*</span></label>
                             <textarea id="edit_description" v-model="editProduct.description" rows="2" class="input-field text-xs p-1" placeholder="Enter your description here (will be shown on the website)…"></textarea>
+                            <span v-if="validationErrorsEdit.description" class="text-red-500 text-xs">{{ validationErrorsEdit.description }}</span>
                         </div>
                         <!-- Expiry Date, Discountable, and Featured -->
                         <div class="col-span-2 grid grid-cols-3 gap-3">
                             <div>
                                 <label for="edit_expDate" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Expiry Date <span class="text-red-500">*</span></label>
                                 <input type="date" id="edit_expDate" v-model="editProduct.expDate" class="input-field text-xs p-1"/>
+                                <span v-if="validationErrorsEdit.expDate" class="text-red-500 text-xs">{{ validationErrorsEdit.expDate }}</span>
                             </div>
                             <!-- Discountable Toggle -->
                             <div>
