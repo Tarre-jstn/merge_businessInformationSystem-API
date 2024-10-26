@@ -155,7 +155,3 @@ const submit = () => {
         </form>
     </GuestLayout>
 </template>
-<style>
-*{
-    color: #0F2C4A;
-}</style>

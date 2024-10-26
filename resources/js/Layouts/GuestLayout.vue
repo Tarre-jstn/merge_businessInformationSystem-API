@@ -28,7 +28,7 @@ async function getWebsiteInfo() {
 <template>
     <div style="background-color: #0F2C4A;"><br><br></div>
     <div class="min-h-screen flex flex-col justify-center sm:justify-center items-center pt-6 sm:pt-0 md:flex-row shadow-2xl" 
-         style="background: linear-gradient(90deg, rgba(15,44,74,1) 0%, rgba(32,75,120,1) 50%, rgba(13,76,89,1) 100%); justify-content: space-evenly;">
+         style="background: linear-gradient(90deg, rgba(15,44,74,1) 0%, rgba(32,75,120,1) 50%, rgba(13,76,89,1) 100%); color: #0F2C4A; justify-content: space-evenly;">
         <div class="max-w-lg h-auto flex flex-col items-center">
             <Link href="/" class="max-w-lg h-auto flex flex-col items-center">
             <div class="text-white font-bold text-5xl mb-6">

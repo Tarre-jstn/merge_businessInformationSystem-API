@@ -50,7 +50,3 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </form>
     </GuestLayout>
 </template>
-<style>
-*{
-    color: #0F2C4A;
-}</style>

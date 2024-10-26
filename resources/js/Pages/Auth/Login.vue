@@ -73,14 +73,14 @@ const submit = () => {
             <div class="flex flex-row justify-between items-center mt-4">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400"><div><b>Remember me</b></div></span>
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400"><div style="color: #0F2C4A;"><b>Remember me</b></div></span>
                 </label>
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
                     class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
                 >
-                    <div><b>Forgot your password?</b></div>
+                    <div style="color: #0F2C4A;"><b>Forgot your password?</b></div>
                 </Link>
             </div>
 
@@ -92,8 +92,3 @@ const submit = () => {
         </form>
     </GuestLayout>
 </template>
-
-<style>
-*{
-    color: #0F2C4A;
-}</style>
