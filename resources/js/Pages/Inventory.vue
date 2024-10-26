@@ -598,12 +598,12 @@ fetchListedCategories();
 
 <template>
     <AuthenticatedLayout>
-        <div  class="py-5">
-            <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-2xl font-semibold">List of Products</h2>
+        <div  class="py-5 h-full">
+            <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[84%]">
+                    <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">
+                        <div class="mt-4 mb-8 flex justify-between items-center mb-4">
+                            <h2 class="font-semibold text-4xl">List of Products</h2>
                             <div class="relative w-64">
                                 <font-awesome-icon
                                     :icon="['fas', 'magnifying-glass']"
@@ -617,97 +617,100 @@ fetchListedCategories();
                                 />
                             </div>
                         </div>
-                        <div class="overflow-auto" style="max-height: 430px;">
-                            <table class="min-w-full bg-white dark:bg-gray-800 text-xs">
-                                <thead>
-                                <tr>
-                                    <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">ID No.</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Image</th>
+                        <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900">
+                            <div class="overflow-x-auto h-full">
+                                <table class="min-w-full table-fixed">
+                                    <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">
+                                    <tr>
+                                        <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">ID No.</th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Image</th>
 
-                                    <th 
-                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer"
-                                        @click="sortByName">
-                                        <div class="flex items-center space-x-1">
-                                            <font-awesome-icon 
-                                                :icon="['fas', 'angle-down']"
-                                                :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
-                                                class="ml-2 transition-transform duration-300 ease-in-out" 
-                                            /> 
-                                            <span>Name</span>
-                                        </div>
-                                    </th>
+                                        <th 
+                                            class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer"
+                                            @click="sortByName">
+                                            <div class="flex items-center space-x-1">
+                                                <font-awesome-icon 
+                                                    :icon="['fas', 'angle-down']"
+                                                    :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                                    class="ml-2 transition-transform duration-300 ease-in-out" 
+                                                /> 
+                                                <span>Name</span>
+                                            </div>
+                                        </th>
 
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Stock</th>
-                                    <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Sold</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
-                                    <th 
-                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
-                                        @click="sortByExpDate">
-                                        <div class="flex items-center space-x-1">
-                                            <font-awesome-icon 
-                                                :icon="['fas', 'angle-down']" 
-                                                :class="expDateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
-                                                class="ml-2 transition-transform duration-300 ease-in-out" 
-                                            />
-                                            <span>Exp. Date</span>
-                                        </div>
-                                    </th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Senior/PWD Discountable</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-if="filteredProducts.length === 0">
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="12">No products available.</td>
-                                </tr>
-                                <tr v-for="product in filteredProducts" :key="product.id">
-                                    <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.id }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                        <div class="flex items-center justify-center">
-                                            <img :src="'/storage/' + product.image" alt="Product Image" class="w-12 h-12 object-cover"/>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.name }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.brand }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.price }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.category }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.stock }}</td>
-                                    <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.sold }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">
-                                            <span :class="{
-                                                'bg-red-500 text-white py-1 px-3 rounded-full': product.status === 'Unlisted',
-                                                'bg-green-500 text-white py-1 px-3 rounded-full': product.status === 'Listed',
-                                                'bg-gray-500 text-white py-1 px-3 rounded-full': product.status === 'Out of Stock',
-                                            }">{{ product.status }}</span>
-                                    </td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Stock</th>
+                                        <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Sold</th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
+                                        <th 
+                                            class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
+                                            @click="sortByExpDate">
+                                            <div class="flex items-center space-x-1">
+                                                <font-awesome-icon 
+                                                    :icon="['fas', 'angle-down']" 
+                                                    :class="expDateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                                    class="ml-2 transition-transform duration-300 ease-in-out" 
+                                                />
+                                                <span>Exp. Date</span>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Senior/PWD Discountable</th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-if="filteredProducts.length === 0">
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="12">No products available.</td>
+                                    </tr>
+                                    <tr v-for="product in filteredProducts" :key="product.id">
+                                        <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.id }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                            <div class="flex items-center justify-center">
+                                                <img :src="'/storage/' + product.image" alt="Product Image" class="w-12 h-12 object-cover"/>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.name }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.brand }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.price }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.category }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.stock }}</td>
+                                        <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.sold }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                                <span :class="{
+                                                    'bg-red-500 text-white py-1 px-3 rounded-full': product.status === 'Unlisted',
+                                                    'bg-green-500 text-white py-1 px-3 rounded-full': product.status === 'Listed',
+                                                    'bg-gray-500 text-white py-1 px-3 rounded-full': product.status === 'Out of Stock',
+                                                }">{{ product.status }}</span>
+                                        </td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
 
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
-                                        <div class="flex items-left justify-center">
-                                            <label class="switch">
-                                                <input type="checkbox" v-model="product.seniorPWD_discountable" true-value="yes" false-value="no" @change="updateDiscountable(product.id, product.seniorPWD_discountable)" />
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <span class="ml-3 text-sm text-gray-700">{{ product.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
-                                        </div>
-                                    
-                                    </td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                        <div class="flex items-center justify-center space-x-4">
-                                            <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="deleteProduct(product.id)" class="bg-red-500 text-white py-2 px-3 rounded-full">
-                                                <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
+                                            <div class="flex items-left justify-center">
+                                                <label class="switch">
+                                                    <input type="checkbox" v-model="product.seniorPWD_discountable" true-value="yes" false-value="no" @change="updateDiscountable(product.id, product.seniorPWD_discountable)" />
+                                                    <span class="slider round"></span>
+                                                </label>
+                                                <span class="ml-3 text-sm text-gray-700">{{ product.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
+                                            </div>
+                                        
+                                        </td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                            <div class="flex items-center justify-center space-x-4">
+                                                <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                                </button>
+                                                <button @click="deleteProduct(product.id)" class="bg-red-500 text-white py-2 px-3 rounded-full">
+                                                    <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -772,7 +775,7 @@ fetchListedCategories();
                         <option value="summaryExcel">Excel Sheet (.xlsx)</option>
                     </select>
                     </div>
-                    <button @click="printInventorySummary()" class="w-full px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    <button @click="printInventorySummary()" class="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                     Export Products
                     </button>
                 </div>
@@ -934,7 +937,7 @@ fetchListedCategories();
                         </div>
                         <!-- Action Buttons -->
                         <div class="col-span-3 flex justify-center mt-3 space-x-2">
-                            <button @click="cancelAddProduct" class="button-cancel text-md">Cancel</button>
+                            <button @click="cancelAddProduct" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
                             <button type="submit" class="button-ok text-md">OK</button>
                         </div>
                     </div>

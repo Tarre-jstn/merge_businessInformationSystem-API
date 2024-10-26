@@ -30,7 +30,7 @@ async function getWebsiteInfo(){
 </script>
 
 <template>
-    <div class="sidebar fixed sm:relative sm:translate-x-0 -translate-x-full">
+    <div class="sidebar dark:bg-gray-800 fixed sm:relative sm:translate-x-0 -translate-x-full">
         <div class="logo">
             <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
             <img v-else-if="businessImage" :src='businessImage' alt="Logo" />
@@ -85,7 +85,6 @@ async function getWebsiteInfo(){
 <style scoped>
 .sidebar {
     width: 250px;
-    background-color: #202c34;
     transition: all 0.3s ease;
     z-index: 100;
     height: 150vh;

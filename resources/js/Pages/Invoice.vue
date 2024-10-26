@@ -1556,13 +1556,12 @@ const showSuccessEditModal = ref(false);
     <Head title="Home" />
 
     <AuthenticatedLayout>
-        <div class="py-7 ">
-            <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-
-                    <div class="p-6 text-gray-900 dark:text-gray-100">  
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-2xl font-semibold">List of Invoices</h2>
+        <div class="py-5 h-full ">
+            <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[84%]">
+                    <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">  
+                        <div class="mt-4 mb-8 flex justify-between items-center mb-4">
+                            <h2 class="font-semibold text-4xl">List of Invoices</h2>
                             <div class="flex">
                                 <div class="flex w-100">
                                     
@@ -1584,160 +1583,167 @@ const showSuccessEditModal = ref(false);
                                             <input id="startDate" class="text-black text-sm" type="date" v-model="startDate" />
                                         <div class="mx-2 text-xs"> To </div>
                                             <input id="endDate" class="text-black text-sm mr-2" type="date" v-model="endDate" />
-                                        <button @click="clearFetchInvoicessByDate" class="text-xs bg-stone-600 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
+                                        <button @click="clearFetchInvoicessByDate" class="text-xs hover:bg-gray-700 transition hover:scale-105 ease-in-out duration-150 bg-gray-600 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
                                     </div>
 
                                 </div>
                             </div>
-                        </div>
+                         </div>
 
-                        <div class="overflow-auto" style="height: 500px">
-                            <table class="min-w-full bg-white dark:bg-gray-800">
-                                <thead class="sticky">   
-                                <!-- HEADER FOR INVOICES -->
-                                    <tr class="sticky">
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">ID No.</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Customer Name</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Payment Type</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Total Amount</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Date</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
-                                    </tr>
-                                </thead>
-                                <!-- FOR SHOWING OF INVOICES -->
-                                    <tbody>
-                                    <tr v-if="filteredInvoices.length === 0 || (invoicesByDate.length === 0 && isDateFiltered)">
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="10">No invoice available.</td>
-                                    </tr>
+                        <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900" >
+                            <div class="overflow-x-auto h-full">
+                                <table class="min-w-full table-fixed">
+                                    <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">   
+                                    <!-- HEADER FOR INVOICES -->
+                                        <tr class="sticky">
+                                            <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">ID No.</th>
+                                            <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Customer Name</th>
+                                            <th class="sticky w-48 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Payment Type</th>
+                                            <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Total Amount</th>
+                                            <th class="sticky w-52 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
+                                            <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Date</th>
+                                            <th class="sticky w-40 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- FOR SHOWING OF INVOICES -->
+                                        <tbody>
+                                        <tr v-if="filteredInvoices.length === 0 || (invoicesByDate.length === 0 && isDateFiltered)">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="10">No invoice available.</td>
+                                        </tr>
 
 
-                                    <tr class = "text-center" v-for="invoice in invoicesByDate" :key="invoice.invoice_id" v-if="isDateFiltered">
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
-                                        <td class="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <div class="w-60">
+                                        <tr class = "text-center" v-for="invoice in invoicesByDate" :key="invoice.invoice_id" v-if="isDateFiltered">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
+                                            <td class="items-center justify-center py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <div class="w-full">
 
-                                                <span :class="{
-                                                    'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
-                                                    'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
-                                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
-                                                }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
-                                                {{  invoice.payment_Type === 'cash' ? 'Cash' : 
-                                                    invoice.payment_Type === 'check' ? 'Check' : 
-                                                    invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
-                                                    invoice.payment_Type  }}</span>
-                                            </div>
+                                                    <span :class="{
+                                                        'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
+                                                        'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
+                                                        'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
+                                                    }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
+                                                    {{  invoice.payment_Type === 'cash' ? 'Cash' : 
+                                                        invoice.payment_Type === 'check' ? 'Check' : 
+                                                        invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
+                                                        invoice.payment_Type  }}</span>
+                                                </div>
 
-                                            </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                                </td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
 
-                                            <div>
-                                                <span :class="{
-                                                    'text-sm bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
-                                                    'text-sm bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
-                                                    'text-sm bg-orange-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
-                                                    'text-sm bg-orange-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
-                                                    'text-sm bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
-                                                }">
-                                                <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                {{invoice.status === 'paid' ? 'Paid' : 
-                                                     invoice.status === 'unpaid' ? 'Unpaid' : 
-                                                     invoice.status === 'partially paid' ? 'Partially Paid' : 
-                                                     invoice.status === 'pending refund' ? 'Pending Refund' : 
-                                                     invoice.status === 'refunded' ? 'Refunded' : 
-                                                     invoice.status }}</span>
-                                            </div>
-
-                                        </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
-                                        <td class="flex gap-1 items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="bg-yellow-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="viewInvoiceDetails(invoice)" class="bg-blue-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
-                                            </button>
-                                            <button @click="openDeleteModal(invoice.invoice_system_id)" class="bg-red-500 text-white px-2 py-1 rounded-full">
-                                            <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
-                                            </button>
-                                        </td>
-                                    </tr>
-
-                                    <tr class = "text-center" v-for="invoice in filteredInvoices" :key="invoice.invoice_id" v-if="!isDateFiltered">
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
-                                        <td class="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <div class="w-60">
-
-                                                <span :class="{
-                                                    'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
-                                                    'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
-                                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
-                                                }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
-                                                {{  invoice.payment_Type === 'cash' ? 'Cash' : 
-                                                    invoice.payment_Type === 'check' ? 'Check' : 
-                                                    invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
-                                                    invoice.payment_Type  }}</span>
-                                            </div>
+                                                <div>
+                                                    <span :class="{
+                                                        'text-sm bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
+                                                        'text-sm bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
+                                                        'text-sm bg-amber-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
+                                                        'text-sm bg-amber-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
+                                                        'text-sm bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
+                                                    }">
+                                                    <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    {{invoice.status === 'paid' ? 'Paid' : 
+                                                        invoice.status === 'unpaid' ? 'Unpaid' : 
+                                                        invoice.status === 'partially paid' ? 'Partially Paid' : 
+                                                        invoice.status === 'pending refund' ? 'Pending Refund' : 
+                                                        invoice.status === 'refunded' ? 'Refunded' : 
+                                                        invoice.status }}</span>
+                                                </div>
 
                                             </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
+                                            <td class="items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                                </button>
+                                                <button @click="viewInvoiceDetails(invoice)" class="mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
+                                                </button>
+                                                <button @click="openDeleteModal(invoice.invoice_system_id)" class="bg-red-500 text-white px-2 py-1 rounded-full">
+                                                <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
+                                                </button>
+                                            </td>
+                                        </tr>
 
-                                            <div>
-                                                <span :class="{
-                                                    'bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
-                                                    'bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
-                                                    'bg-orange-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
-                                                    'bg-orange-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
-                                                    'bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
-                                                }">
-                                                <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                {{invoice.status === 'paid' ? 'Paid' : 
-                                                     invoice.status === 'unpaid' ? 'Unpaid' : 
-                                                     invoice.status === 'partially paid' ? 'Partially Paid' : 
-                                                     invoice.status === 'pending refund' ? 'Pending Refund' : 
-                                                     invoice.status === 'refunded' ? 'Refunded' : 
-                                                     invoice.status }}</span>
+                                        <tr class = "text-center" v-for="invoice in filteredInvoices" :key="invoice.invoice_id" v-if="!isDateFiltered">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
+                                            <td class="items-center justify-center py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <div class=" w-full">
 
-                                            </div>
+                                                    <span :class="{
+                                                        'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
+                                                        'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
+                                                        'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
+                                                    }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
+                                                    {{  invoice.payment_Type === 'cash' ? 'Cash' : 
+                                                        invoice.payment_Type === 'check' ? 'Check' : 
+                                                        invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
+                                                        invoice.payment_Type  }}</span>
+                                                </div>
 
-                                        </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
-                                        <td class="flex gap-1 items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="bg-yellow-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="viewInvoiceDetails(invoice)" class="bg-blue-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
-                                            </button>
-                                            <button @click="openDeleteModal(invoice.invoice_system_id)" class="bg-red-500 text-white px-2 py-1 rounded-full">
-                                            <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                            </table>
+                                                </td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+
+                                                <div>
+                                                    <span :class="{
+                                                        'bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
+                                                        'bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
+                                                        'bg-amber-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
+                                                        'bg-amber-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
+                                                        'bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
+                                                    }">
+                                                    <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    {{invoice.status === 'paid' ? 'Paid' : 
+                                                        invoice.status === 'unpaid' ? 'Unpaid' : 
+                                                        invoice.status === 'partially paid' ? 'Partially Paid' : 
+                                                        invoice.status === 'pending refund' ? 'Pending Refund' : 
+                                                        invoice.status === 'refunded' ? 'Refunded' : 
+                                                        invoice.status }}</span>
+
+                                                </div>
+
+                                            </td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
+                                            <td class="items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" 
+                                                    class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                                </button>
+                                                <button @click="viewInvoiceDetails(invoice)" 
+                                                    class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
+                                                </button>
+                                                <button @click="openDeleteModal(invoice.invoice_system_id)" 
+                                                    class="hover:bg-red-600 transition hover:scale-105 ease-in-out duration-150 bg-red-500 text-white px-2 py-1 rounded-full">
+                                                <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                </table>
+
+                            </div>
+
                         </div>
                     </div>   
                 </div>
                 <div class="flex justify-end mt-4 mr-10 space-x-4">
-                    <button @click="showAddInvoiceModal = true, currentStepAdd = 1" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Invoice</button>
-                    <button @click="printInvoiceSummaryByDate()" class="bg-gray-500 text-white py-2 px-4 rounded">
+                    <button @click="showAddInvoiceModal = true, currentStepAdd = 1" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">+ Add Invoice</button>
+                    <button @click="printInvoiceSummaryByDate()" class="hover:bg-gray-600 transition hover:scale-105 ease-in-out duration-150 bg-gray-500 text-white py-2 px-4 rounded">
                         <font-awesome-icon icon="fa-solid fa-print" size="sm" />
                         Print Invoice Summary</button>
                 </div>
@@ -1846,7 +1852,7 @@ const showSuccessEditModal = ref(false);
 
                 <button 
                     @click.prevent="printInvoicesByDate" 
-                    class="w-full max-w-xs px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 w-full max-w-xs px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                     <font-awesome-icon icon="fa-solid fa-print" class="mr-2" />
                     Print Invoice Summary
@@ -2227,9 +2233,9 @@ const showSuccessEditModal = ref(false);
                     </div>
 
 
-                    <div class="flex justify-center mt-6 gap-14">
-                                    <button @click="showEditInvoiceModal = false" type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
-                                    <button @click.prevent="updateInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Receipt</button>
+                    <div class="flex justify-center mt-4 pb-6 gap-8">
+                                    <button @click="showEditInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                    <button @click.prevent="updateInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
                     </div>
 
             </div>
@@ -2238,8 +2244,8 @@ const showSuccessEditModal = ref(false);
 
         
         <transition name="modal-fade" >
-            <div v-if="showAddInvoiceModal" class="fixed ml-[100px] inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-6xl h-4/5 relative overflow-auto flex flex-col">
+            <div v-if="showAddInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
                 <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Add an Invoice</h3>
 
                     <div class="px-12">
@@ -2594,9 +2600,9 @@ const showSuccessEditModal = ref(false);
 
                     </div>
 
-                    <div class="flex justify-center mt-6 gap-6">
-                                    <button @click="showAddInvoiceModal = false" type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
-                                    <button @click.prevent="addInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Receipt</button>
+                    <div class="flex justify-center mt-4 pb-6 gap-8">
+                                    <button @click="showAddInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                    <button @click.prevent="addInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
                     </div>
 
                 </div>
@@ -2610,7 +2616,7 @@ const showSuccessEditModal = ref(false);
                 <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">View this Invoice</h3>
 
                 <div class="flex justify-center items-center">
-                    <button @click="printInvoice()" class="w-44 bg-blue-500 text-white px-2 py-1 rounded-full">
+                    <button @click="printInvoice()" class="w-44 hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white px-2 py-1 rounded-full">
                             <font-awesome-icon icon="fa-solid fa-print" size="sm"/>
                             <span class="text-lg"> Print Invoice</span>
                     </button>
@@ -2943,8 +2949,8 @@ const showSuccessEditModal = ref(false);
 
                     </div>
 
-                    <div class="flex justify-center mt-6 gap-14">
-                                    <button @click="showViewInvoiceModal = false" type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
+                    <div class="flex justify-center mt-4 pb-6 gap-8">
+                                    <button @click="showViewInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  ">Cancel</button>
                     </div>
 
             </div>

@@ -398,156 +398,155 @@ fetchFinances();
 
 <template>
     <AuthenticatedLayout>
-        <div class="py-5">
-            <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-2xl font-semibold">List of Finances</h2>
+        <div class="py-5 h-full">
+            <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[84%]">
+                    <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">
+                    <div class="mt-4 mb-8 flex justify-between items-center mb-4">
+                        <h2 class="font-semibold text-4xl">List of Finances</h2>
 
-                            <div class="flex">
-                                <div>
-                                    <div class="relative w-64">
-                                    <font-awesome-icon
-                                        :icon="['fas', 'magnifying-glass']"
-                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                                    />
-                                    <input
-                                        v-model="searchQuery"
-                                        type="text"
-                                        placeholder="Search finances..."
-                                        class="pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
-                                    />
-                                    </div>
-                                </div>
-
-
-                                
-                                <div class="items-center flex ml-10 text-white">
-                                    <div class="mr-2 text-xs">Filter by Date:</div>    
-                                        <input id="startDate" class="text-black text-sm" type="date" v-model="startDate" />
-                                    <div class="mx-2 text-xs"> To </div>
-                                        <input id="endDate" class="text-black text-sm mr-2" type="date" v-model="endDate" />
-                                    <button @click="clearFetchFinancesByDate" class="text-xs bg-stone-600 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
-                                </div>
+                        <div class="flex">
+                        <div>
+                            <div class="relative w-64">
+                            <font-awesome-icon
+                                :icon="['fas', 'magnifying-glass']"
+                                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
+                            />
+                            <input
+                                v-model="searchQuery"
+                                type="text"
+                                placeholder="Search finances..."
+                                class="text-white pl-10 pr-4 py-2 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
+                            />
                             </div>
-
                         </div>
-                        <div class="overflow-auto" style="max-height: 430px;">
-                            <table class="min-w-full bg-white dark:bg-gray-800 text-lg text-white">
-                                <thead>
-                                <tr>
-                                     <th 
-                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer whitespace-nowrap"
-                                        @click="sortByDate">
-                                        <div class="items-center text-center space-x-1">
-                                            <font-awesome-icon 
-                                                :icon="['fas', 'angle-down']" 
-                                                :class="DateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
-                                                class="ml-2 transition-transform duration-300 ease-in-out" 
-                                            />
-                                            <span>Date</span>
-                                        </div>
-                                    </th>
-                                    <th 
-                                        class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer"
-                                        @click="sortByDescription">
-                                        <div class="items-center text-center space-x-1">
-                                            <font-awesome-icon 
-                                                :icon="['fas', 'angle-down']"
-                                                :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
-                                                class="ml-2 transition-transform duration-300 ease-in-out" 
-                                            /> 
-                                            <span>Decription</span>
-                                        </div>
-                                    </th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 ">Category</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Amount</th>
-                                    <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
-                                </tr>
-                                </thead>
-                                <tbody class="text-white">
-                                <tr v-if="filteredFinances.length === 0 || (financesByDate.length === 0 && isDateFiltered)">
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="5">No finances available.</td>
-                                </tr>
 
-                                
-
-                                <tr class="" v-for="finance in financesByDate" :key="finance.id" v-if="isDateFiltered" >
-                                    <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.date }}</td>
-                                    <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.description }}</td>
-                                    <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">
-                                        <div>   
-
-                                            <span :class="{
-                                                    'bg-green-800 text-white py-1 px-3 rounded-full': finance.category === 'income',
-                                                    'bg-blue-900 text-white py-1 px-3 rounded-full': finance.category === 'expense',
-                                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': !['income', 'expense'].includes(finance.category) && finance.category !== '',
-                                                }">
-                                                <font-awesome-icon v-if="finance.category === 'income'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="finance.category === 'expense'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="finance.category !== 'income' && finance.category !== 'expense'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
-                                            {{ finance.category.charAt(0).toUpperCase() + finance.category.slice(1) }} </span>
-                                        </div>
-                                    </td>
-                                    <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
-                                    <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                        <div class="flex items-center justify-center space-x-2">
-                                            <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white py-1 px-2 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="viewFinanceDetails(finance)" class="bg-blue-500 text-white px-2 py-1  rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
-                                            </button>
-                                            <button @click="openDeleteModal(finance.id)" class="bg-red-500 text-white py-1 px-2 rounded-full">
-                                                <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr v-for="finance in filteredFinances" :key="finance.id" v-if="!isDateFiltered">
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.date }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.description }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">
-                                        <div>
-                                        <span :class="{
-                                                    'bg-green-800 text-white py-1 px-3 rounded-full': finance.category === 'income',
-                                                    'bg-blue-900 text-white py-1 px-3 rounded-full': finance.category === 'expense',
-                                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': !['income', 'expense'].includes(finance.category) && finance.category !== '',
-                                                }">
-                                                <font-awesome-icon v-if="finance.category === 'income'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="finance.category === 'expense'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="finance.category !== 'income' && finance.category !== 'expense'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
-                                            {{ finance.category.charAt(0).toUpperCase() + finance.category.slice(1) }}</span>
-                                        </div></td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
-                                    <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                        <div class="flex items-center justify-center space-x-1">
-                                            <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white px-2 py-1  rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="viewFinanceDetails(finance)" class="bg-blue-500 text-white px-2 py-1  rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
-                                            </button>
-                                            <button @click="openDeleteModal(finance.id)" class="bg-red-500 text-white py-1 px-2 rounded-full">
-                                                <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
-                                            </button>
-                                        </div>
-
-
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                        <div class="items-center flex ml-10 text-white">
+                            <div class="mr-2 text-xs">Filter by Date:</div>    
+                            <input id="startDate" class="dark:bg-gray-700 dark:border-gray-600 text-sm" type="date" v-model="startDate" />
+                            <div class="mx-2 text-xs"> To </div>
+                            <input id="endDate" class="dark:bg-gray-700 dark:border-gray-600 text-sm mr-2" type="date" v-model="endDate" />
+                            <button @click="clearFetchFinancesByDate" class="text-xs bg-stone-600 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
+                        </div>  
                         </div>
+                    </div>
+
+                    <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900">
+                        <div class="overflow-x-auto h-full">
+                        <table class="min-w-full table-fixed">
+                            <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">
+                            <tr>
+                                <th 
+                                class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer whitespace-nowrap"
+                                @click="sortByDate">
+                                <div class="items-center text-center text-xl space-x-1">
+                                    <font-awesome-icon 
+                                    :icon="['fas', 'angle-down']" 
+                                    :class="DateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                    class="ml-2 transition-transform duration-300 ease-in-out" 
+                                    />
+                                    <span>Date</span>
+                                </div>
+                                </th>
+                                <th 
+                                class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer"
+                                @click="sortByDescription">
+                                <div class="text-xl items-center text-center space-x-1">
+                                    <font-awesome-icon 
+                                    :icon="['fas', 'angle-down']"
+                                    :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                    class="ml-2 transition-transform duration-300 ease-in-out" 
+                                    /> 
+                                    <span>Decription</span>
+                                </div>
+                                </th>
+                                <th class="text-xl px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
+                                <th class="text-xl px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Amount</th>
+                                <th class="text-xl px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 text-white">
+                            <tr v-if="filteredFinances.length === 0 || (financesByDate.length === 0 && isDateFiltered)">
+                                <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="5">No finances available.</td>
+                            </tr>
+
+                            <tr class="" v-for="finance in financesByDate" :key="finance.id" v-if="isDateFiltered" >
+                                <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.date }}</td>
+                                <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.description }}</td>
+                                <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">
+                                <div>   
+                                    <span :class="{
+                                    'bg-green-800 text-white py-1 px-3 rounded-full': finance.category === 'income',
+                                    'bg-blue-900 text-white py-1 px-3 rounded-full': finance.category === 'expense',
+                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': !['income', 'expense'].includes(finance.category) && finance.category !== '',
+                                    }">
+                                    <font-awesome-icon v-if="finance.category === 'income'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
+                                    <font-awesome-icon v-if="finance.category === 'expense'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
+                                    <font-awesome-icon v-if="finance.category !== 'income' && finance.category !== 'expense'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
+                                    {{ finance.category.charAt(0).toUpperCase() + finance.category.slice(1) }}
+                                    </span>
+                                </div>
+                                </td>
+                                <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
+                                <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white py-1 px-2 rounded-full">
+                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                    </button>
+                                    <button @click="viewFinanceDetails(finance)" class="bg-blue-500 text-white px-2 py-1  rounded-full">
+                                    <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
+                                    </button>
+                                    <button @click="openDeleteModal(finance.id)" class="bg-red-500 text-white py-1 px-2 rounded-full">
+                                    <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
+                                    </button>
+                                </div>
+                                </td>
+                            </tr>
+                            <tr v-for="finance in filteredFinances" :key="finance.id" v-if="!isDateFiltered">
+                                <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.date }}</td>
+                                <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.description }}</td>
+                                <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">
+                                <div>
+                                    <span :class="{
+                                    'bg-green-800 text-white py-1 px-3 rounded-full': finance.category === 'income',
+                                    'bg-blue-900 text-white py-1 px-3 rounded-full': finance.category === 'expense',
+                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': !['income', 'expense'].includes(finance.category) && finance.category !== '',
+                                    }">
+                                    <font-awesome-icon v-if="finance.category === 'income'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
+                                    <font-awesome-icon v-if="finance.category === 'expense'" icon="fa-solid fa-peso-sign" size="sm" class="mr-1" />
+                                    <font-awesome-icon v-if="finance.category !== 'income' && finance.category !== 'expense'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
+                                    {{ finance.category.charAt(0).toUpperCase() + finance.category.slice(1) }}
+                                    </span>
+                                </div>
+                                </td>
+                                <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
+                                <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-center space-x-1">
+                                    <button @click="editFinanceDetails(finance)" class="bg-yellow-500 text-white px-2 py-1  rounded-full">
+                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                    </button>
+                                    <button @click="viewFinanceDetails(finance)" class="bg-blue-500 text-white px-2 py-1  rounded-full">
+                                    <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
+                                    </button>
+                                    <button @click="openDeleteModal(finance.id)" class="bg-red-500 text-white py-1 px-2 rounded-full">
+                                    <font-awesome-icon :icon="['fas', 'trash-can']" size="sm" />
+                                    </button>
+                                </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
                     </div>
                 </div>
                 <div class="flex justify-end mt-4 mr-5 space-x-4">
                     <button @click="showAddFinanceModal = true" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Finance</button>
                     <button @click="showFinanceCategoriesModal = true" class="bg-gray-500 text-white py-2 px-4 rounded">Categories</button>
                     <button @click="printFinanceSummaryByDate()" class=" bg-gray-500 text-white py-2 px-4 rounded">
-                        <font-awesome-icon icon="fa-solid fa-print" size="sm" />
-                        Print Finance Summary</button>
+                    <font-awesome-icon icon="fa-solid fa-print" size="sm" />
+                    Print Finance Summary
+                    </button>
                 </div>
             </div>
         </div>
@@ -997,6 +996,9 @@ fetchFinances();
 
 
 <style scoped>
+.overflow-x-auto {
+  overflow-y: auto;
+}
 
 .modal-fade-enter-active,
 .modal-fade-leave-active {
