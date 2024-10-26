@@ -27,9 +27,11 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="px-5">
            
             <div>
+                <div class="text-7xl flex flex-col justify-center items-center mb-14"><b>Register</b></div>
+
                 <InputLabel for="name" value="Name" />
 
                 <TextInput
@@ -141,9 +143,9 @@ const submit = () => {
             <div class="flex items-center justify-end mt-4">
                 <Link
                     :href="route('login')"
-                    class="underline text-sm text-white hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                    Already registered?
+                    <div>Already registered?</div>
                 </Link>
 
                 <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
@@ -153,4 +155,7 @@ const submit = () => {
         </form>
     </GuestLayout>
 </template>
-    
+<style>
+*{
+    color: #0F2C4A;
+}</style>

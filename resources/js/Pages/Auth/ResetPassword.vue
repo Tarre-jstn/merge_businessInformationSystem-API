@@ -35,8 +35,9 @@ const submit = () => {
     <GuestLayout>
         <Head title="Reset Password" />
 
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" class="px-5">
             <div>
+                <div class="text-7xl flex flex-col justify-center items-center mb-14"><b>Reset Password</b></div>
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -90,3 +91,7 @@ const submit = () => {
         </form>
     </GuestLayout>
 </template>
+<style>
+*{
+    color: #0F2C4A;
+}</style>
