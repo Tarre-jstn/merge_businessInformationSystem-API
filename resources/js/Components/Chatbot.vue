@@ -102,8 +102,8 @@ export default {
           this.businessCity = businessData.business_City || 'Unknown City';
           this.businessBarangay = businessData.business_Barangay || 'Unknown Barangay';
           this.businessAddress = businessData.business_Address || 'Unknown Address';
-          this.businessPhoneNumber = businessData.business_Contact_Number || 'Unknown Phone Number';
-          this.businessTelephoneNumber = businessData.business_Telephone_Number || 'Unknown Phone Number';
+          this.businessPhoneNumber = businessData.business_Phone_Number || 'Unknown Phone Number';
+          this.businessTelephonePhoneNumber = businessData.business_Telephone_Number || 'Unknown Telephone Number';
           this.businessFacebook = businessData.business_Facebook || 'Unknown Facebook';
           this.businessX = businessData.business_X || 'Unknown X';
           this.businessInstagram = businessData.business_Instagram || 'Unknown Instagram ';
@@ -124,17 +124,17 @@ export default {
           const firstResponse = chatbotResponse.data[0]; // Get the first chatbot response
 
           this.workingHours = firstResponse?.chabot_BWHours || 'Unavailable';
-          this.productDescription = firstResponse?.chabot_BPDescription || 'description available';
-          this.lazada = firstResponse?.chabot_Lazada || 'Lazada Link available';
-          this.shopee = firstResponse?.chabot_Shopee || 'Shopee Link available';
-          this.region1 = firstResponse.chabot_Region1 || 'Delivery time for Region 1 unavailable';
-          this.region2 = firstResponse.chabot_Region2 || 'Delivery time for Region 2 unavailable';
-          this.region3 = firstResponse.chabot_Region3 || 'Delivery time for Region 3 unavailable';
-          this.region4a = firstResponse.chabot_Region4A || 'Delivery time for Region 4A unavailable';
-          this.region4b = firstResponse.chabot_Region4B || 'Delivery time for Region 4B unavailable';
-          this.region5 = firstResponse.chabot_Region5 || 'Delivery time for Region 5 unavailable';
-          this.regionNCR = firstResponse.chabot_NCR || 'Delivery time for NCR unavailable';
-          this.regionCAR = firstResponse.chabot_CAR || 'Delivery time for CAR unavailable';
+          this.productDescription = firstResponse?.chabot_BPDescription || 'description unvailable';
+          this.lazada = firstResponse?.chabot_Lazada || 'Lazada Link unavailable';
+          this.shopee = firstResponse?.chabot_Shopee || 'Shopee Link unavailable';
+          this.region1 = firstResponse.chabot_Region1 || 'Delivery time for Region 1 is unavailable';
+          this.region2 = firstResponse.chabot_Region2 || 'Delivery time for Region 2 is unavailable';
+          this.region3 = firstResponse.chabot_Region3 || 'Delivery time for Region 3 is unavailable';
+          this.region4a = firstResponse.chabot_Region4A || 'Delivery time for Region is 4A unavailable';
+          this.region4b = firstResponse.chabot_Region4B || 'Delivery time for Region is 4B unavailable';
+          this.region5 = firstResponse.chabot_Region5 || 'Delivery time for Region is 5 unavailable';
+          this.regionNCR = firstResponse.chabot_NCR || 'Delivery time for NCR is unavailable';
+          this.regionCAR = firstResponse.chabot_CAR || 'Delivery time for CAR is unavailable';
 
 
           
@@ -268,7 +268,7 @@ export default {
           case 6:
           this.messages.push({
               id: new Date().getTime(),
-              text: `${this.productDescription}  `,
+              text: `We sell ${this.productDescription}  `,
               sender: 'bot',
             });
             setTimeout(() => {
@@ -464,11 +464,9 @@ export default {
 }
 
 .chat-circle {
-  width: 100px;
-  height: 100px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border-color: black;
-  border: 2px solid black;
   display: flex;
   align-items: center;
   justify-content: center;
