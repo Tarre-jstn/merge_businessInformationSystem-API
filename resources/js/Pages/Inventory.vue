@@ -141,7 +141,6 @@ const editProduct = ref({
     status: '',
     expDate: '',
     image: null,
-    seniorPWD_discountable: null,
     description: '',
     on_sale: null,
     on_sale_price: 0,
@@ -187,7 +186,6 @@ const newProduct = ref({
     status: '',
     expDate: '',
     image: null,
-    seniorPWD_discountable: 'no',
     description: '',
     on_sale: 'no',
     on_sale_price: 0,
@@ -220,7 +218,7 @@ const addProduct = async () => {
 };
 
 const validateProduct = (product) => {
-    if (!product.name || !product.brand || !product.price || !product.category || !product.stock || !product.sold || !product.status || !product.expDate || !product.seniorPWD_discountable || !product.description) {
+    if (!product.name || !product.brand || !product.price || !product.category || !product.stock || !product.sold || !product.status || !product.expDate || !product.description) {
         return false;
     }
     return true;
@@ -307,7 +305,6 @@ const resetNewProduct = () => {
         status: '',
         expDate: '',
         image: null,
-        seniorPWD_discountable: 'no',
         description: '',
         on_sale: 'no',
         on_sale_price: 0,
@@ -327,7 +324,6 @@ const resetEditProduct = () => {
         status: '',
         expDate: '',
         image: null,
-        seniorPWD_discountable: null,
         description: '',
         on_sale: null,
         on_sale_price: 0,
@@ -600,7 +596,7 @@ fetchListedCategories();
     <AuthenticatedLayout>
         <div  class="py-5 h-full">
             <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[84%]">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[86%]">
                     <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">
                         <div class="mt-4 mb-8 flex justify-between items-center mb-4">
                             <h2 class="font-semibold text-4xl">List of Products</h2>
@@ -656,7 +652,6 @@ fetchListedCategories();
                                                 <span>Exp. Date</span>
                                             </div>
                                         </th>
-                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Senior/PWD Discountable</th>
                                         <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
                                     </tr>
                                     </thead>
@@ -685,17 +680,6 @@ fetchListedCategories();
                                                 }">{{ product.status }}</span>
                                         </td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ product.expDate }}</td>
-
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 whitespace-nowrap">
-                                            <div class="flex items-left justify-center">
-                                                <label class="switch">
-                                                    <input type="checkbox" v-model="product.seniorPWD_discountable" true-value="yes" false-value="no" @change="updateDiscountable(product.id, product.seniorPWD_discountable)" />
-                                                    <span class="slider round"></span>
-                                                </label>
-                                                <span class="ml-3 text-sm text-gray-700">{{ product.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
-                                            </div>
-                                        
-                                        </td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                             <div class="flex items-center justify-center space-x-4">
                                                 <button @click="editProductDetails(product)" class="bg-yellow-500 text-white py-2 px-3 rounded-full">
@@ -869,26 +853,6 @@ fetchListedCategories();
                             <input type="date" id="expDate" v-model="newProduct.expDate" class="input-field text-xs p-1"/>
                             <span v-if="validationErrors.expDate" class="text-red-500 text-xs">{{ validationErrors.expDate }}</span>
                         </div>
-                        <!-- Discountable Toggle -->
-                        <div class="flex flex-col space-y-2">
-                            <label class="flex items-center text-xs font-medium text-gray-700 whitespace-nowrap">
-                                Senior/PWD Discountable:
-                                <span class="relative group ml-1">
-                                    <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
-                                    <!-- Tooltip -->
-                                    <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
-                                        Enable this to apply discount for seniors/PWDs.
-                                    </span>
-                                </span>
-                            </label>
-                            <div class="flex items-center space-x-2">
-                                <label class="switch">
-                                    <input type="checkbox" v-model="newProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
-                                    <span class="slider round"></span>
-                                </label>
-                                <span class=" text-gray-700">{{ newProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
-                            </div>
-                        </div>
                         <!-- Featured Toggle -->
                         <div class="flex flex-col space-y-2 ml-8">
                             <label class="flex items-center text-xs font-medium text-gray-700 whitespace-nowrap">
@@ -1025,25 +989,6 @@ fetchListedCategories();
                                 <label for="edit_expDate" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-white">Expiry Date <span class="text-red-500">*</span></label>
                                 <input type="date" id="edit_expDate" v-model="editProduct.expDate" class="input-field text-xs p-1"/>
                                 <span v-if="validationErrorsEdit.expDate" class="text-red-500 text-xs">{{ validationErrorsEdit.expDate }}</span>
-                            </div>
-                            <!-- Discountable Toggle -->
-                            <div>
-                                <label style="font-size: 11px;" class="block text-xs font-medium text-gray-700"> Senior/PWD Discountable:
-                                    <span class="relative group ml-1">
-                                        <font-awesome-icon icon="fa-solid fa-circle-info" class="text-gray-500 cursor-pointer" />
-                                        <span class="absolute left-full top-1/2 transform -translate-y-1/2 ml-4 bg-gray-800 text-white text-xs rounded-md px-3 py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 whitespace-nowrap z-10 pointer-events-none">
-                                            Enable this to apply discount for seniors/PWDs.
-                                        </span>
-                                    </span>
-                                </label>
-
-                                <div class="flex items-center space-x-2">
-                                    <label class="switch">
-                                        <input type="checkbox" v-model="editProduct.seniorPWD_discountable" true-value="yes" false-value="no" />
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <span class="text-xs text-gray-700">{{ editProduct.seniorPWD_discountable === 'yes' ? 'Yes' : 'No' }}</span>
-                                </div>
                             </div>
                             <!-- Featured Toggle -->
                             <div>

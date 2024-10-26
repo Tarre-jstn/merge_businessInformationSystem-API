@@ -81,7 +81,13 @@ const saveFinanceCategories = async () => {
                 </div>
                 <div class="flex justify-between">
                     <button @click="addFinanceCategory" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Category</button>
-                    <button @click="closeModal" style="background-color:#059669" class=" text-white py-2 px-4 rounded mr-2">Ok</button>
+                    <button 
+                    @click="closeModal" 
+                    type="button"
+                    class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Cancel
+                </button>
                 </div>
 
             </div>

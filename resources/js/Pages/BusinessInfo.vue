@@ -297,7 +297,7 @@ import { Head } from '@inertiajs/vue3';
                         <div>
                             <button
                                 type="button"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                class="bg-blue-500 hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                                 @click="updateBusiness"
                             >
                                 Update Business

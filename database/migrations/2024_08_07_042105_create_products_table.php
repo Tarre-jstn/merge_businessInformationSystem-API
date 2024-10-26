@@ -17,7 +17,6 @@ return new class extends Migration
             $table->enum('on_sale', ['yes','no'])->default('no');
             $table->decimal('on_sale_price', 8, 2)->default(0);
             $table->enum('featured', ['true','false'])->default('false');
-            $table->enum('seniorPWD_discountable', ['yes','no'])->default('no');
             $table->id();
             $table->string('name');
             $table->string('brand');

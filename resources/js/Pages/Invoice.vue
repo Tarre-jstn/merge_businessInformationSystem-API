@@ -128,11 +128,17 @@ const filteredInvoices = computed(() => {
     return invoices.value.filter(invoice => {
         const invoiceId = String(invoice.invoice_id).toLowerCase();
         const customerName = String(invoice.customer_Name).toLowerCase();
+        const paymentType = String(invoice.payment_Type).toLowerCase();
+        const status = String(invoice.status).toLowerCase();
         const date = String(invoice.date).toLowerCase();
+        const totalAmountDue = String(invoice.total_Amount_Due).toLowerCase();
         return (
             invoiceId.includes(searchTerm) ||
             customerName.includes(searchTerm) ||
-            date.includes(searchTerm)
+            date.includes(searchTerm) ||
+            paymentType.includes(searchTerm) ||
+            status.includes(searchTerm) ||
+            totalAmountDue.includes(searchTerm)
         );
     });
 });
@@ -707,28 +713,28 @@ const props = defineProps({
 const emit = defineEmits(['financeDeleted', 'editFinance', 'viewFinance'])
 
 const showDeleteModal = ref(false)
-const financeToDelete = ref(null)
+let financeToDelete = 0;
 
-const openDeleteModal = (id) => {
-  financeToDelete.value = id
+const openDeleteModal = (invoice_system_id) => {
+  financeToDelete = invoice_system_id
   showDeleteModal.value = true
 }
 
 const closeDeleteModal = () => {
   showDeleteModal.value = false
-  financeToDelete.value = null
+  financeToDelete = null
 }
 
 const confirmDelete = async () => {
   try {
-    await axios.delete(`/api/finance/${financeToDelete.value}`)
+    await axios.delete(`/api/invoice/${financeToDelete}`)
     closeDeleteModal()
     showSuccessModal.value = true
-    emit('financeDeleted', financeToDelete.value)
+    emit('financeDeleted', financeToDelete)
     setTimeout(() => {
       showSuccessModal.value = false
     }, 1000) // Auto-close after 2 seconds
-    fetchFinances();
+    fetchInvoices();
   } catch (error) {
     console.error("Error deleting finance:", error)
     // You might want to show an error message to the user here
@@ -1485,6 +1491,13 @@ const clearFetchInvoicessByDate = async () => {
     invoicesByDate.value = '';
     isDateFiltered.value = false;
 };
+
+
+const clearDates = async () => {
+
+startDatePrint.value = '';
+endDatePrint.value = '';    
+};
 watch([startDate, endDate], async ([newStartDate, newEndDate]) => {
     if (newStartDate && newEndDate) {
         // if(showPrintInvoiceSummaryByDate){
@@ -1558,37 +1571,25 @@ const showSuccessEditModal = ref(false);
     <AuthenticatedLayout>
         <div class="py-5 h-full ">
             <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[84%]">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[86%]">
                     <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">  
-                        <div class="mt-4 mb-8 flex justify-between items-center mb-4">
+                        <div class="mt-4 mb-8 flex justify-between items-center">
                             <h2 class="font-semibold text-4xl">List of Invoices</h2>
                             <div class="flex">
-                                <div class="flex w-100">
-                                    
-                                    <div>
-                                        <font-awesome-icon
-                                        :icon="['fas', 'magnifying-glass']"
-                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                <div class="relative flex items-center mr-6 w-96">
+                                    <font-awesome-icon
+                                    :icon="['fas', 'magnifying-glass']"
+                                    class="absolute left-3 text-gray-400 pointer-events-none"
                                     />
-                                        <input
-                                            v-model="searchQuery"
-                                            type="text"
-                                            placeholder="Search by ID, Customer, or Date"
-                                            class="pl-10 pr-5 py-4 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
-                                        />
-                                    </div>
-
-                                    <div class="items-center flex ml-10 text-white">
-                                        <div class="mr-2 text-xs">Filter by Date:</div>    
-                                            <input id="startDate" class="text-black text-sm" type="date" v-model="startDate" />
-                                        <div class="mx-2 text-xs"> To </div>
-                                            <input id="endDate" class="text-black text-sm mr-2" type="date" v-model="endDate" />
-                                        <button @click="clearFetchInvoicessByDate" class="text-xs hover:bg-gray-700 transition hover:scale-105 ease-in-out duration-150 bg-gray-600 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
-                                    </div>
-
+                                    <input
+                                    v-model="searchQuery"
+                                    type="text"
+                                    placeholder="Search Invoices..."
+                                    class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
                                 </div>
                             </div>
-                         </div>
+                        </div>
 
                         <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900" >
                             <div class="overflow-x-auto h-full">
@@ -1659,13 +1660,13 @@ const showSuccessEditModal = ref(false);
                                             </td>
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
                                             <td class="items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                                <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                                <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
                                                     <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                                 </button>
-                                                <button @click="viewInvoiceDetails(invoice)" class="mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
+                                                <button @click="viewInvoiceDetails(invoice)" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
                                                     <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
                                                 </button>
-                                                <button @click="openDeleteModal(invoice.invoice_system_id)" class="bg-red-500 text-white px-2 py-1 rounded-full">
+                                                <button @click="openDeleteModal(invoice.invoice_system_id)" class="hover:bg-red-600 transition hover:scale-105 ease-in-out duration-150 bg-red-500 text-white px-2 py-1 rounded-full">
                                                 <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
                                                 </button>
                                             </td>
@@ -1741,12 +1742,24 @@ const showSuccessEditModal = ref(false);
                         </div>
                     </div>   
                 </div>
-                <div class="flex justify-end mt-4 mr-10 space-x-4">
-                    <button @click="showAddInvoiceModal = true, currentStepAdd = 1" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">+ Add Invoice</button>
-                    <button @click="printInvoiceSummaryByDate()" class="hover:bg-gray-600 transition hover:scale-105 ease-in-out duration-150 bg-gray-500 text-white py-2 px-4 rounded">
-                        <font-awesome-icon icon="fa-solid fa-print" size="sm" />
-                        Print Invoice Summary</button>
+
+                <div class="w-full flex items-center justify-between">
+                    <div class="items-center flex ml-5">
+                        <div class="mr-2 text-xs">Filter by Date:</div>    
+                            <input id="startDate" class="text-black text-sm rounded" type="date" v-model="startDate" />
+                        <div class="mx-2 text-xs"> To </div>
+                            <input id="endDate" class="text-black text-sm rounded" type="date" v-model="endDate" />
+                        <button @click="clearFetchInvoicessByDate" class="text-xs hover:bg-gray-600 transition hover:scale-105 ease-in-out duration-150 bg-gray-500 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
+                    </div>
+
+                    <div class="flex justify-end mt-4 mr-10 space-x-4">
+                        <button @click="showAddInvoiceModal = true, currentStepAdd = 1" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">+ Add Invoice</button>
+                        <button @click="printInvoiceSummaryByDate()" class="hover:bg-gray-600 transition hover:scale-105 ease-in-out duration-150 bg-gray-500 text-white py-2 px-4 rounded">
+                            <font-awesome-icon icon="fa-solid fa-print" size="sm" />
+                            Print Invoice Summary</button>
+                    </div>
                 </div>
+
 
             </div>
         </div>
@@ -1757,12 +1770,12 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-trash" size="8x" style="margin-top:2px; color: red;"/>
                     <h2 class="mt-4 text-xl text-center font-bold mb-2">Confirm Deletion</h2>
-                    <p class="mb-4 text-center">Are you sure you want to delete this finance?</p>
+                    <p class="mb-4 text-center">Are you sure you want to delete this Invoice?</p>
                     <div class="flex justify-center space-x-2">
                         <button @click="closeDeleteModal" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
                             No
                         </button>
-                        <button @click="confirmDelete" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        <button @click="confirmDelete" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">
                             Yes
                         </button>
                     </div>
@@ -1775,7 +1788,7 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
                     <h2 class="text-xl font-bold mb-4">Success!</h2>
-                    <p class="mb-4">The finance has been successfully deleted.</p>
+                    <p class="mb-4">The Invoice has been successfully deleted.</p>
                 </div>
             </div>
         </transition>
@@ -1786,7 +1799,7 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
                     <h2 class="text-xl font-bold mb-4">Success!</h2>
-                    <p class="mb-4">The Finance Information has been successfully Updated!.</p>
+                    <p class="mb-4">The Invoice Information has been successfully Updated!.</p>
                 </div>
             </div>
         </transition>
@@ -1798,7 +1811,7 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
                     <h2 class="text-xl font-bold mb-4">Success!</h2>
-                    <p class="mb-4">The Finance Information has been successfully Added!.</p>
+                    <p class="mb-4">The Invoice Information has been successfully Added!.</p>
                 </div>
             </div>
         </transition>
@@ -1830,22 +1843,31 @@ const showSuccessEditModal = ref(false);
                 </div>
 
                 <div class="space-y-2">
-                <p class="text-sm font-medium text-gray-700">Filter by Date:</p>
-                <div class="flex items-center space-x-2">
-                    <input 
-                    id="startDate" 
-                    v-model="startDatePrint" 
-                    type="date" 
-                    class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                    <span class="text-gray-500">to</span>
-                    <input 
-                    id="endDate" 
-                    v-model="endDatePrint" 
-                    type="date" 
-                    class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
+                    <div class="flex items-center justify-start">
+                        <p class="text-sm font-medium text-gray-700">Filter by Date:</p>
+                        <button 
+                        @click="clearDates" 
+                        class="px-3 py-1 ml-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                        Clear Dates
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <input 
+                        id="startDate" 
+                        v-model="startDatePrint" 
+                        type="date" 
+                        class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <span class="text-gray-500">to</span>
+                        <input 
+                        id="endDate" 
+                        v-model="endDatePrint" 
+                        type="date" 
+                        class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                    </div>
                 </div>
 
                 <div class="flex flex-col items-center space-y-3">
@@ -1857,13 +1879,14 @@ const showSuccessEditModal = ref(false);
                     <font-awesome-icon icon="fa-solid fa-print" class="mr-2" />
                     Print Invoice Summary
                 </button>
-                <button 
-                    @click="clearDates" 
-                    class="block max-w-xs px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Clear Dates
-                </button>
 
+                <button 
+                    @click="showPrintInvoiceSummaryByDate = false" 
+                    type="button"
+                    class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Cancel
+                </button>
                 </div>
             </div>
             </div>
@@ -2234,8 +2257,8 @@ const showSuccessEditModal = ref(false);
 
 
                     <div class="flex justify-center mt-4 pb-6 gap-8">
-                                    <button @click="showEditInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
-                                    <button @click.prevent="updateInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
+                                    <button @click="showEditInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                    <button @click.prevent="updateInvoiceInformation()" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">Update Invoice</button>
                     </div>
 
             </div>
@@ -2601,8 +2624,8 @@ const showSuccessEditModal = ref(false);
                     </div>
 
                     <div class="flex justify-center mt-4 pb-6 gap-8">
-                                    <button @click="showAddInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
-                                    <button @click.prevent="addInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
+                                    <button @click="showAddInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                    <button @click.prevent="addInvoiceInformation()" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
                     </div>
 
                 </div>
@@ -2950,7 +2973,7 @@ const showSuccessEditModal = ref(false);
                     </div>
 
                     <div class="flex justify-center mt-4 pb-6 gap-8">
-                                    <button @click="showViewInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  ">Cancel</button>
+                                    <button @click="showViewInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  ">Cancel</button>
                     </div>
 
             </div>
