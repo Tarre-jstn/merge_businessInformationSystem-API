@@ -124,9 +124,9 @@ export default {
           const firstResponse = chatbotResponse.data[0]; // Get the first chatbot response
 
           this.workingHours = firstResponse?.chabot_BWHours || 'Unavailable';
-          this.productDescription = firstResponse?.chabot_BPDescription || 'description available';
-          this.lazada = firstResponse?.chabot_Lazada || 'Lazada Link available';
-          this.shopee = firstResponse?.chabot_Shopee || 'Shopee Link available';
+          this.productDescription = firstResponse?.chabot_BPDescription || 'description unavailable';
+          this.lazada = firstResponse?.chabot_Lazada || 'Lazada Link unavailable';
+          this.shopee = firstResponse?.chabot_Shopee || 'Shopee Link unavailable';
           this.region1 = firstResponse.chabot_Region1 || 'Delivery time for Region 1 unavailable';
           this.region2 = firstResponse.chabot_Region2 || 'Delivery time for Region 2 unavailable';
           this.region3 = firstResponse.chabot_Region3 || 'Delivery time for Region 3 unavailable';
@@ -505,6 +505,20 @@ export default {
   height: 40px; 
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+}
+
+.chat-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  outline: none; /* Removes outline */
+  padding: 0 5px;
+}
+
+.chat-header button:hover {
+  color: #ccc; /* Add hover effect if desired */
 }
 
 

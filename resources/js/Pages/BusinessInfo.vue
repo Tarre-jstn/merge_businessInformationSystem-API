@@ -23,23 +23,48 @@ const business = ref({
 
 const phoneError = ref('');
 const telephoneError = ref('');
+const nameError = ref('');
+const emailError = ref('');
+const addressError = ref('');
 
 const validatePhone = () => {
-    if (business.value.phone && /\D/.test(business.value.phone)) {
+    if (/\D/.test(business.value.phone)) {
         phoneError.value = "Please input only numbers for the Phone field";
+    } else if (!business.value.phone) {
+        phoneError.value = "This field cannot be empty";
     } else {
         phoneError.value = '';
     }
 };
 
-// Validation function for the telephone field
 const validateTelephone = () => {
-    if (business.value.telephone && /\D/.test(business.value.telephone)) {
+    if (/\D/.test(business.value.telephone)) {
         telephoneError.value = "Please input only numbers for the Telephone field";
+    } else if (!business.value.telephone) {
+        telephoneError.value = "This field cannot be empty";
     } else {
         telephoneError.value = '';
     }
 };
+
+const validateName = () => {
+    nameError.value = business.value.name ? '' : "This field cannot be empty";
+};
+
+const validateEmail = () => {
+    if (!business.value.email) {
+        emailError.value = "This field cannot be empty";
+    } else if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(business.value.email)) {
+        emailError.value = "Please enter a valid email format";
+    } else {
+        emailError.value = '';
+    }
+};
+
+const validateAddress = () => {
+    addressError.value = business.value.address ? '' : "This field cannot be empty";
+};
+
 
 // Profile picture
 const profilePicture = ref(null);
@@ -176,11 +201,13 @@ const onProfilePictureChange = (event) => {
 
 // Handle business update
 const updateBusiness = async () => {
-   
+    validateName();
+    validateEmail();
+    validateAddress();
     validatePhone();
     validateTelephone();
 
-    if (phoneError.value || telephoneError.value) {
+    if (nameError.value || emailError.value || addressError.value || phoneError.value || telephoneError.value) {
         alert('Please correct the errors before updating the business profile.');
         return;
     }
@@ -218,6 +245,7 @@ const updateBusiness = async () => {
 
         if (response.data.success) {
             alert('Business profile updated successfully');
+            window.location.reload();  // This will refresh the page
         } else {
             alert('Failed to update business profile');
         }
@@ -225,6 +253,7 @@ const updateBusiness = async () => {
         alert('Failed to update business profile');
     }
 };
+
 
 
 </script>
@@ -242,34 +271,38 @@ const updateBusiness = async () => {
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label for="business-name" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Business Name
-                                </label>
-                                <input
-                                    type="text"
-                                    id="business-name"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    v-model="business.name"
-                                >
-                            </div>
+                            <label for="business-name" class="block text-gray-700 text-sm font-bold mb-2">
+                                <span>Business Name <span class="text-red-500">*</span></span>
+                            </label>
+                            <input
+                                type="text"
+                                id="business-name"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                v-model="business.name"
+                                @input="validateName"
+                            >
+                            <div v-if="nameError" class="text-red-500 text-sm">{{ nameError }}</div>
+                        </div>
 
-                            <div>
-                                <label for="email-address" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Email Address
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email-address"
-                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    v-model="business.email"
-                                >
-                            </div>
+                        <div>
+                            <label for="email-address" class="block text-gray-700 text-sm font-bold mb-2">
+                                <span>Business Email Address <span class="text-red-500">*</span></span>
+                            </label>
+                            <input
+                                type="email"
+                                id="email-address"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                v-model="business.email"
+                                @input="validateEmail"
+                            >
+                            <div v-if="emailError" class="text-red-500 text-sm">{{ emailError }}</div>
+                        </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label for="province" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Province/Region
+                                    <span>Province <span class="text-red-500">*</span></span>
                                 </label>
                                 <select
                                     id="province"
@@ -284,7 +317,7 @@ const updateBusiness = async () => {
                             <!-- City Dropdown -->
                             <div>
                                 <label for="city" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Municipality/City
+                                    <span>Municipality/City<span class="text-red-500">*</span></span>
                                 </label>
                                 <select
                                     id="city"
@@ -300,7 +333,7 @@ const updateBusiness = async () => {
                             <!-- Barangay Dropdown -->
                             <div>
                                 <label for="barangay" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Barangay
+                                    <span>Barangay <span class="text-red-500">*</span></span>
                                 </label>
                                 <select
                                     id="barangay"
@@ -317,39 +350,45 @@ const updateBusiness = async () => {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="address" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Address
+                                    <span>Address <span class="text-red-500">*</span></span>
                                 </label>
                                 <input
                                     type="text"
                                     id="address"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="business.address"
+                                    @input="validateAddress"
                                 >
+                                <div v-if="addressError" class="text-red-500 text-sm">{{ addressError }}</div>
                             </div>
 
                             <div>
                                 <label for="phone-number" class="block text-gray-700 text-sm font-bold mb-2">
-                                    Phone Number
+                                    <span>Phone Number <span class="text-red-500">*</span></span>
                                 </label>
                                 <input
                                     type="text"
                                     id="phone-number"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="business.phone"
+                                    @input="validatePhone"
                                 >
+                                <div v-if="phoneError" class="text-red-500 text-sm">{{ phoneError }}</div>
                             </div>
                         </div>
 
                         <div>
                             <label for="telephone-number" class="block text-gray-700 text-sm font-bold mb-2">
-                                Telephone Number
+                                <span>Telephone Number <span class="text-red-500">*</span></span>
                             </label>
                             <input
                                 type="text"
                                 id="telephone-number"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="business.telephone"
+                                @input="validateTelephone"
                             >
+                            <div v-if="telephoneError" class="text-red-500 text-sm">{{ telephoneError }}</div>
                         </div>
 
                         <div>
@@ -393,7 +432,7 @@ const updateBusiness = async () => {
                             <div class="flex items-center">
                             
                                 <input type="text" 
-                                placeholder="Facebook @username" 
+                                placeholder="Facebook.com/User" 
                                 class="w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="business.facebook"
                                 >
@@ -406,7 +445,7 @@ const updateBusiness = async () => {
                             <div class="flex items-center">
                             
                                 <input type="text" 
-                                placeholder="X @username" 
+                                placeholder="X.com/User" 
                                 class="w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="business.x">
                             </div>
@@ -418,7 +457,7 @@ const updateBusiness = async () => {
                             <div class="flex items-center">
                             
                                 <input type="text" 
-                                placeholder="Instagram @username" 
+                                placeholder="Instagram.com/User" 
                                 class="w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="business.instagram">
                             </div>
@@ -430,7 +469,7 @@ const updateBusiness = async () => {
                             <div class="flex items-center">
                                 
                                 <input type="text" 
-                                placeholder="Tiktok @username" 
+                                placeholder="Tiktok.com/@User" 
                                 class="w-full shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="business.tiktok">
                             </div>

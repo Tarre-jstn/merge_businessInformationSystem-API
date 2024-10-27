@@ -26,7 +26,7 @@ class SendBusinessNameChangeNotification
         $emailBody .= "<div style='padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: auto; background-color: #f9f9f9;'>";
 
         $emailBody .= "<div style='display: flex; align-items: center; margin-bottom: 20px;'>";
-        $emailBody .= "<img src='{$businessLogoUrl}' alt='Business Logo' style='width: 80px; height: 80px; border-radius: 50%; margin-right: 20px; object-fit: contain; aspect-ratio: 1/1;'>";
+        $emailBody .= "<img src='{$businessLogoUrl}' alt='Business Logo' style='width: 80px; height: 80px; border-radius: 50%; margin-right: 20px; object-fit: cover; aspect-ratio: 1 / 1;'>";
         $emailBody .= "<h2 style='color: #0056b3;'>{$event->newName} Information Updated</h2>";
         $emailBody .= "</div>";
 
@@ -40,23 +40,29 @@ class SendBusinessNameChangeNotification
             } elseif ($field === 'business_image' && !$event->ignoreImageChange) {
                 $oldImageUrl = isset($change['old']) ? asset(Storage::url('business_logos/archive/' . $change['old'])) : null;
                 $newImageUrl = isset($change['new']) ? asset(Storage::url('business_logos/' . $change['new'])) : null;
-            
-                // Only show logo update if old and new URLs are different
+
                 if ($oldImageUrl && $newImageUrl && $oldImageUrl !== $newImageUrl) {
                     $imageChange = "<p style='font-size: 14px;'><strong>Logo has been updated:</strong></p>";
                     $imageChange .= "<div style='display: flex; align-items: center;'>";
-            
-                    // Old Logo
+
                     $imageChange .= "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover;'></div>";
-            
-                    // New Logo
                     $imageChange .= "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover;'></div>";
-            
+
                     $imageChange .= "</div>";
                 }
-            }else {
+            } else {
                 $fieldLabel = ucfirst(str_replace('_', ' ', $field));
-                $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
+
+                // Check if a social media field was removed
+                if (in_array($field, ['business_Facebook', 'business_X', 'business_Instagram', 'business_Tiktok'])) {
+                    if (!empty($change['old']) && empty($change['new'])) {
+                        $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> has been removed.</p>";
+                    } elseif (empty($change['old']) && !empty($change['new'])) {
+                        $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> has been added: <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
+                    } else {
+                        $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
+                    }
+                }
             }
         }
 
@@ -66,7 +72,6 @@ class SendBusinessNameChangeNotification
         }
 
         $emailBody .= "</div></body></html>";
-
 
         try {
             Mail::html($emailBody, function ($message) use ($customer, $event) {
@@ -78,5 +83,7 @@ class SendBusinessNameChangeNotification
         }
     }
 }
+
+
 
 }

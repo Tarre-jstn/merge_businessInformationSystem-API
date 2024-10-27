@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+import Chatbot from '@/Components/Chatbot.vue';
 
 // Define the chatbot data structure using ref
 const chatbot = ref({
@@ -68,6 +69,7 @@ const updateChatbotData = async () => {
 
         if (response.status === 200) {
             alert('Chatbot Responses updated successfully');
+            window.location.reload();
         } else {
             console.error("Update failed:", response.data);
             alert('Update failed');
@@ -96,7 +98,7 @@ const updateChatbotData = async () => {
                             </label>
                             <input
                                 type="text"
-                                placeholder="9AM - 9PM" 
+                                placeholder="e.g. 9AM - 9PM" 
                                 id="business-working-hours"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="chatbot.bwh"
@@ -108,6 +110,7 @@ const updateChatbotData = async () => {
                             </label>
                             <input
                                 type="text"
+                                placeholder="e.g. Food Products" 
                                 id="product-description"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="chatbot.pd"
@@ -121,6 +124,7 @@ const updateChatbotData = async () => {
                             </label>
                             <input
                                 type="text"
+                                placeholder="lazada.com.ph/shop/Store" 
                                 id="lazada"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="chatbot.lazada"
@@ -133,6 +137,7 @@ const updateChatbotData = async () => {
                             </label>
                             <input
                                 type="text"
+                                placeholder="shopee.ph/Store" 
                                 id="shopee"
                                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                 v-model="chatbot.shopee"
@@ -165,7 +170,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.region1"
                                 >
@@ -177,7 +182,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.region2"
                                 >
@@ -190,7 +195,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.region3"
                                 >
@@ -202,7 +207,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.region4a"
                                 >
@@ -215,7 +220,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.region4b"
                                 >
@@ -227,7 +232,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.region5"
                                 >
@@ -240,7 +245,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.ncr"
                                 >
@@ -252,7 +257,7 @@ const updateChatbotData = async () => {
                                 </label>
                                 <input
                                     type="text"
-                                    placeholder="X days" 
+                                    placeholder="Days/Months/Years" 
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                     v-model="chatbot.car"
                                 >
@@ -260,6 +265,7 @@ const updateChatbotData = async () => {
                         </div>
                     </div>
                 </div>
+                <Chatbot />
          
             
         </div>
