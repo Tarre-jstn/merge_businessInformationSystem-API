@@ -7,8 +7,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-
 
 class SendBusinessNameChangeNotification
 {
@@ -40,22 +38,23 @@ class SendBusinessNameChangeNotification
             if ($field === 'business_Address') {
                 $emailBody .= "<p style='font-size: 14px;'><strong>Business Address</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
             } elseif ($field === 'business_image' && !$event->ignoreImageChange) {
-                $oldImageUrl = isset($change['old']) ? asset(Storage::url('business_logos/archive/' . $change['old'])) : 'No previous logo';
-                $newImageUrl = isset($change['new']) ? asset(Storage::url('business_logos/' . $change['new'])) : 'No new logo';
-
-                if ($oldImageUrl || $newImageUrl) {
+                $oldImageUrl = isset($change['old']) ? asset(Storage::url('business_logos/archive/' . $change['old'])) : null;
+                $newImageUrl = isset($change['new']) ? asset(Storage::url('business_logos/' . $change['new'])) : null;
+            
+                // Only show logo update if old and new URLs are different
+                if ($oldImageUrl && $newImageUrl && $oldImageUrl !== $newImageUrl) {
                     $imageChange = "<p style='font-size: 14px;'><strong>Logo has been updated:</strong></p>";
                     $imageChange .= "<div style='display: flex; align-items: center;'>";
-
+            
                     // Old Logo
-                    $imageChange .= $oldImageUrl ? "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover; max-width: 100%; max-height: 96px;'></div>" : '';
-
+                    $imageChange .= "<div style='margin-right: 20px; text-align: center;'><strong>Old Logo</strong><br><img src='{$oldImageUrl}' alt='Old Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover;'></div>";
+            
                     // New Logo
-                    $imageChange .= $newImageUrl ? "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover; max-width: 100%; max-height: 96px;'></div>" : '';
-
+                    $imageChange .= "<div style='text-align: center;'><strong>New Logo</strong><br><img src='{$newImageUrl}' alt='New Logo' style='width: 96px; height: 96px; border-radius: 50%; border: 1px solid #ddd; object-fit: cover;'></div>";
+            
                     $imageChange .= "</div>";
                 }
-            } else {
+            }else {
                 $fieldLabel = ucfirst(str_replace('_', ' ', $field));
                 $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
             }
@@ -75,8 +74,7 @@ class SendBusinessNameChangeNotification
                     ->subject("Business Information Change Notification for {$event->newName}");
             });
         } catch (\Exception $e) {
-
-            Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
+            \Log::error('Error sending email to ' . $customer->email . ': ' . $e->getMessage());
         }
     }
 }

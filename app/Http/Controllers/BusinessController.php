@@ -38,7 +38,7 @@ class BusinessController extends Controller
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
-            'business_Contact_Number' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
             'business_TIN'=> 'required|numeric',
             'business_Telephone_Number' => 'required|string|max:255',
             'business_Facebook' => 'nullable|string|max:255',
@@ -71,7 +71,7 @@ class BusinessController extends Controller
                     'business_City' => $request->business_City,
                     'business_Barangay' => $request->business_Barangay,
                     'business_Address' => $request->business_Address,
-                    'business_Contact_Number' => $request->business_Contact_Number,
+                    'business_Phone_Number' => $request->business_Phone_Number,
                     'business_TIN'=> $request->business_TIN,
                     'business_Telephone_Number' => $request->business_Telephone_Number,
                     'business_Facebook' => $request->business_Facebook,
@@ -111,7 +111,7 @@ class BusinessController extends Controller
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
-            'business_Contact_Number' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
             'business_Facebook' => 'nullable|string|max:255',
             'business_X' => 'nullable|string|max:255',
@@ -120,13 +120,6 @@ class BusinessController extends Controller
         ]);
         
         $business = Business::findOrFail($id);
-        $oldData = $business->toArray();
-        $oldName = $business->business_Name;
-        $oldImage = $business->business_image;
-
-        $changes = [];
-        $ignoreImageChange = false; // New flag to ignore specific image changes
-
         $oldData = $business->toArray();
         $oldName = $business->business_Name;
         $oldImage = $business->business_image;
@@ -177,10 +170,10 @@ class BusinessController extends Controller
 
         // Similar comparison for address and other fields...
         $fieldsToCheck = [
-            'business_Contact_Number', 'business_Telephone_Number', 'business_Email',
+            'business_Phone_Number', 'business_Telephone_Number', 'business_Email',
             'business_Facebook', 'business_X', 'business_Instagram', 'business_Tiktok',
         ];
-
+        
         foreach ($fieldsToCheck as $field) {
             if ($oldData[$field] !== $request->input($field)) {
                 $changes[$field] = ['old' => $oldData[$field], 'new' => $request->input($field)];

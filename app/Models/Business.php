@@ -30,7 +30,7 @@ class Business extends Model
         'business_City',
         'business_Barangay',
         'business_Address',
-        'business_Contact_Number',
+        'business_Phone_Number',
         'business_TIN',
         'business_Telephone_Number',
         'business_Facebook',
