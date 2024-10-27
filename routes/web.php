@@ -68,7 +68,7 @@ Route::get('/aboutUs_page', function () {
 //     dd($analyticsData);
 // });
 
-Route::get('/analytics', [AnalyticsController::class, 'index']);
+Route::get('/api/analytics', [AnalyticsController::class, 'fetchData']);
 Route::get('/server-time', function () {
     return response()->json(['server_time' => now()->toDateTimeString()]);
 });

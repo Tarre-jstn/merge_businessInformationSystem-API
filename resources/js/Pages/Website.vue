@@ -7,6 +7,9 @@ import { Head } from '@inertiajs/vue3';
 import { Inertia } from '@inertiajs/inertia';
 import { route } from 'ziggy-js';
 
+let visitorsViewsChart = null;
+let engagementRateChart = null;
+
 function goToEditWebsite1(){
     Inertia.visit(route('editWebsite1'));
 }
@@ -17,82 +20,70 @@ function goToPreviewHomePage(){
 
 Chart.register(...registerables);
 
-const analyticsData = ref([]);
-const totalPageViews = ref(0);
-const totalVisitors = ref(0);
+const selectedPeriod = ref(7);
+const views = ref(0);
+const visits = ref(0);
+const visitors = ref(0);
 const bounceRate = ref(0);
-const averageEngagementTime = ref(0);
-const totalSessions = ref(0);
-const retentionRate = ref(0);
+const avgVisitTime = ref('');
+const engagementRate = ref(0);
 
-// Dropdown selected period
-const selectedPeriod = ref(7); // Default to 7 days
+const dailyData = ref([]);
 
-// Watch for changes in the selected period and fetch data accordingly
-watch(selectedPeriod, () => {
-    fetchAnalyticsData(selectedPeriod.value);
-});
-
-let visitorsViewsChart = null;
-let retentionRateChart = null;
-
-async function fetchAnalyticsData(days = 7) {
+const fetchAnalyticsData = async () => {
     try {
-        const response = await axios.get(`/analytics?days=${days}`);
-        analyticsData.value = response.data.analyticsData;
-        totalPageViews.value = response.data.totalPageViews;
-        totalVisitors.value = response.data.totalVisitors;
-        bounceRate.value = response.data.bounceRate;
-        averageEngagementTime.value = response.data.averageEngagementTimePerActiveUser;
-        totalSessions.value = response.data.totalSessions;
-        retentionRate.value = response.data.retentionRates;
+        const { data } = await axios.get(`/api/analytics`, {
+            params: { period: selectedPeriod.value },
+        });
 
-        // Update the charts with the new data
-        if (days === 14) {
-            updateVisitorsViewsChartFor14Days();
-        } else {
-            updateVisitorsViewsChart();
-        }
-        updateRetentionRateChart();
+        views.value = data.metricsData.views;
+        visits.value = data.metricsData.visits;
+        visitors.value = data.metricsData.visitors;
+        bounceRate.value = data.metricsData.bounceRate;
+        avgVisitTime.value = data.metricsData.avgVisitTime;
+
+        engagementRate.value = data.metricsData.engagementRate;
+
+        dailyData.value = data.dailyData;
+
+        renderVisitorsViewsChart();
+        renderEngagementRateChart();
     } catch (error) {
-        console.error('Error fetching analytics data:', error);
+        console.error("Error fetching analytics data", error);
     }
-}
+};
 
-onMounted(() => {
-    fetchAnalyticsData(selectedPeriod.value);
-});
+const renderVisitorsViewsChart = () => {
+    // If chart already exists, destroy it before creating a new one
+    if (visitorsViewsChart) {
+        visitorsViewsChart.destroy();
+    }
 
-function formatDate(date) {
-    return date.toLocaleDateString(); // Format the date
-}
+    const labels = dailyData.value.map(data => data.date);
+    const viewsData = dailyData.value.map(data => data.views);
+    const visitorsData = dailyData.value.map(data => data.visitors);
 
-function updateVisitorsViewsChart() {
-    const ctx = document.getElementById('visitorsViewsChart').getContext('2d');
-
-    if (visitorsViewsChart) visitorsViewsChart.destroy(); // Destroy existing chart before creating new one
-
-    // Adjust the labels based on the selected period (e.g., 7 days or 14 days)
-    const labels = Array.from({ length: selectedPeriod.value }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - (selectedPeriod.value - 1 - i)); // Get the correct date
-        return formatDate(date); // Format the date for display
-    });
-
+    const ctx = document.getElementById("visitorsViewsChart").getContext("2d");
     visitorsViewsChart = new Chart(ctx, {
-        type: 'bar',
+        type: "bar",
         data: {
-            labels: labels, // Use formatted dates
+            labels: labels,
             datasets: [
                 {
-                    label: 'Visitors',
-                    backgroundColor: '#4D82E9',
-                    data: analyticsData.value.map((item) => item.activeUsers), // Use dynamic data
+                    label: "Visitors",
+                    data: visitorsData,
+                    backgroundColor: "#5E9FF2",
+                    borderColor: "#5E9FF2",
+                    borderWidth: 1,
+                    stack: 'combined',
                 },
                 {
-                    label: 'Views',
-                    backgroundColor: '#2A4F97',
-                    data: analyticsData.value.map((item) => item.screenPageViews), // Use dynamic data
+                    label: "Views",
+                    data: viewsData,
+                    backgroundColor: "#3F6CA6",
+                    borderColor: "#3F6CA6",
+                    borderWidth: 1,
+                    stack: 'combined',
                 },
             ],
         },
@@ -108,41 +99,41 @@ function updateVisitorsViewsChart() {
                     stacked: true,
                 },
             },
-            plugins: {
+        plugins: {
                 legend: {
+                    display: true,
                     position: 'bottom',
                     labels: {
-                        usePointStyle: true,
+                        usePointStyle: true, // Use circles instead of rectangles for legend icons
                         pointStyle: 'circle',
                     },
                 },
             },
         },
     });
-}
+};
 
-function updateRetentionRateChart() {
-    const ctx = document.getElementById('retentionRateChart').getContext('2d');
+const renderEngagementRateChart = () => {
+    if (engagementRateChart) {
+        engagementRateChart.destroy();
+    }
 
-    if (retentionRateChart) retentionRateChart.destroy(); // Destroy existing chart before creating new one
+    const labels = dailyData.value.map(data => data.date);
+    const engagementRateData = dailyData.value.map(data => data.engagementRate);
 
-    const labels = Array.from({ length: retentionRate.value.length }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - (retentionRate.value.length - 1 - i)); // Get the correct date
-        return formatDate(date); // Format the date for display
-    });
-
-    retentionRateChart = new Chart(ctx, {
-        type: 'line',
+    const ctx = document.getElementById("engagementRateChart").getContext("2d");
+    engagementRateChart = new Chart(ctx, {
+        type: "line",
         data: {
-            labels: labels, // Use formatted dates
+            labels: labels,
             datasets: [
                 {
-                    label: 'Retention Rate',
-                    backgroundColor: '#E0DFFD',
-                    borderColor: '#27378F',
+                    label: "Engagement Rate",
+                    data: engagementRateData,
+                    backgroundColor: "#E0DFFD",
+                    borderColor: "#27378F",
                     fill: true,
-                    data: retentionRate.value, // Use dynamic data
+                    tension: 0.1,
                 },
             ],
         },
@@ -150,18 +141,39 @@ function updateRetentionRateChart() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
+                x: {
+                    ticks: {
+                        maxRotation: 15, // Set max rotation
+                        minRotation: 15, // Set min rotation to make them diagonal
+                    },
+                },
                 y: {
                     beginAtZero: true,
+                    ticks: {
+                        callback: (value) => `${value}%`,
+                    },
                 },
             },
             plugins: {
                 legend: {
-                    display: false,
+                    display: true,
+                    position: 'bottom',
                 },
             },
         },
     });
-}
+};
+
+watch(selectedPeriod, async () => {
+    await fetchAnalyticsData();  // Fetch new data based on selected period
+    renderVisitorsViewsChart();  // Re-render the chart with new data
+    renderEngagementRateChart();
+});
+
+
+// Fetch data initially and refetch on period change
+onMounted(fetchAnalyticsData);
+
 </script>
 
 
@@ -174,44 +186,45 @@ function updateRetentionRateChart() {
         <div class="mt-4 px-8 border-b border-black">
             <div class="grid grid-cols-6 gap-4 text-center">
                 <div>
-                    <h2 class="text-3xl font-extrabold">{{ totalPageViews }}</h2>
+                    <h2 class="text-3xl font-extrabold">{{ views }}</h2>
                     <p class="font-bold">Views</p>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-extrabold">{{ totalSessions }}</h2>
+                    <h2 class="text-3xl font-extrabold">{{ visits }}</h2>
                     <p class="font-bold">Visits</p>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-extrabold">{{ totalVisitors }}</h2>
+                    <h2 class="text-3xl font-extrabold">{{ visitors }}</h2>
                     <p class="font-bold">Visitors</p>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-extrabold">{{ bounceRate }}%</h2>
+                    <h2 class="text-3xl font-extrabold">{{ bounceRate }}</h2>
                     <p class="font-bold">Bounce Rate</p>
                 </div>
                 <div>
-                    <h2 class="text-3xl font-bold">{{ averageEngagementTime }}</h2>
+                    <h2 class="text-3xl font-bold">{{ avgVisitTime }}</h2>
                     <p class="font-bold">Avg Visit Time</p>
                 </div>
                 <div>
                     <select v-model="selectedPeriod" class="ml-4 p-2 pr-8 border rounded">
                         <option value="7">7 Days</option>
                         <option value="14">14 Days</option>
+                        <option value="28">28 Days</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <!-- Visitors & Views and Retention Rate Charts side by side -->
-        <div class="flex flex-wrap justify-center mt-10 px-8 space-x-10"> 
+        <div class="flex flex-wrap justify-center px-8 space-x-4"> 
             <!-- Visitors & Views Chart -->
-            <div class="custom-chart-width p-4 border border-black rounded-lg"> <!-- Add padding, border, and rounded corners -->
+            <div class="custom-chart-width p-4 border border-black rounded-lg mt-10"> <!-- Add padding, border, and rounded corners -->
                 <canvas id="visitorsViewsChart" class="w-full" style="height: 300px;"></canvas> <!-- Set height using inline style -->
             </div>
 
             <!-- Retention Rate Chart -->
-            <div class="custom-chart-width p-4 border border-black rounded-lg"> <!-- Add padding, border, and rounded corners -->
-                <canvas id="retentionRateChart" class="w-full" style="height: 300px;"></canvas> <!-- Set height using inline style -->
+            <div class="custom-chart-width p-4 border border-black rounded-lg mt-10"> <!-- Add padding, border, and rounded corners -->
+                <canvas id="engagementRateChart" class="w-full" style="height: 300px;"></canvas> <!-- Set height using inline style -->
             </div>
         </div>
 

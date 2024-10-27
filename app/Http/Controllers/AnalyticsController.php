@@ -3,141 +3,116 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Google\Service\AnalyticsData;
-use Google\Client;
-use Google\Service\AnalyticsData\DateRange;
-use Google\Service\AnalyticsData\Metric;
-use Google\Service\AnalyticsData\RunReportRequest;
-use Illuminate\Support\Facades\Log;
-
-use Spatie\Analytics\Facades\Analytics;
-use Spatie\Analytics\Period;
+use Google\Analytics\Data\V1beta\BetaAnalyticsDataClient;
+use Google\Analytics\Data\V1beta\DateRange;
+use Google\Analytics\Data\V1beta\Metric;
+use Google\Analytics\Data\V1beta\RunReportRequest;
+use Google\Analytics\Data\V1beta\Dimension;
+use Carbon\Carbon;
 
 class AnalyticsController extends Controller
 {
-    protected $analytics;
+    protected $analyticsDataClient;
 
     public function __construct()
     {
-        $client = new Client();
-        $client->setAuthConfig(app_path('google-analytics/capstone-website.json'));
-        $client->addScope(AnalyticsData::ANALYTICS_READONLY); // Use AnalyticsData for scope
-        $this->analytics = new AnalyticsData($client); // Use AnalyticsData for instantiation
-
-        try {
-            // Fetch the access token using the service account's credentials
-            $accessToken = $client->fetchAccessTokenWithAssertion();
-            Log::info('Access Token', ['token' => $accessToken]);
-        } catch (\Exception $e) {
-            Log::error('Failed to fetch access token: ' . $e->getMessage());
-        }
-
-        Log::info('System Time', ['timestamp' => now()->timestamp]);
-
-
-        Log::info('Google Client Information', [
-            'project_id' => $client->getConfig('project_id'),  // Log the email
-            'scopes' => $client->getScopes(),              // Log the scopes
-            'access_token' => $client->getAccessToken(),   // Log the access token, if set
-        ]);
+        $this->analyticsDataClient = new BetaAnalyticsDataClient();
     }
 
-    public function index(Request $request)
-{
-    // Get the number of days from the query parameter, defaulting to 7 if not provided
-    $days = $request->query('days', 7);
+    public function fetchData(Request $request)
+    {
+        $propertyId = '460219113';
+        $period = $request->input('period', 7);
+        $startDate = Carbon::now()->subDays($period);
+        $endDate = Carbon::now();
 
-    // Fetch total visitors, page views, and sessions for the specified number of days
-    $analyticsData = Analytics::fetchTotalVisitorsAndPageViews(Period::days($days));
+        $dateRange = new DateRange([
+            'start_date' => $startDate->toDateString(),
+            'end_date' => $endDate->toDateString(),
+        ]);
 
-    // Calculate total page views and visitors
-    $totalPageViews = $analyticsData->sum('screenPageViews');
-    $totalVisitors = $analyticsData->sum('activeUsers');
+        // Request 1: Aggregate data for top metrics
+        $metrics = [
+            new Metric(['name' => 'screenPageViews']),
+            new Metric(['name' => 'sessions']),
+            new Metric(['name' => 'totalUsers']),
+            new Metric(['name' => 'bounceRate']),
+            new Metric(['name' => 'userEngagementDuration']),
+            new Metric(['name' => 'engagementRate']),
+        ];
 
-    // Set the date range dynamically
-    $propertyId = '460219113';
-    $dateRange = new DateRange();
-    $dateRange->setStartDate("${days}daysAgo");
-    $dateRange->setEndDate("today");
+        $aggregateResponse = $this->analyticsDataClient->runReport([
+            'property' => 'properties/' . $propertyId,
+            'dateRanges' => [$dateRange],
+            'metrics' => $metrics,
+        ]);
 
+        // Calculate average engagement time for top metrics
+        $totalEngagementTime = $aggregateResponse->getRows()[0]->getMetricValues()[4]->getValue(); // in seconds
+        $totalUsers = $aggregateResponse->getRows()[0]->getMetricValues()[2]->getValue();
+        $averageEngagementTimePerUser = $totalUsers > 0 ? ($totalEngagementTime / $totalUsers) : 0;
+        $avgMinutes = floor($averageEngagementTimePerUser / 60);
+        $avgSeconds = $averageEngagementTimePerUser % 60;
 
-    $metric1 = new Metric();
-    $metric1->setName('userEngagementDuration');
-    
-    $metric2 = new Metric();
-    $metric2->setName('activeUsers');
-    
-    $metric3 = new Metric();
-    $metric3->setName('bounceRate');
-    
-    $metric4 = new Metric();
-    $metric4->setName('sessions');
-    
-    $metric5 = new Metric();
-    $metric5->setName('newUsers');
-    
-    $metric6 = new Metric();
-    $metric6->setName('totalUsers');
+        $engagementRate = $aggregateResponse->getRows()[0]->getMetricValues()[5]->getValue();
 
-    $request = new RunReportRequest();
-    $request->setDateRanges([$dateRange]);
-    $request->setMetrics([$metric1, $metric2, $metric3, $metric4, $metric5, $metric6]);
+        $metricsData = [
+            'views' => $aggregateResponse->getRows()[0]->getMetricValues()[0]->getValue(),
+            'visits' => $aggregateResponse->getRows()[0]->getMetricValues()[1]->getValue(),
+            'visitors' => $totalUsers,
+            'bounceRate' => number_format($aggregateResponse->getRows()[0]->getMetricValues()[3]->getValue() * 100, 2) . '%',
+            'avgVisitTime' => $avgMinutes . ' M ' . $avgSeconds . ' S',
+            'engagementRate' => number_format($engagementRate * 100, 2) . '%',
+        ];
 
-    try {
-        $response = $this->analytics->properties->runReport("properties/$propertyId", $request);
+        // Request 2: Daily breakdown for views and visitors (for the chart)
+        $dimensions = [
+            new Dimension(['name' => 'date']),
+        ];
 
-        // Process the response to calculate the necessary data
-        $retentionRates = [];
-        $totalEngagementTime = 0;
-        $totalActiveUsers = 0;
-        $bounceRate = 0;
-        $totalSessions = 0;
-        $newUsers = 0;
-        $totalUsers = 0;
+        $dailyResponse = $this->analyticsDataClient->runReport([
+            'property' => 'properties/' . $propertyId,
+            'dateRanges' => [$dateRange],
+            'metrics' => 
+            [
+                new Metric(['name' => 'screenPageViews']), 
+                new Metric(['name' => 'totalUsers']), 
+                new Metric(['name' => 'engagementRate']),
+            ],
+            'dimensions' => $dimensions,
+        ]);
 
-        foreach ($response->getRows() as $row) {
-            $totalEngagementTime += $row->getMetricValues()[0]->getValue();
-            $totalActiveUsers += $row->getMetricValues()[1]->getValue(); 
-            $bounceRate = $row->getMetricValues()[2]->getValue();
-            $totalSessions = $row->getMetricValues()[3]->getValue();
-            $newUsers = $row->getMetricValues()[4]->getValue();
-            $totalUsers = $row->getMetricValues()[5]->getValue();
+        $dailyData = [];
 
-            $retentionRate = $totalUsers > 0 ? (($totalUsers - $newUsers) / $totalUsers) * 100 : 0;
-            $retentionRates[] = number_format($retentionRate, 2);
+        // Generate all dates within the range with default values
+        $dateRangeArray = [];
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $dateRangeArray[$date->format('Ymd')] = [
+                'date' => $date->format('Y-m-d'),
+                'views' => 0,
+                'visitors' => 0,
+                'engagementRate' => 0,
+            ];
         }
 
-        // Pad the retentionRates array if it has fewer than the required days
-        while (count($retentionRates) < $days) {
-            $retentionRates[] = 0;
+        // Fill in the actual data from the Google Analytics response
+        foreach ($dailyResponse->getRows() as $row) {
+            $dateKey = $row->getDimensionValues()[0]->getValue();
+            $dateRangeArray[$dateKey] = [
+                'date' => Carbon::createFromFormat('Ymd', $dateKey)->toDateString(),
+                'views' => $row->getMetricValues()[0]->getValue(),
+                'visitors' => $row->getMetricValues()[1]->getValue(),
+                'engagementRate' => number_format($row->getMetricValues()[2]->getValue() * 100, 2),
+            ];
         }
 
-        $averageEngagementTimePerActiveUser = $totalActiveUsers > 0 ? 
-            ($totalEngagementTime / $totalActiveUsers) : 0;
+        // Convert to an array to pass to the frontend
+        $dailyData = array_values($dateRangeArray);
 
-        $formattedAverageEngagementTime = floor($averageEngagementTimePerActiveUser / 60) . 'm ' . ($averageEngagementTimePerActiveUser % 60) . 's';
-        $formattedBounceRate = number_format($bounceRate, 2);
-
+        // Include both total metrics and daily data in the response
         return response()->json([
-            'analyticsData' => $analyticsData,
-            'totalPageViews' => $totalPageViews,
-            'totalVisitors' => $totalVisitors,
-            'bounceRate' => $formattedBounceRate,
-            'averageEngagementTimePerActiveUser' => $formattedAverageEngagementTime,
-            'totalSessions' => $totalSessions,
-            'retentionRates' => $retentionRates,
+            'metricsData' => $metricsData,
+            'dailyData' => $dailyData,
         ]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-
-        Log::error('Google Analytics API error: ', [
-            'message' => $e->getMessage(),
-            'code' => $e->getCode(),
-            'trace' => $e->getTraceAsString(),
-        ]);
-        return response()->json(['error' => $e->getMessage()], 500);
     }
-}
-
-
 }
