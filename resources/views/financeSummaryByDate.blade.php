@@ -122,11 +122,13 @@
     <table width="100%" style="border-collapse: collapse;">
         <tr>
             <td class="title" style="text-align: left;">
-                <img src="{{ asset('path_to_logo') }}" style="width:140px" />
+                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px" />
             </td>
             <td>&nbsp;</td> <!-- Non-breaking space for empty cell -->
             <td style="text-align: right;">
-
+                <p style="margin-bottom:0px; font-weight: bold; font-size: 37px">{{ $businessName }}</p>
+                Address: {{ $businessAddress }}<br />
+                TIN: {{ $businessTIN ?? 'N/A'}}
             </td>
         </tr>
         
