@@ -19,8 +19,7 @@ class BusinessController extends Controller
      */
     public function index()
 {
-    $Business = Business::where('user_id', auth()->id())->first(); 
-    return response()->json($Business);
+   
 }
 
 
@@ -111,7 +110,7 @@ class BusinessController extends Controller
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
-            'business_Contact_Number' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
             'business_Telephone_Number' => 'required|string|max:255',
             'business_Facebook' => 'nullable|string|max:255',
             'business_X' => 'nullable|string|max:255',
@@ -120,13 +119,6 @@ class BusinessController extends Controller
         ]);
         
         $business = Business::findOrFail($id);
-        $oldData = $business->toArray();
-        $oldName = $business->business_Name;
-        $oldImage = $business->business_image;
-
-        $changes = [];
-        $ignoreImageChange = false; // New flag to ignore specific image changes
-
         $oldData = $business->toArray();
         $oldName = $business->business_Name;
         $oldImage = $business->business_image;
@@ -177,7 +169,7 @@ class BusinessController extends Controller
 
         // Similar comparison for address and other fields...
         $fieldsToCheck = [
-            'business_Contact_Number', 'business_Telephone_Number', 'business_Email',
+            'business_Phone_Number', 'business_Telephone_Number', 'business_Email',
             'business_Facebook', 'business_X', 'business_Instagram', 'business_Tiktok',
         ];
 

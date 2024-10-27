@@ -105,7 +105,6 @@ Route::get('/Business', [BusinessController::class, 'show']);
 Route::post('/Business', [BusinessController::class, 'store']);
 Route::put('/Business/{id}', [BusinessController::class, 'update']);
 Route::delete('/Business/{id}', [BusinessController::class, 'destroy']);
-Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 
 
 Route::apiResource('categories', CategoryController::class);
