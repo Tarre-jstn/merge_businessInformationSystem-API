@@ -766,95 +766,94 @@ const isLowStock = (productStock) => {
                             <h2 class="font-semibold text-4xl">List of Products</h2>
 
                             <div class="flex items-center">
-                                <div>
-                                    <div class="justify-end relative inline-block text-left">
-                                        <!-- Settings Button -->
-                                        <button
-                                            @click="toggleDropdown"
-                                            type="button"
-                                            class="inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                        >
-                                            Additional Settings
-                                            <ChevronDownIcon class="ml-2 h-5 w-5" />
-                                        </button>
+              <div class="relative inline-block text-left ">
+                <!-- Settings Button -->
+                <button
+                  @click="toggleDropdown"
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Additional Settings
+                  <ChevronDownIcon class="ml-2 h-5 w-5" />
+                </button>
 
-                                        <!-- Dropdown Menu -->
-                                        <transition
-                                            enter-active-class="transition ease-out duration-100"
-                                            enter-from-class="transform opacity-0 scale-95"
-                                            enter-to-class="transform opacity-100 scale-100"
-                                            leave-active-class="transition ease-in duration-75"
-                                            leave-from-class="transform opacity-100 scale-100"
-                                            leave-to-class="transform opacity-0 scale-95"
-                                        >
-                                            <div
-                                                v-if="isOpen"
-                                                class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
-                                            >
-                                                <div class="px-4 py-3">
-                                                    <p class="text-sm font-medium text-gray-900">Notify me about:</p>
+                <!-- Dropdown Menu -->
+                <transition
+                  enter-active-class="transition ease-out duration-100"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
+                >
+                  <div
+                    v-if="isOpen"
+                    class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-10"
+                  >
+                                                <div class="px-4 flex items-center justify-center py-3">
+                                                    <p class="mt-3 items-center justify-center text-md font-bold text-gray-900">Notify me about:</p>
                                                 </div>
                                                 <div class="py-2">
                                                     <!-- Stocks Option -->
                                                     <div class="px-4 py-2 flex justify-between items-center">
-                                                        <label for="stocks" class="text-sm text-gray-700">Stocks</label>
+                                                        <label for="stocks" class="text-sm text-gray-700">Stocks if it has </label>
                                                         <div class="flex items-center">
                                                             <input
                                                                 type="number"
                                                                 id="stocks"
                                                                 v-model="stocksDays"
                                                                 min="0"
-                                                                class="w-16 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                class="w-16 text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                             />
-                                                            <span class="ml-2 text-sm text-gray-600">days</span>
+                                                            <span class="ml-2 text-sm text-gray-600">items left</span>
                                                         </div>
                                                     </div>
                                                     <!-- Expiry Date Option -->
                                                     <div class="px-4 py-2 flex justify-between items-center">
-                                                        <label for="expiry" class="text-sm text-gray-700">Expiry Date</label>
+                                                        <label for="expiry" class="text-sm text-gray-700">Expiry Date if near</label>
                                                         <div class="flex items-center">
                                                             <input
                                                                 type="number"
                                                                 id="expiry"
                                                                 v-model="expiryDays"
                                                                 min="0"
-                                                                class="w-16 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                                class="w-16 text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                                             />
                                                             <span class="ml-2 text-sm text-gray-600">days</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <!-- Save and Cancel Buttons -->
-                                                <div class="px-4 py-3 flex justify-end space-x-2">
-                                                    <button @click="cancelChanges" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
-                                                    <button @click="saveSettings" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button>
+                                                <div class="px-4 py-3 flex justify-center space-x-2">
+                                                    <button @click="cancelChanges" class="transition hover:scale-105 ease-in-out duration-150 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                                                    <button @click="saveSettings" class="transition hover:scale-105 ease-in-out duration-150 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600">Save</button>
                                                 </div>
                                             </div>
                                         </transition>
                                     </div>
-                                </div>
+
 
                                 <div class="flex">
 
 
-<div class="ml-6">
+                                <div class="ml-6">
 
-    <div class="relative mr-6 w-96">
-    <font-awesome-icon
-        :icon="['fas', 'magnifying-glass']"
-        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
-    />
-    <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search by name, category, status, or brand..."
-        class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    />
-    </div>
-</div>
+                                    <div class="relative mr-6 w-96">
+                                    <font-awesome-icon
+                                        :icon="['fas', 'magnifying-glass']"
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
+                                    />
+                                    <input
+                                        v-model="searchQuery"
+                                        type="text"
+                                        placeholder="Search by name, category, status, or brand..."
+                                        class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    </div>
+                                </div>
 
 
-</div>
+                                </div>
                             </div>
 
                         </div>

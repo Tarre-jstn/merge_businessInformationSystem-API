@@ -314,95 +314,7 @@ const addInvoice = async () => {
 
 
 
-//ADD INVOICE ITEMS
 
-const fetchProducts = async () => {
-  try {
-    const response = await axios.get('/api/products');
-    products.value = response.data;
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  }
-};
-const filteredProducts = (query) => {
-  if (!query) {
-    return [];
-  }
-  const searchTerm = query.toLowerCase();
-  return products.value.filter((product) => {
-    return (
-      product.name.toLowerCase().includes(searchTerm) ||
-      product.category.toLowerCase().includes(searchTerm) ||
-      product.status.toLowerCase().includes(searchTerm) ||
-      product.brand.toLowerCase().includes(searchTerm)
-    );
-  });
-};
-
-const textItemFields = ref([
-  { 
-    image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', total_amount: '', areFieldsEnabled: false, isSearching: false, product_id:'', seniorPWD_discountable:'no' }
-]);// Start with one pair of text fields
-
-// Method to add a new pair of text fields
-const addItemTextField = () => {
-  textItemFields.value.push({
-    image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', total_amount: '', isSearching: false, product_id:'', seniorPWD_discountable:'no'
-  });
-  newInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
-};
-// Method to remove a text field
-const removeItemTextField = (index) => {
-    newInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
-  textItemFields.value.splice(index, 1); // Remove the text field pair at the specified index
-};
-const selectProduct = (product, index) => {
-  // Assign the selected product's details to the corresponding text field
-  textItemFields.value[index].image = product.image;
-  textItemFields.value[index].searchProductQuery = product.name;
-  textItemFields.value[index].on_sale = product.on_sale;
-  // Hide the search results (clear the search query)
-  textItemFields.value[index].amount = product.price;
-  textItemFields.value[index].areFieldsEnabled = true;
-  textItemFields.value[index].isSearching = false; // Hide the search results 
-  textItemFields.value[index].product_id = product.id;
-  console.log('Selected Product Image:', textItemFields.value[index].product_id)
-  console.log('Selected Product Image:', textItemFields.value[index].image)
-};
-
-const addInvoiceItem = async () => {
-    try {
-        for (let field of textItemFields.value) {
-            if(field.searchProductQuery.trim() !== ''){
-            const formData = new FormData();
-            formData.append('invoice_system_id', invoiceSystemId)
-            formData.append('product_id', field.product_id);
-            formData.append('product_name', field.searchProductQuery);
-            formData.append('product_price', field.amount)
-            formData.append('on_sale', field.on_sale);
-            formData.append('seniorPWD_discountable', field.seniorPWD_discountable);
-            formData.append('on_sale_price', field.amount);
-            formData.append('quantity', field.quantity);
-            formData.append('final_price', field.total_amount);
-
-            await axios.post('/api/invoice_item', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-        } else{
-                console.log('Skipping empty item description');
-            }
-
-        }
-
-        addInvoiceAdditional();
-
-        console.log("Invoice Item added successfully.");
-    } catch (error) {
-        console.error("Error adding invoice item:", error);
-    }
-}
 
 
 
@@ -1697,6 +1609,105 @@ watch([startDatePrint, endDatePrint], (newValues) => {
 const showSuccessAddModal = ref(false);
 const showSuccessModal = ref(false);
 const showSuccessEditModal = ref(false);
+
+
+
+
+
+
+
+
+
+//ADD INVOICE ITEMS
+
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('/api/products');
+    products.value = response.data;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  }
+};
+const filteredProducts = (query) => {
+  if (!query) {
+    return [];
+  }
+  const searchTerm = query.toLowerCase();
+  return products.value.filter((product) => {
+    return (
+      product.name.toLowerCase().includes(searchTerm) ||
+      product.category.toLowerCase().includes(searchTerm) ||
+      product.status.toLowerCase().includes(searchTerm) ||
+      product.brand.toLowerCase().includes(searchTerm)
+    );
+  });
+};
+
+const textItemFields = ref([
+  { 
+    image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', total_amount: '', areFieldsEnabled: false, isSearching: false, product_id:'', seniorPWD_discountable:'no' }
+]);// Start with one pair of text fields
+
+// Method to add a new pair of text fields
+const addItemTextField = () => {
+  textItemFields.value.push({
+    image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', total_amount: '', isSearching: false, product_id:'', seniorPWD_discountable:'no'
+  });
+  newInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
+};
+// Method to remove a text field
+const removeItemTextField = (index) => {
+    newInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
+  textItemFields.value.splice(index, 1); // Remove the text field pair at the specified index
+};
+const selectProduct = (product, index) => {
+  // Assign the selected product's details to the corresponding text field
+  textItemFields.value[index].image = product.image;
+  textItemFields.value[index].searchProductQuery = product.name;
+  textItemFields.value[index].on_sale = product.on_sale;
+  // Hide the search results (clear the search query)
+  textItemFields.value[index].amount = product.price;
+  textItemFields.value[index].areFieldsEnabled = true;
+  textItemFields.value[index].isSearching = false; // Hide the search results 
+  textItemFields.value[index].product_id = product.id;
+  console.log('Selected Product Image:', textItemFields.value[index].product_id)
+  console.log('Selected Product Image:', textItemFields.value[index].image)
+};
+
+const addInvoiceItem = async () => {
+    try {
+        for (let field of textItemFields.value) {
+            if(field.searchProductQuery.trim() !== ''){
+            const formData = new FormData();
+            formData.append('invoice_system_id', invoiceSystemId)
+            formData.append('product_id', field.product_id);
+            formData.append('product_name', field.searchProductQuery);
+            formData.append('product_price', field.amount)
+            formData.append('on_sale', field.on_sale);
+            formData.append('seniorPWD_discountable', field.seniorPWD_discountable);
+            formData.append('on_sale_price', field.amount);
+            formData.append('quantity', field.quantity);
+            formData.append('final_price', field.total_amount);
+
+            await axios.post('/api/invoice_item', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        } else{
+                console.log('Skipping empty item description');
+            }
+
+        }
+
+        addInvoiceAdditional();
+
+        console.log("Invoice Item added successfully.");
+    } catch (error) {
+        console.error("Error adding invoice item:", error);
+    }
+}
+
 </script>
 
 
