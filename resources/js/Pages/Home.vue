@@ -1,7 +1,7 @@
 <template>
     <AuthenticatedLayout>
         <div class="flex flex-row">
-            <div class="max-w-7xl sm:px-6 lg:px-8 py-6 flex flex-col" style="width: 60vw;">
+            <div class="w-full sm:px-6 lg:px-8 py-6 flex flex-col" style="width: 60vw;">
                 <div class="bg-whiteoverflow-hidden shadow-sm sm:rounded-lg" style="background-color: #0F2C4A;">
                     <div class="p-6 text-gray-900 dark:text-gray-100 flex flex-col items-center">
                         <div class="flex flex-row justify-center"><div class="flex flex-col text-center mr-20"><div style="font-size: 18px;"><b>Total Income (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalIncome }}</div></div>

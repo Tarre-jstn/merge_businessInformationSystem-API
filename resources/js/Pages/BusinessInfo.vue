@@ -121,6 +121,8 @@ import { Head } from '@inertiajs/vue3';
         !business.value.address ||
         !business.value.phone_number ||
         !business.value.telephone_number 
+    
+    
     ) {
         alert('Please fill out all required fields');
         return; 
@@ -162,6 +164,7 @@ import { Head } from '@inertiajs/vue3';
         });
         if (response.data.success) {
         alert('Business profile updated successfully');
+        window.location.reload(true);
         } else {
         console.error("Update failed:", response.data);
         }
@@ -297,7 +300,7 @@ import { Head } from '@inertiajs/vue3';
                         <div>
                             <button
                                 type="button"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                class="bg-blue-500 hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                                 @click="updateBusiness"
                             >
                                 Update Business
