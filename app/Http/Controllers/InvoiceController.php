@@ -189,9 +189,14 @@ public function show($invoice_id)
         }if (!$invoice_computation) {
             return response()->json(['error' => 'Invoice Computation not found'], 404);
        }
+      
+            $business = Business::first();
+            $businessName = $business->business_Name;
+            $businessImage = $business->business_image;
 
         // Pass the fetched invoice data directly to the PDF view
-        $pdf = Pdf::loadView('invoicepdf', ['invoice' => $invoice, 'invoice_items' => $invoice_items, 'invoice_additionals' => $invoice_additionals, 'invoice_computation' => $invoice_computation]);
+        $pdf = Pdf::loadView('invoicepdf', ['invoice' => $invoice, 'invoice_items' => $invoice_items, 'invoice_additionals' => $invoice_additionals, 'invoice_computation' => $invoice_computation, 'businessName' => $businessName,
+                'businessImage' => $businessImage]);
     
         // Stream the generated PDF to the browser
         return $pdf->stream();
