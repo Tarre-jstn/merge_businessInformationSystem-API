@@ -10,18 +10,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Events\BusinessNameUpdated;
-
+use Illuminate\Support\Facades\Auth;
 
 class BusinessController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
     public function index()
-{
-    $Business = Business::where('user_id', auth()->id())->first(); 
-    return response()->json($Business);
-}
+    {
+        $business = Business::where('user_id', Auth::id())->first();
+        
+        if ($business) {
+            Log::info("Business data fetched successfully", ['business_id' => $business->business_id]);
+            return response()->json($business);
+        } else {
+            Log::info("No business found for user", ['user_id' => Auth::id()]);
+            return response()->json(['message' => 'No business found'], 404);
+        }
+    }
+        /**
+     * Display the specified resource.
+     */
+    public function show(Request $request, Business $Business)
+    {
+        return $Business->all();
+    }
 
 
     /**
@@ -90,13 +105,7 @@ class BusinessController extends Controller
     }
 }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request, Business $Business)
-    {
-        return $Business->all();
-    }
+
 
     /**
      * Update the specified resource in storage.

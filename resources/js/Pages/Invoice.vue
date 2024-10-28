@@ -1575,25 +1575,28 @@ const showSuccessEditModal = ref(false);
                     <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">  
                         <div class="mt-4 mb-8 flex justify-between items-center">
                             <h2 class="font-semibold text-4xl">List of Invoices</h2>
+
                             <div class="flex">
-                                <div class="relative flex items-center mr-6 w-96">
+                                <div>
+                                    <div class="relative mr-6 w-96">
                                     <font-awesome-icon
-                                    :icon="['fas', 'magnifying-glass']"
-                                    class="absolute left-3 text-gray-400 pointer-events-none"
+                                        :icon="['fas', 'magnifying-glass']"
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
                                     />
                                     <input
-                                    v-model="searchQuery"
-                                    type="text"
-                                    placeholder="Search Invoices..."
-                                    class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        v-model="searchQuery"
+                                        type="text"
+                                        placeholder="Search by id, customer, payment, status, or date, ..."
+                                        class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900" >
                             <div class="overflow-x-auto h-full">
-                                <table class="min-w-full table-fixed">
+                                <table class="min-w-full">
                                     <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">   
                                     <!-- HEADER FOR INVOICES -->
                                         <tr class="sticky">
@@ -1759,15 +1762,13 @@ const showSuccessEditModal = ref(false);
                             Print Invoice Summary</button>
                     </div>
                 </div>
-
-
             </div>
         </div>
         
 
         <transition name="modal-fade" >
-            <div v-show="showDeleteModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
+            <div v-show="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div  @click.stop  class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-trash" size="8x" style="margin-top:2px; color: red;"/>
                     <h2 class="mt-4 text-xl text-center font-bold mb-2">Confirm Deletion</h2>
                     <p class="mb-4 text-center">Are you sure you want to delete this Invoice?</p>
@@ -1817,8 +1818,8 @@ const showSuccessEditModal = ref(false);
         </transition>
 
         <transition name="modal-fade" >
-            <div v-if="showPrintInvoiceSummaryByDate" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="pop-in bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+            <div v-if="showPrintInvoiceSummaryByDate" @click="showPrintInvoiceSummaryByDate = false"  class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div  @click.stop class="pop-in bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
             <h2 class="text-2xl font-bold text-center mb-6">Print Invoice Summary</h2>
             
             <button 
@@ -1870,23 +1871,23 @@ const showSuccessEditModal = ref(false);
                     </div>
                 </div>
 
-                <div class="flex flex-col items-center space-y-3">
-
-                <button 
-                    @click.prevent="printInvoicesByDate" 
-                    class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 w-full max-w-xs px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    <font-awesome-icon icon="fa-solid fa-print" class="mr-2" />
-                    Print Invoice Summary
-                </button>
-
-                <button 
+                <div class="flex items-center justify-center mt-8 mb-8 space-x-2">
+                    <button 
                     @click="showPrintInvoiceSummaryByDate = false" 
                     type="button"
                     class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                     Cancel
                 </button>
+                <button 
+                    @click.prevent="printInvoicesByDate" 
+                    class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 max-w-xs px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    <font-awesome-icon icon="fa-solid fa-print" class="mr-2" />
+                    Print Invoice Summary
+                </button>
+
+
                 </div>
             </div>
             </div>
@@ -1895,9 +1896,9 @@ const showSuccessEditModal = ref(false);
 
 
         <transition name="modal-fade" >
-            <div v-if="showEditInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
-                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Edit this Invoice</h3>
+            <div v-if="showEditInvoiceModal" @click="showEditInvoiceModal = false"  class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div @click.stop  class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
+                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Edit Invoice</h3>
 
                     <div class="px-12">
                         <p class="font-bold text-9x1 p-5 border inline-block rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 font-medium text-white">Step 1: Invoice and Customer Info</p>
@@ -2267,8 +2268,8 @@ const showSuccessEditModal = ref(false);
 
         
         <transition name="modal-fade" >
-            <div v-if="showAddInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
+            <div v-if="showAddInvoiceModal" @click="showAddInvoiceModal = false" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div @click.stop  class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
                 <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Add an Invoice</h3>
 
                     <div class="px-12">
@@ -2623,7 +2624,7 @@ const showSuccessEditModal = ref(false);
 
                     </div>
 
-                    <div class="flex justify-center mt-4 pb-6 gap-8">
+                    <div class="flex justify-center mt-4 pb-6 gap-4">
                                     <button @click="showAddInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
                                     <button @click.prevent="addInvoiceInformation()" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
                     </div>
@@ -2634,9 +2635,9 @@ const showSuccessEditModal = ref(false);
 
 
         <transition name="modal-fade" >
-            <div v-if="showViewInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class=" bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
-                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">View this Invoice</h3>
+            <div v-if="showViewInvoiceModal" @click="showViewInvoiceModal = false" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div  @click.stop class=" bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
+                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">View Invoice</h3>
 
                 <div class="flex justify-center items-center">
                     <button @click="printInvoice()" class="w-44 hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white px-2 py-1 rounded-full">
@@ -2962,7 +2963,7 @@ const showSuccessEditModal = ref(false);
 
                                     <div class="mb-2">
                                         <label for="tax" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Tax</label>
-                                        <input disabled ref="tax" type="number" id="tax" v-model="selectedInvoiceComputation.tax" class="w-full block border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input disabled ref="tax" type="number" id="tax" v-wsmodel="selectedInvoiceComputation.tax" class="w-full block border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
                                     </div>
 
                                 </div>

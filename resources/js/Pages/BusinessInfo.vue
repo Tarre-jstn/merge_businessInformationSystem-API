@@ -121,6 +121,8 @@ import { Head } from '@inertiajs/vue3';
         !business.value.address ||
         !business.value.phone_number ||
         !business.value.telephone_number 
+    
+    
     ) {
         alert('Please fill out all required fields');
         return; 
@@ -162,6 +164,7 @@ import { Head } from '@inertiajs/vue3';
         });
         if (response.data.success) {
         alert('Business profile updated successfully');
+        window.location.reload(true);
         } else {
         console.error("Update failed:", response.data);
         }
