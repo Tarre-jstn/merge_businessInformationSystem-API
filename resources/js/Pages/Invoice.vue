@@ -92,6 +92,120 @@ const editInvoice = ref({
     customer_OSCA_PWD_ID_No: 0,
   });
 
+//ERROR TRAPPING
+const invoiceIDError = ref('');
+const dateError = ref('');
+const statusError = ref('');
+const ptypeError = ref('');
+const termsError = ref('');
+
+const UpdateinvoiceIDError = ref('');
+const UpdatedateError = ref('');
+const UpdatestatusError = ref('');
+const UpdateptypeError = ref('');
+const UpdatetermsError = ref('');
+
+const validateUpdateInvoiceID = () => {
+    if (!editInvoice.value.invoice_id) {
+        UpdateinvoiceIDError.value = "This field cannot be empty";
+    } else {
+        UpdateinvoiceIDError.value = '';
+    }
+};
+
+const validateUpdateDate = () => {
+    if (!editInvoice.value.date) {
+        UpdatedateError.value = "This field cannot be empty";
+    } else {
+        UpdatedateError.value = '';
+    }
+};
+
+const validateUpdateStatus = () => {
+    if (!editInvoice.value.status) {
+        UpdatestatusError.value = "This field cannot be empty";
+    } else {
+        UpdatestatusError.value = '';
+    }
+};
+
+const validateUpdatePtype = () => {
+    if (!editInvoice.value.payment_Type) {
+        UpdateptypeError.value = "This field cannot be empty";
+    } else {
+        UpdateptypeError.value = '';
+    }
+};
+
+const validateUpdateTerms = () => {
+    if (!editInvoice.value.terms) {
+        UpdatetermsError.value = "This field cannot be empty";
+    } else {
+        UpdatetermsError.value = '';
+    }
+};
+
+
+
+const validateInvoiceID = () => {
+    if (!newInvoice.value.invoice_id) {
+        invoiceIDError.value = "This field cannot be empty";
+    } else {
+        invoiceIDError.value = '';
+    }
+};
+
+const validateDate = () => {
+    if (!newInvoice.value.date) {
+        dateError.value = "This field cannot be empty";
+    } else {
+        dateError.value = '';
+    }
+};
+
+const validateStatus = () => {
+    if (!newInvoice.value.status) {
+        statusError.value = "This field cannot be empty";
+    } else {
+        statusError.value = '';
+    }
+};
+
+const validatePtype = () => {
+    if (!newInvoice.value.payment_Type) {
+        ptypeError.value = "This field cannot be empty";
+    } else {
+        ptypeError.value = '';
+    }
+};
+
+const validateTerms = () => {
+    if (!newInvoice.value.terms) {
+        termsError.value = "This field cannot be empty";
+    } else {
+        termsError.value = '';
+    }
+};
+
+watch(showAddInvoiceModal, (newVal) => {
+    if (newVal) {
+        validateInvoiceID();
+        validateDate(); 
+        validateStatus();
+        validatePtype();
+        validateTerms();
+    }
+});
+watch(showEditInvoiceModal, (newVal) => {
+    if (newVal) {
+        validateUpdateInvoiceID();
+        validateUpdateDate(); 
+        validateUpdateStatus();
+        validateUpdatePtype();
+        validateUpdateTerms();
+    }
+});
+
 //GET INVOICES
 const fetchInvoices = async () => {
     try {
@@ -148,6 +262,16 @@ const filteredInvoices = computed(() => {
 
 //ADD INVOICES
 const addInvoice = async () => {
+    validateInvoiceID();
+    validateDate(); 
+    validateStatus();
+    validatePtype();
+    validateTerms();
+    if (invoiceIDError.value || dateError.value || statusError.value || ptypeError.value || termsError.value) {
+        alert('Please correct the errors before adding an Invoice.');
+        return;
+    }
+
     try {
         // Create FormData and send request to create the invoice
         const formData = new FormData();
@@ -849,6 +973,15 @@ const editInvoiceDetails = async (invoice) => {
 
 //----------------------------------------------FOR UPDATING INVOICE------------------------------------------
 const updateInvoice = async () => {
+    validateInvoiceID();
+    validateDate(); 
+    validateStatus();
+    validatePtype();
+    validateTerms();
+    if (invoiceIDError.value || dateError.value || statusError.value || ptypeError.value || termsError.value) {
+        alert('Please correct the errors before updating the Invoice.');
+        return;
+    }
     try {
 
         // Create a FormData object and append the necessary fields
@@ -1904,7 +2037,7 @@ const showSuccessEditModal = ref(false);
                         <p class="font-bold text-9x1 p-5 border inline-block rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 font-medium text-white">Step 1: Invoice and Customer Info</p>
                     </div>
                     <div class="px-12 mb-10">
-                        
+                    
                         <!-- STEP 1: DIV FOR INVOICE AND CUSTOMER DETAILS -->
                         <form @submit.prevent="updateInvoice" class="border-4 border-black rounded-bl-lg rounded-r-lg shadow-lg w-full">
                         <!-- Step 1: Invoice and Customer Details -->
@@ -1912,24 +2045,26 @@ const showSuccessEditModal = ref(false);
                                 <div class="grid grid-cols-3 gap-8 mb-4">
                                     <div>
                                         <label for="invoice_id" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Invoice I.D. No.</label>
-                                        <input type="number" id="invoice_id" v-model="editInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="number" id="invoice_id" v-model="editInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"  @input="validateUpdateInvoiceID" />
+                                        <div v-if="UpdateinvoiceIDError" class="text-red-500 text-sm">{{ UpdateinvoiceIDError }}</div>
                                     </div>
                                     
                                     <div class="">
                                         <label for="date" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Date</label>
-                                        <input type="date" id="date" v-model="editInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="date" id="date" v-model="editInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @input="validateUpdateDate"/>
+                                        <div v-if="UpdatedateError" class="text-red-500 text-sm">{{ UpdatedateError }}</div>
                                     </div>
 
                                     <div class="">
                                         <label for="status" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Status</label>
-                                        <select id="status" v-model="editInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <select id="status" v-model="editInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validateUpdateStatus">
                                             <option value="paid">Paid</option>
                                             <option value="partially paid">Partially Paid</option>
                                             <option value="unpaid">Unpaid</option>
                                             <option value="pending refund">Pending Refund</option>
                                             <option value="refunded">Refunded</option>
-
                                         </select>
+                                        <div v-if="UpdatestatusError" class="text-red-500 text-sm">{{ UpdatestatusError }}</div>
                                     </div>
                                 </div>
                                     
@@ -1941,11 +2076,12 @@ const showSuccessEditModal = ref(false);
                                 
                                     <div class="">
                                         <label for="payment_Type" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
-                                        <select id="payment_Type" v-model="editInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <select id="payment_Type" v-model="editInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validateUpdatePtype">
                                             <option value="cash">Cash</option>
                                             <option value="check">Check</option>
                                             <option value="online transaction">Online Transaction</option>
                                         </select>
+                                        <div v-if="UpdateptypeError" class="text-red-500 text-sm">{{ UpdateptypeError }}</div>
                                     </div>
                                 
 
@@ -1979,7 +2115,8 @@ const showSuccessEditModal = ref(false);
                                 <div class="grid grid-cols-2  gap-8 mb-4">
                                     <div class="">
                                         <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
-                                        <input type="text" id="terms" v-model="editInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days"/>
+                                        <input type="text" id="terms" v-model="editInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days" @input="validateUpdateTerms"/>
+                                        <div v-if="UpdatetermsError" class="text-red-500 text-sm">{{ UpdatetermsError }}</div>
                                     </div>
 
                                     <div>
@@ -2284,17 +2421,19 @@ const showSuccessEditModal = ref(false);
                                 <div class="grid grid-cols-3 gap-8 mb-4">
                                     <div>
                                         <label for="invoice_id" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Invoice I.D. No.</label>
-                                        <input type="number" id="invoice_id" v-model="newInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="number" id="invoice_id" v-model="newInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @input="validateInvoiceID"/>
+                                        <div v-if="invoiceIDError" class="text-red-500 text-sm">{{ invoiceIDError }}</div>
                                     </div>
                                     
                                     <div class="">
                                         <label for="date" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Date</label>
-                                        <input type="date" id="date" v-model="newInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="date" id="date" v-model="newInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @input="validateDate"/>
+                                        <div v-if="dateError" class="text-red-500 text-sm">{{ dateError }}</div>
                                     </div>
 
                                     <div class="">
                                         <label for="status" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Status</label>
-                                        <select id="status" v-model="newInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <select id="status" v-model="newInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validateStatus">
                                             <option value="paid">Paid</option>
                                             <option value="partially paid">Partially Paid</option>
                                             <option value="unpaid">Unpaid</option>
@@ -2302,6 +2441,7 @@ const showSuccessEditModal = ref(false);
                                             <option value="refunded">Refunded</option>
 
                                         </select>
+                                        <div v-if="statusError" class="text-red-500 text-sm">{{ statusError }}</div>
                                     </div>
                                 </div>
                                     
@@ -2313,15 +2453,16 @@ const showSuccessEditModal = ref(false);
                                 
                                     <div class="">
                                         <label for="payment_Type" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
-                                        <select id="payment_Type" v-model="newInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <select id="payment_Type" v-model="newInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validatePtype">
                                             <option value="cash">Cash</option>
                                             <option value="check">Check</option>
                                             <option value="online transaction">Online Transaction</option>
                                         </select>
+                                        <div v-if="ptypeError" class="text-red-500 text-sm">{{ ptypeError }}</div>
                                     </div>
                                 
 
-                                </div>
+                                </div> 
 
 
                                 
@@ -2351,7 +2492,8 @@ const showSuccessEditModal = ref(false);
                                 <div class="grid grid-cols-2  gap-8 mb-4">
                                     <div class="">
                                         <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
-                                        <input type="text" id="terms" v-model="newInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days"/>
+                                        <input type="text" id="terms" v-model="newInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days" @input="validateTerms"/>
+                                        <div v-if="termsError" class="text-red-500 text-sm">{{ termsError }}</div>
                                     </div>
 
                                     <div>
