@@ -127,21 +127,38 @@ public function show($invoice_id)
     public function destroy($invoice_system_id)
     {
         try {
-            // Find the invoice by invoice_system_id
             $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->first();
             
             if (!$invoice) {
                 return response()->json(['error' => 'Invoice not found'], 404);
             }
-    
-            // Delete the invoice
+
             $invoice->delete();
-    
+
             return response()->json(['message' => 'Invoice deleted successfully']);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Unable to delete invoice: ' . $e->getMessage()], 500);
+            Log::error('Error deleting invoice: ' . $e->getMessage());
+            return response()->json(['error' => 'Unable to delete invoice. Please try again later.'], 500);
         }
     }
+    // public function destroy($invoice_system_id)
+    // {
+    //     try {
+    //         // Find the invoice by invoice_system_id
+    //         $invoice = Invoice::where('invoice_system_id', $invoice_system_id)->first();
+            
+    //         if (!$invoice) {
+    //             return response()->json(['error' => 'Invoice not found'], 404);
+    //         }
+    
+    //         // Delete the invoice
+    //         $invoice->delete();
+    
+    //         return response()->json(['message' => 'Invoice deleted successfully']);
+    //     } catch (Exception $e) {
+    //         return response()->json(['error' => 'Unable to delete invoice: ' . $e->getMessage()], 500);
+    //     }
+    // }
     public function invoice_print($invoice_id)
     {
         // Fetch the invoice based on invoice_id without loading any related models
@@ -272,8 +289,14 @@ public function show($invoice_id)
                 return response()->json(['message' => 'No invoices found for the given date range.'], 404);
             }
 
+            $business = Business::first();
+            $businessName = $business->business_Name;
+            $businessImage = $business->business_image;
+            
+
                             
-        $pdf = Pdf::loadView('invoiceSummaryByDate', ['invoice' => $invoicesByDate, 'invoice_computations' => $invoice_computation, 'startDate' => $startDate, 'endDate' => $endDate])
+        $pdf = Pdf::loadView('invoiceSummaryByDate', ['invoice' => $invoicesByDate, 'invoice_computations' => $invoice_computation, 'startDate' => $startDate, 'endDate' => $endDate, 'businessName' => $businessName,
+                'businessImage' => $businessImage])
             ->setPaper([0, 0, 612, 936], 'landscape');
 
         return $pdf->stream();

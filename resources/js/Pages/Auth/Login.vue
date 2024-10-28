@@ -37,9 +37,9 @@ const submit = () => {
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit">
-            <p class="text-[25px] text-white font-Montserrat text-center">Log In</p>
+        <form @submit.prevent="submit" class="px-5">
             <div>
+                <div class="text-7xl flex flex-col justify-center items-center mb-14"><b>Login</b></div>
                 <InputLabel for="email" value="Email" />
 
                 <TextInput
@@ -70,25 +70,32 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="block mt-4">
+            <div class="flex flex-row justify-between items-center mt-4">
                 <label class="flex items-center">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400"><div style="color: #0F2C4A;"><b>Remember me</b></div></span>
                 </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
+                <div class="flex flex-col">
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request')"
-                    class="underline text-sm text-white hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 "
+                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
                 >
-                    Forgot your password?
+                    <div style="color: #0F2C4A;"><b>Forgot your password?</b></div>
                 </Link>
+            </div>
+            </div>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+            <div class="flex flex-col items-center justify-center mt-6" style="font-size: 1rem; line-height: 1.5rem;">
+                <PrimaryButton :class="{ 'opacity-25': form.processing } " :disabled="form.processing">
                     Log in
                 </PrimaryButton>
+
+                <Link
+                    :href="route('register')"
+                    class="mt-5 underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
+                    <div style="color: #0F2C4A;"><b>Don't have an account? Sign Up</b></div>
+                </Link>
             </div>
         </form>
     </GuestLayout>

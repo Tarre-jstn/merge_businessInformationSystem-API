@@ -133,6 +133,7 @@ watch(() => business.value.city, async (newCity) => {
         }
     } else {
         filteredBarangays.value = [];
+
     }
 });
 
@@ -179,6 +180,7 @@ onMounted(async () => {
         } else {
             console.error("No business data found or invalid format.");
         }
+
     } catch (error) {
         console.error("Error fetching business data:", error);
         alert('Failed to fetch business profile');
@@ -224,12 +226,14 @@ const updateBusiness = async () => {
     formData.append('business_City', business.value.city);
     formData.append('business_Barangay', business.value.barangay);
     formData.append('business_Address', business.value.address.trim());
+
     formData.append('business_Phone_Number', business.value.phone.trim() || '');
     formData.append('business_Telephone_Number', business.value.telephone.trim() || '');
     formData.append('business_Facebook', business.value.facebook || '');
     formData.append('business_X', business.value.x || '');
     formData.append('business_Instagram', business.value.instagram || '');
     formData.append('business_Tiktok', business.value.tiktok || '');
+
 
     if (business.value.image instanceof File) {
         formData.append('business_image', business.value.image);
@@ -244,8 +248,10 @@ const updateBusiness = async () => {
         });
 
         if (response.data.success) {
+
             alert('Business profile updated successfully');
             window.location.reload();  // This will refresh the page
+
         } else {
             alert('Failed to update business profile');
         }
@@ -394,7 +400,7 @@ const updateBusiness = async () => {
                         <div>
                             <button
                                 type="button"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                class="bg-blue-500 hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                                 @click="updateBusiness"
                             >
                                 Update Business

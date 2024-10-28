@@ -13,6 +13,7 @@ class Business extends Model
     // Tell Eloquent that the primary key is 'business_id'
     protected $primaryKey = 'business_id';
 
+    
     // Disable auto-increment if you are using a custom incrementing value
     public $incrementing = true;
 
@@ -38,6 +39,13 @@ class Business extends Model
         'business_Instagram',
         'business_Tiktok'
     ];
+
+    protected $with = ['user'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
 
 

@@ -2,13 +2,23 @@
 import { Link } from '@inertiajs/vue3';
 import { ArchiveBoxIcon, BuildingLibraryIcon, ChatBubbleLeftRightIcon, GlobeAltIcon, HomeIcon, ReceiptPercentIcon, Cog6ToothIcon, ArrowDownTrayIcon  } from '@heroicons/vue/24/solid'
 import { onMounted, ref } from 'vue';
+import { useBusinessStore } from '../store/businessStore';
+import { useReloadStore } from '../store/useReloadStore';
+import axios from 'axios';
 
-let businessImage = ref('');
-let businessName = ref('');
-let isLoading = ref(true);
-onMounted(()=>{
-    getWebsiteInfo();
-    });
+
+
+const businessImage = ref('');
+const businessName = ref('');
+
+
+const businessStore = useBusinessStore();
+const reloadStore = useReloadStore();
+const { state } = businessStore;
+
+onMounted(() => {
+  businessStore.fetchBusinessData();
+});
 
 async function getWebsiteInfo(){
     const response_userId = await axios.get('/user-id');
@@ -27,16 +37,51 @@ async function getWebsiteInfo(){
         businessName.value = getBusinessInfo.data.business_Name;
         
     }
+
+    function navigateAndHiddenReload(routeName) {
+    // Check reloadOnce from Pinia store
+    if (reloadStore.reloadOnce === 0) {
+        reloadStore.setReloadOnce(1); // Update the store to prevent further reloads
+        console.log("ReloadOnce updated to:", reloadStore.reloadOnce);
+        // Navigate to the new page
+        window.location.href = route(routeName);
+
+        // Set up a listener for when the page becomes hidden (during reload)
+        document.addEventListener('visibilitychange', function listener() {
+            if (document.visibilityState === 'hidden') {
+                document.removeEventListener('visibilitychange', listener);
+                window.location.reload(true); // Reload the page
+            }
+        });
+    } else {
+        // Just navigate without reloading if `reloadOnce` is already set to 1
+        window.location.href = route(routeName);
+    }
+}
+
+
+// Reset the reloadOnce counter when you navigate away or on another condition
+function resetReloadOnce() {
+    localStorage.removeItem('reloadOnce');
+}
+
+
 </script>
 
 <template>
-    <div class="sidebar fixed sm:relative sm:translate-x-0 -translate-x-full">
-        <div class="logo">
-            <img v-if="isLoading" src='/storage/business_logos/default-profile.png'/>
-            <img v-else-if="businessImage" :src='businessImage' alt="Logo" />
-            <img v-else src='/storage/business_logos/default-profile.png'/>
-            <h1>{{businessName}}</h1>
+    <div class="sidebar dark:bg-gray-800 fixed sm:relative sm:translate-x-0 -translate-x-full">
+        <div class="logo text-white">
+            <div class="items-center flex flex-col text-center pt-5 px-10" v-if="state.isLoading">
+                <img :src="'/storage/business_logos/' + state.businessImage" :alt="state.businessName">
+                    <p>Default Name</p>
+            </div>
+            <div v-else class="items-center flex flex-col text-center pt-5" >
+                <img :src="'/storage/business_logos/' + state.businessImage" :alt="state.businessName">
+                <h1>{{ state.businessName }}</h1>
+            </div>
         </div>
+
+        
         <nav>
             <ul>
                 <li class="flex items-center mb-4"><Link :href="route('home')" :class="{ active: route().current('home') }">
@@ -54,20 +99,37 @@ async function getWebsiteInfo(){
                     <span class="ml-3">Chats</span>
                 </Link></li>
 
-                <li class="flex items-center mb-4"><Link :href="route('inventory')" :class="{ active: route().current('inventory') }">
-                    <ArchiveBoxIcon class="size-6"/>
-                    <span class="ml-3">Inventory</span>
-                </Link></li> 
+                <li class="flex items-center mb-4">
+                    <a href="#" @click.prevent="navigateAndHiddenReload('inventory')" :class="{ active: route().current('inventory') }">
+                        <ArchiveBoxIcon class="size-6"/>
+                        <span class="ml-3">Inventory</span>
+                    </a>
+                </li> 
 
-                <li class="flex items-center mb-4"><Link :href="route('invoice')" :class="{ active: route().current('receipt') }">
+                <li class="flex items-center mb-4"><Link :href="route('invoice')" :class="{ active: route().current('invoice') }">
                     <ReceiptPercentIcon class="size-6"/>
-                    <span class="ml-3">Receipt</span>
+                    <span class="ml-3">Invoice</span>
                 </Link></li>
 
                 <li class="flex items-center mb-4"><Link :href="route('finance')" :class="{ active: route().current('finance') }">
                     <BuildingLibraryIcon class="size-6"/>
                     <span class="ml-3">Finance</span>
                 </Link></li>
+
+                <!-- <li class="flex items-center mb-4">
+                    <a href="#" @click.prevent="navigateAndHiddenReload('invoice')" :class="{ active: route().current('invoice') }">
+                        <ArchiveBoxIcon class="size-6"/>
+                        <span class="ml-3">Invoice</span>
+                    </a>
+                </li> 
+
+                <li class="flex items-center mb-4">
+                    <a href="#" @click.prevent="navigateAndHiddenReload('finance')" :class="{ active: route().current('finance') }">
+                        <BuildingLibraryIcon class="size-6"/>
+                        <span class="ml-3">Finance</span>
+                    </a>
+                </li> -->
+
                 <li class="flex items-center mb-4"><Link :href="route('BusinessInfo')" :class="{ active: route().current('BusinessInfo') }">
                     <Cog6ToothIcon class="size-6"/>
                     <span class="ml-2">Business Information</span>
@@ -85,7 +147,6 @@ async function getWebsiteInfo(){
 <style scoped>
 .sidebar {
     width: 250px;
-    background-color: #202c34;
     transition: all 0.3s ease;
     z-index: 100;
     height: 150vh;
@@ -166,11 +227,18 @@ nav ul li a:hover {
     height: 100px;
     border-radius: 50%;
     margin-bottom: 10px; 
+    background-color: white;
 }
 .logo h1 {
     font-size: 1.5em;
     margin: 0; 
 }
+
+.logo p {
+    font-size: 1.5em;
+    margin: 0; 
+}
+
 .active {
     background-color: #ddd;
     color: #202c34;

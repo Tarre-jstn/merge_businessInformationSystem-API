@@ -41,6 +41,9 @@ Route::get('/all-invoices', function(){
     return Invoice::all();
 });
 
+
+Route::get('/business', [BusinessController::class, 'show']);
+Route::get('/business_info', [BusinessController::class, 'index']);
 Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 Route::post('/website', [WebsiteController::class, 'store']);
 Route::get('/website', [WebsiteController::class, 'info']);
@@ -160,5 +163,4 @@ Route::get('products/print/pdf', [FinanceController::class, 'printProductsPdf'])
 Route::post('products/import/xlsx', [ProductController::class, 'importProductsXlsx']);
 
 Route::get('products/print/export/xlsx', [ProductController::class, 'exportProductsXslx']);
-
 
