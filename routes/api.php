@@ -48,6 +48,10 @@ Route::get('/all-invoices', function(){
 Route::get('/productNotif', [ProductNotificationSettingsController::class, 'show']);
 Route::put('/productNotif', [ProductNotificationSettingsController::class, 'updateCounts']);
 
+Route::patch('/products/{id}/sold', [ProductController::class, 'updateSold']);
+Route::patch('/products/{id}/stock', [ProductController::class, 'updateStock']);
+
+
 
 Route::get('/business', [BusinessController::class, 'show']);
 Route::get('/business_info', [BusinessController::class, 'index']);

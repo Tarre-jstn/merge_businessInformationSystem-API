@@ -19,6 +19,40 @@ use Maatwebsite\Excel\Validators\ValidationException;
 
 class ProductController extends Controller
 {
+
+    public function updateSold(Request $request, $id)
+    {
+        // Validate only the sold field
+        $validated = $request->validate([
+            'sold' => 'required|integer|min:0',
+        ]);
+
+        // Find the product
+        $product = Product::findOrFail($id);
+
+        // Update only the sold field
+        $product->sold = $validated['sold'];
+        $product->save();
+
+        return response()->json(['message' => 'Sold attribute updated successfully.', 'product' => $product], 200);
+    }
+
+    public function updateStock(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'stock' => 'required|integer', // Validate that stock is required and must be an integer
+        ]);
+
+        // Find the product
+        $product = Product::findOrFail($id);
+
+        // Update only the stock field
+        $product->stock = $validated['stock'];
+        $product->save();
+
+        return response()->json(['message' => 'Stock updated successfully.', 'product' => $product], 200);
+    }
+
     public function index()
     {
         return Product::all();

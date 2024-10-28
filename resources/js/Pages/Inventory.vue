@@ -1390,7 +1390,7 @@ const isLowStock = (productStock) => {
         <div v-if="showViewProductModal" @click="showViewProductModal = false" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
             <div  @click.stop class="px-5 bg-white p-4 rounded-lg shadow-lg w-full max-w-3xl relative">
                 <h3 class="text-5xl font-semibold text-center mt-6 mb-5">View Product</h3>
-                <form @submit.prevent="updateProduct">
+                <form @submit.prevent="">
                     <div class="grid grid-cols-3 gap-3">
                         <div class="col-span-1">
                             <label style="font-size: 10px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block  text-white">
@@ -1508,7 +1508,7 @@ const isLowStock = (productStock) => {
                         </div>
                     </div>
                     <div class="col-span-3 flex justify-center mt-3 space-x-2">
-                        <button @click="showViewProductModal=false" class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                        <button @click="showViewProductModal = false" class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
                     </div>
                 </form>
             </div>
