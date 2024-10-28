@@ -1,3 +1,5 @@
+
+
 <script>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
@@ -20,14 +22,12 @@ export default {
       </div>
     </div>
     <div class="flex flex-col items-center">
-      <div class="flex flex-row">
-        <div class="bg-white dark:bg-gray-800 overflow-hidden h-full m-5 sm:rounded-lg ">
+      <div class="flex flex-row items-start justify-center w-full">
+        <div class="flex-1 flex justify-end pr-8">
           <BackupButton />
         </div>
-        <svg width="100" height="600" xmlns="http://www.w3.org/2000/svg"> 
-            <line x1="50" y1="20" x2="50" y2="380" stroke="black" stroke-width="2" /> 
-        </svg>
-        <div class=" m-8">
+        <div class="w-px h-96 bg-gray-300 dark:bg-gray-600"></div>
+        <div class="flex-1 flex justify-start pl-8">
           <ImportButton />
         </div>
       </div>
