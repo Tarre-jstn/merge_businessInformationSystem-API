@@ -15,6 +15,7 @@ class ExportDatabase extends Command
     {
         $tables = ['categories', 'finances', 'invoices', 'products', 'websites', 'finance_categories', 'invoice_items', 'invoice_computations', 'invoice_additionals','chatbot_response'];
 
+
         $backupPath = storage_path('app/backups/backup.sql');
 
         $sqlContent = '';
