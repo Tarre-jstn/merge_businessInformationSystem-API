@@ -289,8 +289,14 @@ public function show($invoice_id)
                 return response()->json(['message' => 'No invoices found for the given date range.'], 404);
             }
 
+            $business = Business::first();
+            $businessName = $business->business_Name;
+            $businessImage = $business->business_image;
+            
+
                             
-        $pdf = Pdf::loadView('invoiceSummaryByDate', ['invoice' => $invoicesByDate, 'invoice_computations' => $invoice_computation, 'startDate' => $startDate, 'endDate' => $endDate])
+        $pdf = Pdf::loadView('invoiceSummaryByDate', ['invoice' => $invoicesByDate, 'invoice_computations' => $invoice_computation, 'startDate' => $startDate, 'endDate' => $endDate, 'businessName' => $businessName,
+                'businessImage' => $businessImage])
             ->setPaper([0, 0, 612, 936], 'landscape');
 
         return $pdf->stream();

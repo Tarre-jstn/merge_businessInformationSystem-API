@@ -118,7 +118,7 @@
                         <tr>
                             <!-- Left-aligned content -->
                             <td class="title" style="text-align: left;">
-                                <img src="{{ asset('path_to_logo') }}" style="width:120px" />
+                                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px" />
                             </td>
 
                             <!-- Empty space between the left and right td -->
