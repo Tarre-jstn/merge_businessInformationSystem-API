@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Finance;
 use App\Models\FinanceCategory;
+use App\Models\Business;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Carbon\carbon;
@@ -161,10 +162,19 @@ class FinanceController extends Controller
             return response()->json(['message' => 'No finances found for the given date range.'], 404);
         }
 
+        $business = Business::first();
+        $businessName = $business->business_Name;
+        $businessAddress = $business->business_Address;
+        $businessTIN = $business->business_TIN;
+        $businessImage = $business->business_image;
         $pdf = Pdf::loadView('financeSummaryByDate', [
                 'finance' => $financesByDate, 
                 'startDate' => $startDate, 
-                'endDate' => $endDate
+                'endDate' => $endDate,
+                'businessName' => $businessName,
+                'businessAddress' => $businessAddress,
+                'businessTIN' => $businessTIN,
+                'businessImage' => $businessImage
             ])
             ->setPaper([0, 0, 612, 936], 'portrait');
 
