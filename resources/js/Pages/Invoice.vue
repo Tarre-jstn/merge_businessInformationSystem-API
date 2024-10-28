@@ -299,6 +299,7 @@ const addInvoice = async () => {
 
         // Fetch updated list of invoices
         fetchInvoices();
+        
         // Send the new invoice item
         //await addInvoiceItem(newInvoiceItem.value); // Call addInvoiceItem with the single item
 
@@ -535,6 +536,8 @@ const addInvoiceComputation = async () => {
         completed.value = true;
         clearAddInvoiceFields();
         console.log('completed value', completed.value);
+
+        fetchInvoices();
 
         showSuccessAddModal.value = true;
         setTimeout(() => {
@@ -1769,7 +1772,7 @@ const showSuccessEditModal = ref(false);
                                                 </div>
 
                                                 </td>
-                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ roundToTwoDecimals(invoice.total_Amount_Due)  }}</td>
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
 
                                                 <div>

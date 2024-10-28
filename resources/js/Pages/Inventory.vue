@@ -1,11 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import CategoriesModal from "@/Components/CategoriesModal.vue";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-
-
 
 const products = ref([]);
 const showAddProductModal = ref(false);
@@ -664,13 +662,13 @@ function isDateNear(productExpDate) {
     (productExpDateObj - currentDate) / (1000 * 60 * 60 * 24)
   );
 
-  return daysDifference <= 7; // Adjust the range as needed
+  return daysDifference <= (expiryDays.value || 7);
 }
 
 function isDateTodayOrPast(date) {
   const today = new Date().setHours(0, 0, 0, 0);
   const expiryDate = new Date(date).setHours(0, 0, 0, 0);
-  return expiryDate <= today; // Returns true if expiry date is today or in the past
+  return expiryDate <= today;
 }
 
 function formatDate(date) {
@@ -680,32 +678,185 @@ function formatDate(date) {
 
 fetchProducts();
 fetchListedCategories();
+
+
+const isOpen = ref(false);
+const stocksDays = ref(0);
+const expiryDays = ref(0);
+
+// Toggle dropdown visibility
+const toggleDropdown = () => {
+    isOpen.value = !isOpen.value;
+};
+
+// Fetch notification settings from the API
+onMounted(async () => {
+    try {
+        const response = await axios.get('/api/productNotif');
+        const settings = response.data;
+
+        // Map API data to the Vue component's variables
+        settings.forEach(setting => {
+            if (setting.stock_expDate === 'stock') {
+                stocksDays.value = setting.count;
+            } else if (setting.stock_expDate === 'expDate') {
+                expiryDays.value = setting.count;
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching product notification settings:', error);
+    }
+});
+
+// Function to save updated values
+const saveSettings = async () => {
+    try {
+        await axios.put('/api/productNotif', [
+            { stock_expDate: 'stock', count: stocksDays.value },
+            { stock_expDate: 'expDate', count: expiryDays.value }
+        ]);
+        alert('Settings saved successfully');
+    } catch (error) {
+        console.error('Error saving product notification settings:', error);
+        alert('Error saving settings');
+    }
+};
+
+// Function to reset the input values
+const cancelChanges = () => {
+    // Reset values by re-fetching from the API
+    onMounted();
+    isOpen.value = false; // Close the dropdown
+};
+
+watch(
+  () => expiryDays.value, // Watch the specific value within the ref
+  (newValue) => {
+    console.log('NEW STOCKDAYS VALUE:', newValue);
+
+    // Add additional logic here if needed
+  }
+);
+watch(
+  () => stocksDays.value, // Watch the specific value within the ref
+  (newValue) => {
+    console.log('NEW STOCKDAYS VALUE:', newValue);
+
+    // Add additional logic here if needed
+  }
+);
+
+
+const isLowStock = (productStock) => {
+    return productStock < stocksDays.value;
+};
+
+
 </script>
 
 <template>
     <AuthenticatedLayout>
+
+
         <div  class="py-5 h-full">
             <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[86%]">
                     <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">
                         <div class="mt-4 mb-8 flex justify-between items-center mb-4">
                             <h2 class="font-semibold text-4xl">List of Products</h2>
-                            <div class="flex">
+
+                            <div class="flex items-center">
                                 <div>
-                                    <div class="relative mr-6 w-96">
-                                    <font-awesome-icon
-                                        :icon="['fas', 'magnifying-glass']"
-                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
-                                    />
-                                    <input
-                                        v-model="searchQuery"
-                                        type="text"
-                                        placeholder="Search by name, category, status, or brand..."
-                                        class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                    />
+                                    <div class="justify-end relative inline-block text-left">
+                                        <!-- Settings Button -->
+                                        <button
+                                            @click="toggleDropdown"
+                                            type="button"
+                                            class="inline-flex items-center justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        >
+                                            Additional Settings
+                                            <ChevronDownIcon class="ml-2 h-5 w-5" />
+                                        </button>
+
+                                        <!-- Dropdown Menu -->
+                                        <transition
+                                            enter-active-class="transition ease-out duration-100"
+                                            enter-from-class="transform opacity-0 scale-95"
+                                            enter-to-class="transform opacity-100 scale-100"
+                                            leave-active-class="transition ease-in duration-75"
+                                            leave-from-class="transform opacity-100 scale-100"
+                                            leave-to-class="transform opacity-0 scale-95"
+                                        >
+                                            <div
+                                                v-if="isOpen"
+                                                class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none"
+                                            >
+                                                <div class="px-4 py-3">
+                                                    <p class="text-sm font-medium text-gray-900">Notify me about:</p>
+                                                </div>
+                                                <div class="py-2">
+                                                    <!-- Stocks Option -->
+                                                    <div class="px-4 py-2 flex justify-between items-center">
+                                                        <label for="stocks" class="text-sm text-gray-700">Stocks</label>
+                                                        <div class="flex items-center">
+                                                            <input
+                                                                type="number"
+                                                                id="stocks"
+                                                                v-model="stocksDays"
+                                                                min="0"
+                                                                class="w-16 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                            />
+                                                            <span class="ml-2 text-sm text-gray-600">days</span>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Expiry Date Option -->
+                                                    <div class="px-4 py-2 flex justify-between items-center">
+                                                        <label for="expiry" class="text-sm text-gray-700">Expiry Date</label>
+                                                        <div class="flex items-center">
+                                                            <input
+                                                                type="number"
+                                                                id="expiry"
+                                                                v-model="expiryDays"
+                                                                min="0"
+                                                                class="w-16 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                                            />
+                                                            <span class="ml-2 text-sm text-gray-600">days</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Save and Cancel Buttons -->
+                                                <div class="px-4 py-3 flex justify-end space-x-2">
+                                                    <button @click="cancelChanges" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                                                    <button @click="saveSettings" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save</button>
+                                                </div>
+                                            </div>
+                                        </transition>
                                     </div>
                                 </div>
+
+                                <div class="flex">
+
+
+<div class="ml-6">
+
+    <div class="relative mr-6 w-96">
+    <font-awesome-icon
+        :icon="['fas', 'magnifying-glass']"
+        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
+    />
+    <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search by name, category, status, or brand..."
+        class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+    </div>
+</div>
+
+
+</div>
                             </div>
+
                         </div>
                         <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900">
                             <div class="overflow-x-auto h-full">
@@ -764,7 +915,29 @@ fetchListedCategories();
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-left align-middle">{{ product.brand }}</td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.price }}</td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.category }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.stock }}</td>
+                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                            <span v-if="product.stock === 0" 
+                                                class="transition hover:scale-105 ease-in-out duration-150 hover:bg-red-700 font-semibold group inline-block rounded-full bg-red-600 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
+                                            !
+                                            <span class="transition hover:scale-105 ease-in-out duration-150 absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-max bg-gray-700 text-white text-sm rounded-md px-2 py-1">
+                                                Warning, this item has no stock!
+                                            </span>
+                                            </span>
+
+                                            <span v-else-if="isLowStock(product.stock)" 
+                                                class="transition hover:scale-105 ease-in-out duration-150 hover:bg-yellow-600 font-semibold group inline-block rounded-full bg-yellow-500 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
+                                            !
+                                            <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-max bg-gray-700 text-white text-sm rounded-md px-2 py-1">
+                                                Warning, this item is low on stock!
+                                            </span>
+                                            </span>
+                                            
+
+                                            <span class="inline-block align-middle">
+                                            {{ product.stock }}
+                                            </span>
+
+                                        </td>
                                         <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.sold }}</td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">
                                                 <span :class="{
@@ -776,7 +949,7 @@ fetchListedCategories();
 
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">
                                             <span v-if="isDateTodayOrPast(product.expDate)" 
-                                                class="transition hover:scale-105 ease-in-out duration-150 hover:bg-red-700 font-semibold relative group inline-block rounded-full bg-red-600 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
+                                                class="transition hover:scale-105 ease-in-out duration-150 hover:bg-red-700 font-semibold group inline-block rounded-full bg-red-600 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
                                             !
                                             <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-max bg-gray-700 text-white text-sm rounded-md px-2 py-1">
                                                 Warning, this item has expired or is expiring today!
@@ -784,7 +957,7 @@ fetchListedCategories();
                                             </span>
                                             
                                             <span v-else-if="isDateNear(product.expDate)" 
-                                                class="transition hover:scale-105 ease-in-out duration-150 hover:bg-yellow-600 font-semibold relative group inline-block rounded-full bg-yellow-500 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
+                                                class="transition hover:scale-105 ease-in-out duration-150 hover:bg-yellow-600 font-semibold group inline-block rounded-full bg-yellow-500 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
                                             !
                                             <span class="transition hover:scale-105 ease-in-out duration-150 absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-max bg-gray-700 text-white text-sm rounded-md px-2 py-1">
                                                 Warning, this item is nearing its expiry date!
@@ -972,7 +1145,7 @@ fetchListedCategories();
                                 <!-- Price Field -->
                                 <div>
                                     <label for="price" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Price (PHP) <span class="text-red-500">*</span></label>
-                                    <input type="number" id="price" v-model="newProduct.price" class="input-field text-xs p-1" required />
+                                    <input type="number" step="0.01" id="price" v-model="newProduct.price" class="input-field text-xs p-1" required />
                                     <span v-if="validationErrors.price" class="text-red-500 text-xs">{{ validationErrors.price }}</span>
                                 </div>
                                 <!-- Category Field -->
@@ -1111,7 +1284,7 @@ fetchListedCategories();
                             <!-- Price Field -->
                             <div>
                                 <label for="edit_price" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Price (PHP) <span class="text-red-500">*</span></label>
-                                <input type="number" id="edit_price" v-model="editProduct.price" class="input-field text-xs p-1" required />
+                                <input type="number" step="0.01" id="edit_price" v-model="editProduct.price" class="input-field text-xs p-1" required />
                                 <span v-if="validationErrorsEdit.price" class="text-red-500 text-xs">{{ validationErrorsEdit.price }}</span>
                             </div>
                             <!-- Category Field -->
@@ -1200,7 +1373,7 @@ fetchListedCategories();
                                 </label>
                                 <span class="text-xs text-gray-700">{{ editProduct.on_sale === 'yes' ? 'Yes' : 'No' }}</span>
                             </div>
-                            <input v-if="editProduct.on_sale === 'yes'" type="number" id="edit_on_sale_price" v-model="editProduct.on_sale_price" class="input-field mt-2 text-xs p-1" placeholder="On Sale Price (PHP)" />
+                            <input step="0.01" v-if="editProduct.on_sale === 'yes'" type="number" id="edit_on_sale_price" v-model="editProduct.on_sale_price" class="input-field mt-2 text-xs p-1" placeholder="On Sale Price (PHP)" />
                         </div>
                     </div>
                     <div class="col-span-3 flex justify-center mt-3 space-x-2">

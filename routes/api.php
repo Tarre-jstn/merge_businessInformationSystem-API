@@ -7,6 +7,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceItemController;
 use App\Http\Controllers\InvoiceAdditionalController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductNotificationSettingsController;
 use App\Models\InvoiceAdditional;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Models\Business;
 use App\Models\Product;
 use App\Models\Invoice;
+use App\Models\ProductNotificationSettings;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\GetIdController;
@@ -40,6 +42,11 @@ Route::get('/all-business', function(){
 Route::get('/all-invoices', function(){
     return Invoice::all();
 });
+
+
+
+Route::get('/productNotif', [ProductNotificationSettingsController::class, 'show']);
+Route::put('/productNotif', [ProductNotificationSettingsController::class, 'updateCounts']);
 
 
 Route::get('/business', [BusinessController::class, 'show']);
