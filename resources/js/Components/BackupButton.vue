@@ -25,7 +25,7 @@
             link.click();
           })
           .catch(error => {
-            console.error('Error downloading the backup:', error);
+            console.log('Error downloading the backup:', error);
           });
       }
     }
