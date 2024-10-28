@@ -413,17 +413,17 @@ const updateBusiness = async () => {
                 <div class="w-full md:w-1/2 flex flex-col items-center mt-8 md:mt-0 py-0">
                     <div class="relative group">
                         <img :src="profilePicture" alt="Profile Picture" class="w-32 h-32 rounded-full border-4 border-blue-500 object-cover">
-                            <input
-                                type="file"
-                                id="profile-upload"
-                                class="absolute inset-0 opacity-0 cursor-pointer z-10" 
-                                @change="onProfilePictureChange"
-                            >
-                        <label for="profile-upload" class="absolute bottom-0 right-0 bg-gray-800 text-white p-1 rounded-full cursor-pointer">
+                        <input
+                            type="file"
+                            id="profile-upload"
+                            class="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                            @change="onProfilePictureChange"
+                        >
+                        <label for="profile-upload" class="absolute bottom-0 right-0 bg-gray-800 text-white p-2 rounded-full cursor-pointer flex items-center justify-center w-8 h-8 z-20">
                             <i class="fas fa-camera"></i>
                         </label>
                         <!-- Overlay for hover effect -->
-                        <div class="absolute inset-0 pl-4 bg-gray-800 bg-opacity-50 flex items-center justify-center text-white text-sm font-bold opacity-0 rounded-full group-hover:opacity-100 transition-opacity z-0">
+                        <div class="absolute inset-0 pl-4 bg-gray-800 bg-opacity-50 flex items-center justify-center text-white text-sm font-bold opacity-0 rounded-full group-hover:opacity-100 transition-opacity z-10">
                             Please select a profile picture
                         </div>
                     </div>
