@@ -74,7 +74,7 @@ import { Head } from '@inertiajs/vue3';
                     city: businessData.business_City,
                     barangay: businessData.business_Barangay,
                     address: businessData.business_Address,
-                    phone_number: businessData.business_Contact_Number,
+                    phone_number: businessData.business_Phone_Number,
                     telephone_number: businessData.business_Telephone_Number,
                     facebook: businessData.business_Facebook,
                     x: businessData.business_X,
@@ -140,7 +140,7 @@ import { Head } from '@inertiajs/vue3';
     formData.append('business_City', business.value.city.trim());
     formData.append('business_Barangay', business.value.barangay.trim());
     formData.append('business_Address', business.value.address.trim());
-    formData.append('business_Contact_Number', business.value.phone_number.trim());
+    formData.append('business_Phone_Number', business.value.phone_number.trim());
     formData.append('business_Telephone_Number', business.value.telephone_number.trim());
     formData.append('business_Facebook', business.value.facebook);
     formData.append('business_X', business.value.x);
