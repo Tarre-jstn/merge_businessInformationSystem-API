@@ -1003,12 +1003,13 @@ const editInvoiceDetails = async (invoice) => {
 
 //----------------------------------------------FOR UPDATING INVOICE------------------------------------------
 const updateInvoice = async () => {
-    validateInvoiceID();
-    validateDate(); 
-    validateStatus();
-    validatePtype();
-    validateTerms();
-    if (invoiceIDError.value || dateError.value || statusError.value || ptypeError.value || termsError.value) {
+    validateUpdateInvoiceID();
+    validateUpdateDate();
+    validateUpdateStatus();
+    validateUpdatePtype();
+    validateUpdateTerms();
+
+    if (UpdateinvoiceIDError.value || UpdatedateError.value || UpdatestatusError.value || UpdateptypeError.value || UpdatetermsError.value) {
         alert('Please correct the errors before updating the Invoice.');
         return;
     }
