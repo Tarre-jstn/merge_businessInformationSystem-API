@@ -34,19 +34,20 @@ async function getWebsiteInfo() {
             <div class="text-white font-bold text-5xl mb-6">
                 {{ businessName }} 
             </div>
-            <div class="relative">
+            <div class="relative flex justify-center items-center">
                 <div class="absolute w-[400px] h-[400px] rounded-full bg-transparent -z-10"
-                     style="box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);"></div>
+                    style="box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);"></div>
                 <img v-if="isLoading" src='/storage/business_logos/default-profile.png' 
-                     class="hidden md:block rounded-full shadow-2xl shadow-slate-950" 
-                     style="border-color: #081626; border-width: 10px; background-color: #FFFFFF;" />
+                    class="md:block rounded-full shadow-2xl shadow-slate-950" 
+                    style="border: 10px solid #081626; background-color: #FFFFFF; width: 400px; height: 400px; object-fit: cover;" />
                 <img v-else-if="businessImage" :src='businessImage' 
-                     class="hidden md:block rounded-full shadow-2xl shadow-slate-950" 
-                     style="border-color: #081626; border-width: 10px; background-color: #FFFFFF;" />
+                    class="md:block rounded-full shadow-2xl shadow-slate-950" 
+                    style="border: 10px solid #081626; background-color: #FFFFFF; width: 400px; height: 400px; object-fit: cover;" />
                 <img v-else src='/storage/business_logos/default-profile.png' 
-                     class="hidden md:block rounded-full shadow-2xl shadow-slate-950" 
-                     style="border-color: #081626; border-width: 10px; background-color: #FFFFFF;" />
+                    class="md:block rounded-full shadow-2xl shadow-slate-950" 
+                    style="border: 10px solid #081626; background-color: #FFFFFF; width: 400px; height: 400px; object-fit: cover;" />
             </div>
+
             </Link>
         </div>
 
