@@ -7,7 +7,7 @@
                         <div class="flex flex-row justify-center"><div class="flex flex-col text-center mr-20"><div style="font-size: 18px;"><b>Total Income (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalIncome }}</div></div>
                         <div class="flex flex-col text-center"><div style="font-size: 18px;"><b>Total Expenses (30 Days)</b></div><div style="font-size: 25px">₱ {{ totalExpenses }}</div></div></div>
                         <div class="flex flex-row justify-center">
-                            <button style="background-color: #FFFFFF; ">
+                            <button style="background-color: #FFFFFF; border-radius: 14px;">
                                 <ResponsiveNavLink :href="route('finance')" :active="route().current('finance')" style="color: #0F2C4A; font-size: 12px;">View Finance</ResponsiveNavLink>
                             </button>
                         </div>
@@ -20,7 +20,7 @@
                         <div class="flex md:flex-row justify-between px-4 py-2">
                             <div style="font-size: 23px;"><b>Inventory</b></div>
                                 <button>
-                                    <ResponsiveNavLink :href="route('inventory')" :active="route().current('inventory')" style="color: white; font-size: 12px;">View all products</ResponsiveNavLink>
+                                    <ResponsiveNavLink :href="route('inventory')" :active="route().current('inventory')" style="color: white; background-color: #0F2C4A; border-radius: 14px; font-size: 12px;">View all products</ResponsiveNavLink>
                                 </button>
                         </div>
                         <div class="overflow-x-auto w-full">
@@ -68,15 +68,33 @@
                         <i class="fa-solid fa-arrow-right"></i>
                     </template>
                 </vue-cal>
-                <div class="flex flex-col items-center mt-4">
-                    <h3><b>Social Media</b></h3>
+                <div class="flex flex-col items-center mt-4 text-white">
+                    <h3 style="color: black"><b>Social Media</b></h3>
                     <div class="flex flex-row">
-                        <button class=" p-3 mx-3 h-20 min-w-36 bg-blue-800 mt-2"><a :href="business_Facebook" target="_blank"><i class="fa-brands fa-facebook-f"></i><br>Facebook</a></button>
-                        <button class=" p-3 mx-3 h-20 min-w-36 bg-blue-400 mt-2"><a :href="business_X" target="_blank"><i class="fa-brands fa-twitter"></i><br>Twitter</a></button>
+                            <a v-if="business_Facebook" :href="business_Facebook" target="_blank" class="p-3 mx-3 h-20 min-w-36 bg-blue-800 mt-2 flex flex-col justify-center items-center rounded-2xl">
+                                <i class="fa-brands fa-facebook-f"></i><br>Facebook
+                            </a>
+                            <a v-else class="p-3 mx-3 h-20 min-w-36 bg-blue-800 mt-2 flex flex-col justify-center items-center rounded-2xl" :href="route('BusinessInfo')" :active="route().current('BusinessInfo')">
+                                <i class="fa-brands fa-facebook-f"></i><br>Facebook
+                            </a>
+                            <a v-if="business_X" :href="business_X" target="_blank" class="p-3 mx-3 h-20 min-w-36 bg-blue-400 mt-2 flex flex-col justify-center items-center rounded-2xl">
+                                <i class="fa-brands fa-twitter"></i><br>Twitter
+                            </a>
+                            <a v-else class="p-3 mx-3 h-20 min-w-36 bg-blue-400 mt-2 flex flex-col justify-center items-center rounded-2xl" :href="route('BusinessInfo')" :active="route().current('BusinessInfo')">
+                                <i class="fa-brands fa-twitter"></i><br>Twitter
+                            </a>
                     </div>
                     <div class="flex flex-row">
-                        <button class=" p-3 mx-3 h-20 min-w-36 bg-pink-700 mt-2"><a :href="business_Instagram" target="_blank"><i class="fa-brands fa-instagram"></i><br>Instagram</a></button>
-                        <button class=" p-3 mx-3 h-20 min-w-36 bg-black mt-2"><a :href="business_Tiktok" target="_blank"><i class="fa-brands fa-tiktok"></i><br>Tiktok</a></button>
+                            <a v-if="business_Instagram" :href="business_Instagram" target="_blank" class="p-3 mx-3 h-20 min-w-36 bg-pink-700 mt-2 flex flex-col justify-center items-center rounded-2xl">
+                                <i class="fa-brands fa-instagram"></i><br>Instagram
+                            </a>
+                            <a v-else class="p-3 mx-3 h-20 min-w-36 bg-pink-700 mt-2 flex flex-col justify-center items-center rounded-2xl" :href="route('BusinessInfo')" :active="route().current('BusinessInfo')">
+                                <i class="fa-brands fa-instagram"></i><br>Instagram
+                            </a>
+                            <a v-if="business_Tiktok" :href="business_Tiktok" target="_blank" class="p-3 mx-3 h-20 min-w-36 bg-black mt-2 flex flex-col justify-center items-center rounded-2xl">
+                                <i class="fa-brands fa-tiktok"></i><br>Tiktok
+                            </a> 
+                            <a v-else class="p-3 mx-3 h-20 min-w-36 bg-black mt-2 flex flex-col justify-center items-center rounded-2xl" :href="route('BusinessInfo')" :active="route().current('BusinessInfo')"><i class="fa-brands fa-tiktok"></i><br>Tiktok</a>
                     </div>
                 </div>
             </div>
@@ -360,15 +378,28 @@ const fetchsocialmediaLinks = async() =>{
             params: {business_id: businessId}
         });
         console.log(getWebsiteInfo.data);
-
-        business_Facebook.value = getBusinessInfo.data.business_Facebook;
-        business_X.value = getBusinessInfo.data.business_X;
-        business_Instagram.value = getBusinessInfo.data.business_Instagram;
-        business_Tiktok.value = getBusinessInfo.data.business_Tiktok;
+        business_Facebook.value = validateAndFormatUrl(getBusinessInfo.data.business_Facebook, "facebook.com");
+        business_X.value = validateAndFormatUrl(getBusinessInfo.data.business_X, "X.com");
+        business_Instagram.value = validateAndFormatUrl(getBusinessInfo.data.business_Instagram, "Instagram.com");
+        business_Tiktok.value = validateAndFormatUrl(getBusinessInfo.data.business_Tiktok, "Tiktok.com");
 
         console.log("Social Media Links:", business_Facebook.value, business_X.value, business_Instagram.value, business_Tiktok.value);
     }catch(error){
         console.error('There was an error fetching the data:', error);
+    }
+}
+function validateAndFormatUrl(url, baseUrl) {
+    // Check if url already starts with "https://www."
+    const isValidLink = url.startsWith(`https://www.${baseUrl}`);
+    
+    // If valid, return the URL as is
+    if (isValidLink) {
+        console.log("This link is valid");
+        return url;
+    } else {
+        // Else, construct the full URL with the base URL + string
+        console.log("This link is not valid");
+        return `https://www.${baseUrl}/${url}`;
     }
 }
 
@@ -381,11 +412,6 @@ fetchListedCategories();
 /* Button and Table Styling */
 h3 {
     font-size: 25px;
-}
-button {
-    background-color: #0F2C4A;
-    color:#FFFFFF;
-    border-radius: 14px;
 }
 td, th {
     border-top: 0.5px solid #0F2C4A;
