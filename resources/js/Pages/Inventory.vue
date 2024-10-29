@@ -19,7 +19,6 @@ const validationErrors = ref({
     name: '',
     price: '',
     category: '',
-    stock: '',
     status: '',
     brand: '',
     description: '',
@@ -43,10 +42,6 @@ const validateForm = () => {
     }
     if (!newProduct.value.category) {
         validationErrors.value.category = 'This field is required';
-        isValid = false;
-    }
-    if (!newProduct.value.stock) {
-        validationErrors.value.stock = 'This field is required';
         isValid = false;
     }
     if (!newProduct.value.status) {
@@ -80,7 +75,6 @@ const validationErrorsEdit = ref({
     name: '',
     price: '',
     category: '',
-    stock: '',
     status: '',
     brand: '',
     description: '',
@@ -104,10 +98,6 @@ const validateEditForm = () => {
     }
     if (!editProduct.value.category) {
         validationErrorsEdit.value.category = 'This field is required';
-        isValid = false;
-    }
-    if (!editProduct.value.stock) {
-        validationErrorsEdit.value.stock = 'This field is required';
         isValid = false;
     }
     if (!editProduct.value.status) {
@@ -1159,7 +1149,6 @@ const isLowStock = (productStock) => {
                                 <div>
                                     <label for="stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline  text-white">Stock <span class="text-red-500">*</span></label>
                                     <input type="number" id="stock" v-model="newProduct.stock" class="input-field text-xs p-1" required />
-                                    <span v-if="validationErrors.stock" class="text-red-500 text-xs">{{ validationErrors.stock }}</span>
                                 </div>
 
                                 <!-- Sold Field -->
@@ -1298,7 +1287,6 @@ const isLowStock = (productStock) => {
                             <div>
                                 <label for="edit_stock" style="font-size: 11px;" class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-white">Stock <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_stock" v-model="editProduct.stock" class="input-field text-xs p-1" required />
-                                <span v-if="validationErrorsEdit.stock" class="text-red-500 text-xs">{{ validationErrorsEdit.stock }}</span>
                             </div>
 
                             <!-- Sold Field -->
