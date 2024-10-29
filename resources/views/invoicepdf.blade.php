@@ -118,7 +118,7 @@
                         <tr>
                             <!-- Left-aligned content -->
                             <td class="title" style="text-align: left;">
-                                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px" />
+                                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px; height: 140px; border-radius: 50%; object-fit: cover;" />
                             </td>
 
                             <!-- Empty space between the left and right td -->

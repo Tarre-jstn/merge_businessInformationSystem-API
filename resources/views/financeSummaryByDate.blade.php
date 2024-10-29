@@ -47,7 +47,7 @@
 			}
 
 			.invoice-box table tr.heading td {
-				background: #8B0000;
+				background: #1F2937;
 				border-bottom: 1px solid #ddd;
 				font-weight: bold;
                 color: #ffffff;
@@ -122,7 +122,7 @@
     <table width="100%" style="border-collapse: collapse;">
         <tr>
             <td class="title" style="text-align: left;">
-                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px" />
+                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px; height: 140px; border-radius: 50%; object-fit: cover;" />
             </td>
             <td>&nbsp;</td> <!-- Non-breaking space for empty cell -->
             <td style="text-align: right;">
