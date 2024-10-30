@@ -249,43 +249,6 @@ const filteredFinances = computed(() => {
 
 
 
-
-
-const sortOrder = ref('asc'); // Default sort order
-
-function sortByDescription() {
-    // Toggle the sort order
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
-
-    // Sort the products array in-place based on the current sort order
-    finances.value.sort((a, b) => {
-        if (sortOrder.value === 'asc') {
-            return a.name.localeCompare(b.name);
-        } else {
-            return b.name.localeCompare(a.name);
-        }
-    });
-}
-
-const DateSortOrder = ref('asc'); // Default sort order for Exp. Date
-
-function sortByDate() {
-    // Toggle the sort order for DateSortOrder. Date
-    DateSortOrder.value = DateSortOrder.value === 'asc' ? 'desc' : 'asc';
-
-    // Sort the products array in-place based on the current expDate sort order
-    finances.value.sort((a, b) => {
-        const dateA = new Date(a.Date);
-        const dateB = new Date(b.Date);
-
-        if (DateSortOrder.value === 'asc') {
-            return dateA - dateB; // Sort ascending by date (earliest first)
-        } else {
-            return dateB - dateA; // Sort descending by date (latest first)
-        }
-    });
-}
-
 const isDateFiltered = ref(false);
 const startDate = ref('');
 const endDate = ref('');
@@ -427,6 +390,70 @@ onMounted(() => {
 });
 
 
+
+const sortOrderDate = ref('asc'); // Default sort order
+function sortByDate() {
+    // Toggle the sort order for Exp. Date
+    sortOrderDate.value = sortOrderDate.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current expDate sort order
+    finances.value.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        if (sortOrderDate.value === 'asc') {
+            return dateA - dateB; // Sort ascending by date (earliest first)
+        } else {
+            return dateB - dateA; // Sort descending by date (latest first)
+        }
+    });
+}
+
+const sortOrderDescription = ref('asc'); // Default sort order
+function sortByDescription() {
+    // Toggle the sort order
+    sortOrderDescription.value = sortOrderDescription.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    finances.value.sort((a, b) => {
+        if (sortOrderDescription.value === 'asc') {
+            return a.description.localeCompare(b.description);
+        } else {
+            return b.description.localeCompare(a.description);
+        }
+    });
+}
+
+const sortOrderCategory = ref('asc'); // Default sort order
+function sortByCategory() {
+    // Toggle the sort order
+    sortOrderCategory.value = sortOrderCategory.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    finances.value.sort((a, b) => {
+        if (sortOrderCategory.value === 'asc') {
+            return a.category.localeCompare(b.category);
+        } else {
+            return b.category.localeCompare(a.category);
+        }
+    });
+}
+
+const sortOrderAmount = ref('asc'); // Default sort order
+function sortByAmount() {
+    // Toggle the sort order
+    sortOrderAmount.value = sortOrderAmount.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    finances.value.sort((a, b) => {
+        if (sortOrderAmount.value === 'asc') {
+            return a.amount - b.amount;
+        } else {
+            return b.amount - a.amount;
+        }
+    });
+}
+
 </script>
 
 <template>
@@ -463,32 +490,18 @@ onMounted(() => {
                         <table class="min-w-full">
                             <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">
                             <tr>
-                                <th 
-                                class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer whitespace-nowrap"
-                                @click="sortByDate">
-                                <div class="items-center text-center text-xl space-x-1">
-                                    <font-awesome-icon 
-                                    :icon="['fas', 'angle-down']" 
-                                    :class="DateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
-                                    class="ml-2 transition-transform duration-300 ease-in-out" 
-                                    />
-                                    <span>Date</span>
-                                </div>
-                                </th>
-                                <th 
-                                class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-center align-middle cursor-pointer"
-                                @click="sortByDescription">
-                                <div class="text-xl items-center text-center space-x-1">
-                                    <font-awesome-icon 
-                                    :icon="['fas', 'angle-down']"
-                                    :class="sortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
-                                    class="ml-2 transition-transform duration-300 ease-in-out" 
-                                    /> 
-                                    <span>Decription</span>
-                                </div>
-                                </th>
-                                <th class="text-xl px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
-                                <th class="text-xl px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Amount</th>
+                                <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByDate">
+                                    <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderDate === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                        <span>Date</span></div></th>
+                                <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByDescription">
+                                    <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderDescription === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                        <span>Description</span></div></th>
+                                <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByCategory">
+                                    <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderCategory === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                        <span>Category</span></div></th>
+                                <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByAmount">
+                                    <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderAmount === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                        <span>Amount.</span></div></th>
                                 <th class="text-xl px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
                             </tr>
                             </thead>
@@ -518,7 +531,7 @@ onMounted(() => {
                                 <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
                                 <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                 <div class="flex items-center justify-center space-x-1">
-                                    <button @click="editFinanceDetails(finance)" class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                    <button @click="editFinanceDetails(finance)" class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 bg-yellow-500 text-white px-2 py-1 rounded-full">
                                     <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                     </button>
                                     <button @click="viewFinanceDetails(finance)" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
@@ -550,8 +563,8 @@ onMounted(() => {
                                 </td>
                                 <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">{{ finance.amount }}</td>
                                 <td class="text-white px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                <div class="flex items-center justify-center space-x-2">
-                                    <button @click="editFinanceDetails(finance)" class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                <div class="flex items-center justify-center space-x-1">
+                                    <button @click="editFinanceDetails(finance)" class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 bg-yellow-500 text-white px-2 py-1 rounded-full">
                                     <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
                                     </button>
                                     <button @click="viewFinanceDetails(finance)" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">

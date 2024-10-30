@@ -253,8 +253,10 @@ const updateProduct = async () => {
 
         const index = products.value.findIndex(product => product.id === editProduct.value.id);
         products.value[index] = response.data.product;
+        fetchProducts();
         showEditProductModal.value = false;
         resetEditProduct();
+        
     } catch (error) {
         if (error.response && error.response.data) {
             console.error("Validation errors:", error.response.data);
@@ -428,40 +430,7 @@ const updateDiscountable = async (productId, discountableStatus) => {
 
 
 
-const sortOrder = ref('asc'); // Default sort order
 
-function sortByName() {
-    // Toggle the sort order
-    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
-
-    // Sort the products array in-place based on the current sort order
-    products.value.sort((a, b) => {
-        if (sortOrder.value === 'asc') {
-            return a.name.localeCompare(b.name);
-        } else {
-            return b.name.localeCompare(a.name);
-        }
-    });
-}
-
-const expDateSortOrder = ref('asc'); // Default sort order for Exp. Date
-
-function sortByExpDate() {
-    // Toggle the sort order for Exp. Date
-    expDateSortOrder.value = expDateSortOrder.value === 'asc' ? 'desc' : 'asc';
-
-    // Sort the products array in-place based on the current expDate sort order
-    products.value.sort((a, b) => {
-        const dateA = new Date(a.expDate);
-        const dateB = new Date(b.expDate);
-
-        if (expDateSortOrder.value === 'asc') {
-            return dateA - dateB; // Sort ascending by date (earliest first)
-        } else {
-            return dateB - dateA; // Sort descending by date (latest first)
-        }
-    });
-}
 
 const isDateFiltered = ref(false);
 const startDate = ref('');
@@ -578,7 +547,7 @@ function printInventorySummary() {
 
         if(summaryOption.value.option === 'summaryPdf'){
             window.open(`/api/products/print/pdf`, '_blank');
-        }
+        }   
         else{
             window.open(`/api/products/print/export/xlsx/`, '_blank');
         }
@@ -705,6 +674,7 @@ const saveSettings = async () => {
             { stock_expDate: 'stock', count: stocksDays.value },
             { stock_expDate: 'expDate', count: expiryDays.value }
         ]);
+        fetchProducts;
         alert('Settings saved successfully');
     } catch (error) {
         console.error('Error saving product notification settings:', error);
@@ -716,6 +686,7 @@ const saveSettings = async () => {
 const cancelChanges = () => {
     // Reset values by re-fetching from the API
     onMounted();
+    
     isOpen.value = false; // Close the dropdown
 };
 
@@ -741,7 +712,134 @@ const isLowStock = (productStock) => {
     return productStock < stocksDays.value;
 };
 
+const sortOrder = ref('asc'); // Default sort order
+function sortByName() {
+    // Toggle the sort order
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
 
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrder.value === 'asc') {
+            return a.name.localeCompare(b.name);
+        } else {
+            return b.name.localeCompare(a.name);
+        }
+    });
+}
+
+const sortOrderBrand = ref('asc'); // Default sort order
+function sortByBrand() {
+    // Toggle the sort order
+    sortOrderBrand.value = sortOrderBrand.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrderBrand.value === 'asc') {
+            return a.brand.localeCompare(b.brand);
+        } else {
+            return b.brand.localeCompare(a.brand);
+        }
+    });
+}
+
+
+
+const sortOrderPrice = ref('asc'); // Default sort order
+function sortByPrice() {
+    // Toggle the sort order
+    sortOrderPrice.value = sortOrderPrice.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrderPrice.value === 'asc') {
+            return a.price - b.price;
+        } else {
+            return b.price - a.price;
+        }
+    });
+}
+
+
+
+const sortOrderCategory = ref('asc'); // Default sort order
+function sortByCategory() {
+    // Toggle the sort order
+    sortOrderCategory.value = sortOrderCategory.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrderCategory.value === 'asc') {
+            return a.category.localeCompare(b.category);
+        } else {
+            return b.category.localeCompare(a.category);
+        }
+    });
+}
+
+const sortOrderStock = ref('asc'); // Default sort order
+function sortByStock() {
+    // Toggle the sort order
+    sortOrderStock.value = sortOrderStock.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrderStock.value === 'asc') {
+            return a.stock - b.stock;
+        } else {
+            return b.stock - a.stock;
+        }
+    });
+}
+
+const sortOrderSold = ref('asc'); // Default sort order
+function sortBySold() {
+    // Toggle the sort order
+    sortOrderSold.value = sortOrderSold.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrderSold.value === 'asc') {
+            return a.sold - b.sold;
+        } else {
+            return b.sold - a.sold;
+        }
+    });
+}
+
+const sortOrderStatus = ref('asc'); // Default sort order
+function sortByStatus() {
+    // Toggle the sort order
+    sortOrderStatus.value = sortOrderStatus.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    products.value.sort((a, b) => {
+        if (sortOrderStatus.value === 'asc') {
+            return a.status.localeCompare(b.status);
+        } else {
+            return b.status.localeCompare(a.status);
+        }
+    });
+}
+
+
+const expDateSortOrder = ref('asc'); // Default sort order for Exp. Date
+
+function sortByExpDate() {
+    // Toggle the sort order for Exp. Date
+    expDateSortOrder.value = expDateSortOrder.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current expDate sort order
+    products.value.sort((a, b) => {
+        const dateA = new Date(a.expDate);
+        const dateB = new Date(b.expDate);
+
+        if (expDateSortOrder.value === 'asc') {
+            return dateA - dateB; // Sort ascending by date (earliest first)
+        } else {
+            return dateB - dateA; // Sort descending by date (latest first)
+        }
+    });
+}
 </script>
 
 <template>
@@ -867,17 +965,55 @@ const isLowStock = (productStock) => {
                                                 <span>Name</span>
                                             </div>
                                         </th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByBrand">
+                                            <div class="flex items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderBrand === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                <span>Brand</span>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByPrice">
+                                            <div class="p-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderPrice === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                <span>Price (PHP)</span>
+                                            </div>
+                                        </th>
+                                        <th 
+                                            class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
+                                            @click="sortByCategory">
+                                            <div class="p-3 flex justify-center items-center space-x-1">
+                                                <font-awesome-icon 
+                                                    :icon="['fas', 'angle-down']"
+                                                    :class="sortOrderCategory === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                                    class="ml-2 transition-transform duration-300 ease-in-out" 
+                                                /> 
+                                                <span>Category</span>
+                                            </div>
+                                        </th>
 
-                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle">Brand</th>
-                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Price (PHP)</th>
-                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Category</th>
-                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Stock</th>
-                                        <th class="px-2 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Sold</th>
-                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
+                                        <th 
+                                            class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
+                                            @click="sortByStock">
+                                            <div class="p-3 flex justify-center items-center space-x-1">
+                                                <font-awesome-icon 
+                                                    :icon="['fas', 'angle-down']"
+                                                    :class="sortOrderStock === 'asc' ? 'rotate-180' : 'rotate-0'"
+                                                    class="ml-2 transition-transform duration-300 ease-in-out" 
+                                                /> 
+                                                <span>Stock</span>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortBySold">
+                                            <div class="p-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderSold === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                <span>Sold</span>
+                                            </div>
+                                        </th>
+                                        <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByStatus">
+                                            <div class="p-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderStatus === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                <span>Status</span>
+                                            </div>
+                                        </th>
                                         <th 
                                             class=" px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap"
                                             @click="sortByExpDate">
-                                            <div class="pr-4 flex justify-center items-center space-x-1">
+                                            <div class="pr-3 flex justify-center items-center space-x-1">
                                                 <font-awesome-icon 
                                                     :icon="['fas', 'angle-down']" 
                                                     :class="expDateSortOrder === 'asc' ? 'rotate-180' : 'rotate-0'"
@@ -929,15 +1065,20 @@ const isLowStock = (productStock) => {
                                         </td>
                                         <td class="px-2 py-4 border-b border-gray-200 dark:border-gray-700 text-center">{{ product.sold }}</td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center">
+                                            <div class="flex items-center justify-center w-full">
+                                                
+                                            
                                                 <span :class="{
                                                     'bg-red-500 text-white py-1 px-3 rounded-full': product.status === 'Unlisted',
                                                     'bg-green-500 text-white py-1 px-3 rounded-full': product.status === 'Listed',
                                                     'bg-gray-500 text-white py-1 px-3 rounded-full': product.status === 'Out of Stock',
                                                 }">{{ product.status }}</span>
+                                            </div>
                                         </td>
 
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 text-center align-middle">
-                                            <span v-if="isDateTodayOrPast(product.expDate)" 
+                                            <div class="flex items-center justify-center w-full">
+                                                <span v-if="isDateTodayOrPast(product.expDate)" 
                                                 class="transition hover:scale-105 ease-in-out duration-150 hover:bg-red-700 font-semibold group inline-block rounded-full bg-red-600 text-white font-bold px-3 py-1 text-sm mr-2 cursor-pointer align-middle">
                                             !
                                             <span class="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-max bg-gray-700 text-white text-sm rounded-md px-2 py-1">
@@ -955,6 +1096,8 @@ const isLowStock = (productStock) => {
                                             <span class="inline-block align-middle">
                                             {{ formatDate(product.expDate) }}
                                             </span>
+                                            </div>
+
                                         </td>
                                         <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
                                             <div class="flex items-center justify-center">
@@ -1027,7 +1170,19 @@ const isLowStock = (productStock) => {
         </transition>
 
 
-        
+        <!-- <transition name="toast">
+            <div v-if="showSuccessAddModal" class="fixed top-4 right-4 flex items-center p-4 mb-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800 z-50" role="alert">
+            <div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                <CheckCircle class="w-5 h-5" />
+            </div>
+            <div class="ml-3 text-sm font-normal">The Product Information has been successfully Added!</div>
+            <button @click="dismiss" type="button" class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700" aria-label="Close">
+                <span class="sr-only">Close</span>
+                <X class="w-5 h-5" />
+            </button>
+            </div>
+        </transition> -->
+
         <transition name="modal-fade" >
             <div v-if="showSuccessAddModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 overflow-y-auto h-full w-full">
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
@@ -1052,6 +1207,7 @@ const isLowStock = (productStock) => {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
+
 
                 <div class="flex space-x-6">
                     <!-- Import section -->
@@ -1153,7 +1309,7 @@ const isLowStock = (productStock) => {
 
                                 <!-- Sold Field -->
                                 <div>
-                                    <label for="sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                    <label for="sold" style="font-size: 11px;" class=" pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline   text-white">Sold  <span class="text-red-500">*</span></label>
                                     <input type="number" id="sold" v-model="newProduct.sold" class="input-field text-xs p-1" />
                                 </div>
                                 <!-- Status Field -->
@@ -1291,7 +1447,7 @@ const isLowStock = (productStock) => {
 
                             <!-- Sold Field -->
                             <div>
-                                <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <label for="edit_sold" style="font-size: 11px;" class=" pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline   text-white">Sold  <span class="text-red-500">*</span></label>
                                 <input type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
                             </div>
                             <!-- Status Field -->
@@ -1423,7 +1579,7 @@ const isLowStock = (productStock) => {
 
                             <!-- Sold Field -->
                             <div>
-                                <label for="edit_sold" class="block text-xs font-medium text-gray-700">Sold</label>
+                                <label for="edit_sold" style="font-size: 11px;" class=" pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline   text-white">Sold  <span class="text-red-500">*</span></label>
                                 <input disabled type="number" id="edit_sold" v-model="editProduct.sold" class="input-field text-xs p-1" />
                             </div>
                             <!-- Status Field -->
@@ -1533,6 +1689,15 @@ const isLowStock = (productStock) => {
 }
 
 
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.5s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
+}
 
 @keyframes popIn {
     0% {
@@ -1566,7 +1731,9 @@ const isLowStock = (productStock) => {
     width: 100%;
     padding: 0.4rem 0.6rem;
     border: 1px solid #CBD5E0;
-    border-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }

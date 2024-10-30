@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Inventory;
 use App\Models\Business;
+use App\Models\Product;
 use Exception;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -80,8 +81,6 @@ class InvoiceItemController extends Controller
         }
     }
 
-
-
     public function updateInvoiceItems(Request $request, $invoice_system_id) {
         // Find all invoice items for the given invoice_system_id
 
@@ -121,10 +120,101 @@ class InvoiceItemController extends Controller
                 'amount' => $request->amount,
 
             ]);
+            
         }catch(Exception $e){
             return response()->json(data:['error in generating invoice items' => $e->getMessage()], status: 500);
         }
     }
+    
+    // public function updateInvoiceItems(Request $request, $invoice_system_id) {
+    //     // Find all invoice items for the given invoice_system_id
+
+    //     try{
+    //         $validatedData = $request->validate([
+    //             'invoice_system_id' => 'nullable|exists:invoices,invoice_system_id',
+
+    //             'product_id' => 'nullable|exists:products,id',
+    //             'product_name' => 'nullable|string|max:255',
+    //             'product_price' => 'nullable|numeric',
+            
+    //             'on_sale' => 'nullable|in:yes,no',
+    //             'on_sale_price' => 'nullable' ,
+
+    //             'seniorPWD_discountable' => 'nullable|in:yes,no',
+
+    //             'final price' => 'nullable|numeric',
+
+    //             'quantity' => 'nullable|numeric',
+    //             'amount' => 'nullable|numeric'
+    //         ]);
+            
+
+    //         $invoice_item = InvoiceItem::create([
+    //             'invoice_system_id' => $request->invoice_system_id,
+                
+    //             'product_id' => $request->product_id,
+    //             'product_name' => $request->product_name,
+    //             'product_price' => $request->product_price,
+
+    //             'on_sale' => $request->on_sale,
+    //             'on_sale_price' => $request->on_sale_price,
+    //             'seniorPWD_discountable' => $request->seniorPWD_discountable,
+    //                 'final_price' => $request->final_price,
+
+    //             'quantity' => $request->quantity,
+    //             'amount' => $request->amount,
+
+    //         ]);
+    //     }catch(Exception $e){
+    //     }
+    // }
+    
+    
+    // public function updateInvoiceItems(Request $request, $invoice_system_id) {
+    //     try {
+    //         // Validate request data
+    //         $validatedData = $request->validate([
+    //             'invoice_system_id' => 'required|exists:invoices,invoice_system_id',
+    //             'product_id' => 'required|exists:products,id',
+    //             'product_name' => 'required|string|max:255',
+    //             'product_price' => 'required|numeric',
+    //             'on_sale' => 'nullable|in:yes,no',
+    //             'on_sale_price' => 'nullable|numeric',
+    //             'seniorPWD_discountable' => 'nullable|in:yes,no',
+    //             'final_price' => 'required|numeric',
+    //             'quantity' => 'required|integer|min:1',
+    //             'amount' => 'required|numeric'
+    //         ]);
+    
+    //         // Retrieve existing item or create a new one if it doesn’t exist
+    //         $invoiceItem = InvoiceItem::updateOrCreate(
+    //             [
+    //                 'invoice_system_id' => $invoice_system_id,
+    //                 'product_id' => $request->product_id
+    //             ],
+    //             [
+    //                 'product_name' => $request->product_name,
+    //                 'product_price' => $request->product_price,
+    //                 'on_sale' => $request->on_sale,
+    //                 'on_sale_price' => $request->on_sale_price,
+    //                 'seniorPWD_discountable' => $request->seniorPWD_discountable,
+    //                 'final_price' => $request->final_price,
+    //                 'quantity' => $request->quantity,
+    //                 'amount' => $request->amount,
+    //             ]
+    //         );
+    
+    //         // Adjust stock based on the new quantity
+    //         $product = Product::find($request->product_id);
+    //         $newStock = max(0, $product->stock - $request->quantity);
+    //         $product->update(['stock' => $newStock]);
+    
+    //         return response()->json(['success' => 'Invoice item updated successfully'], 200);
+            
+    //     } catch (Exception $e) {
+    //         return response()->json(['error' => 'Error updating invoice items: ' . $e->getMessage()], 500);
+    //     }
+    // }
 
 
     public function deleteInvoiceItems(Request $request, $invoice_system_id){
@@ -135,53 +225,7 @@ class InvoiceItemController extends Controller
 }
 
     
-    // public function updateInvoiceItems(Request $request, $invoice_system_id) {
-    //     try{
-    //                 // Retrieve the invoice items by its invoice_system_id
-    //     $invoiceItems = InvoiceItem::where('invoice_system_id', $invoice_system_id)->get();
-    
 
-    //     // Validate the request data
-    //     $request->validate([
-    //         'invoice_system_id' => 'nullable|exists:invoices,invoice_system_id',
-    //         'product_id' => 'nullable|exists:products,id',
-    //         'product_name' => 'nullable|string|max:255',
-    //         'product_price' => 'nullable|numeric',
-    //         'on_sale' => 'nullable|in:yes,no',
-    //         'on_sale_price' => 'nullable|numeric',
-    //         'seniorPWD_discountable' => 'nullable|in:yes,no',
-    //         'final_price' => 'nullable|numeric',
-    //         'quantity' => 'nullable|numeric',
-    //         'amount' => 'nullable|numeric'
-    //     ]);
-    
-    //     // Iterate and update each item
-    //     foreach ($invoiceItems as $item) {
-    //         $item->update($request->only([
-    //             'product_id',
-    //             'product_name',
-    //             'product_price',
-    //             'on_sale',
-    //             'on_sale_price',
-    //             'seniorPWD_discountable',
-    //             'final_price',
-    //             'quantity',
-    //             'amount'
-    //         ]));
-    //     }
-
-    //     $invoiceItem = InvoiceItem::findOrFail($invoice_system_id);
-
-    //     $invoiceItem->update($request);
-
-    //     // return response()->json(['finance' => $finance], 200);
-    
-    //     return response()->json($invoiceItem);
-
-
-    //     }catch(Exception $e){
-    //         return response()->json(['error in updating invoice item' => $e->getMessage()], 500);
-    //     }
 
 
 

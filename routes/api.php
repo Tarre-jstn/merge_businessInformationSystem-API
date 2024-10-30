@@ -50,7 +50,7 @@ Route::put('/productNotif', [ProductNotificationSettingsController::class, 'upda
 
 Route::patch('/products/{id}/sold', [ProductController::class, 'updateSold']);
 Route::patch('/products/{id}/stock', [ProductController::class, 'updateStock']);
-
+Route::get('/products/{id}/stock', [ProductController::class, 'getStock']);
 
 
 Route::get('/business', [BusinessController::class, 'show']);

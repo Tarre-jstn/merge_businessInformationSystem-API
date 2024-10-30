@@ -20,6 +20,21 @@ use Maatwebsite\Excel\Validators\ValidationException;
 class ProductController extends Controller
 {
 
+    public function getStock($id)
+    {
+        // Find the product by its ID and select only the stock field
+        $product = Product::find($id);
+
+        // Check if the product exists
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        // Return the stock value in JSON format
+        return response()->json(['stock' => $product->stock]);
+    }
+
+
     public function updateSold(Request $request, $id)
     {
         // Validate only the sold field
