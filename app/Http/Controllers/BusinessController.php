@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Auth;
 class BusinessController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource.a
      */
 
     public function index()

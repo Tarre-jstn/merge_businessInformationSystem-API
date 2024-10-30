@@ -4,6 +4,8 @@ import axios from 'axios';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import Chatbot from '@/Components/Chatbot.vue';
+import ErrorToast from '@/Components/ErrorToast.vue';
+import SuccessToast from '@/Components/SuccessToast.vue';
 
 // Define the chatbot data structure using ref
 const chatbot = ref({
@@ -21,6 +23,20 @@ const chatbot = ref({
     ncr: '',      // NCR info
     car: ''       // CAR info
 });
+
+const showErrorToast = ref(false);
+const showSuccessToast = ref(false);
+const toastMessage = ref('');
+
+const showToast = (message, type) => {
+  toastMessage.value = message;
+  if (type === 'error') showErrorToast.value = true;
+  if (type === 'success') showSuccessToast.value = true;
+  setTimeout(() => {
+    showErrorToast.value = false;
+    showSuccessToast.value = false;
+  }, 3000);
+};
 
 onMounted(async () => {
     try {
@@ -67,16 +83,18 @@ const updateChatbotData = async () => {
         });
         console.log("Response data:", response.data);
 
-        if (response.status === 200) {
-            alert('Chatbot Responses updated successfully');
-            window.location.reload();
+        if (response.data.success) {
+            showToast("Business Info Has Been Updated", "success");
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);  
         } else {
-            console.error("Update failed:", response.data);
-            alert('Update failed');
+            showToast("Failed to update respons", "error");
+
         }
     } catch (error) {
         console.error("Error updating responses:", JSON.stringify(error.response?.data, null, 2));
-        alert('Failed to update responses profile');
+        showToast("Failed to update response", "error");
     }
 };
 
@@ -274,9 +292,19 @@ const updateChatbotData = async () => {
                     </div>
                 </div>
                 <Chatbot />
-         
-            
         </div>
+            <ErrorToast
+                v-if="showErrorToast"
+                :visible="showErrorToast"
+                :message="toastMessage"
+                @close="showErrorToast = false"
+            />
+            <SuccessToast
+                v-if="showSuccessToast"
+                :visible="showSuccessToast"
+                :message="toastMessage"
+                @close="showSuccessToast = false"
+            />
     </AuthenticatedLayout>
 </template>
 

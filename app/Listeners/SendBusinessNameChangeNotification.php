@@ -35,11 +35,13 @@ class SendBusinessNameChangeNotification
         $imageChange = '';
 
         foreach ($event->changes as $field => $change) {
-            if ($field === 'business_Address') {
-                $emailBody .= "<p style='font-size: 14px;'><strong>Business Address</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
-            } elseif ($field === 'business_image' && !$event->ignoreImageChange) {
-                $oldImageUrl = isset($change['old']) ? asset(Storage::url('business_logos/archive/' . $change['old'])) : null;
-                $newImageUrl = isset($change['new']) ? asset(Storage::url('business_logos/' . $change['new'])) : null;
+            $fieldLabel = ucfirst(str_replace('_', ' ', $field));
+            $oldValue = $change['old'];
+            $newValue = $change['new'];
+
+            if ($field === 'business_image' && !$event->ignoreImageChange) {
+                $oldImageUrl = isset($oldValue) ? asset(Storage::url('business_logos/archive/' . $oldValue)) : null;
+                $newImageUrl = isset($newValue) ? asset(Storage::url('business_logos/' . $newValue)) : null;
 
                 if ($oldImageUrl && $newImageUrl && $oldImageUrl !== $newImageUrl) {
                     $imageChange = "<p style='font-size: 14px;'><strong>Logo has been updated:</strong></p>";
@@ -51,17 +53,13 @@ class SendBusinessNameChangeNotification
                     $imageChange .= "</div>";
                 }
             } else {
-                $fieldLabel = ucfirst(str_replace('_', ' ', $field));
-
-                // Check if a social media field was removed
-                if (in_array($field, ['business_Facebook', 'business_X', 'business_Instagram', 'business_Tiktok'])) {
-                    if (!empty($change['old']) && empty($change['new'])) {
-                        $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> has been removed.</p>";
-                    } elseif (empty($change['old']) && !empty($change['new'])) {
-                        $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> has been added: <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
-                    } else {
-                        $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$change['old']}</span> to <span style='color: #5cb85c;'>{$change['new']}</span>.</p>";
-                    }
+                // Handle all other fields, including Business Name, Email, Phone Number, and Telephone Number
+                if (!empty($oldValue) && empty($newValue)) {
+                    $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> has been removed.</p>";
+                } elseif (empty($oldValue) && !empty($newValue)) {
+                    $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> has been added: <span style='color: #5cb85c;'>{$newValue}</span>.</p>";
+                } else {
+                    $emailBody .= "<p style='font-size: 14px;'><strong>{$fieldLabel}</strong> changed from <span style='color: #d9534f;'>{$oldValue}</span> to <span style='color: #5cb85c;'>{$newValue}</span>.</p>";
                 }
             }
         }
@@ -83,7 +81,6 @@ class SendBusinessNameChangeNotification
         }
     }
 }
-
 
 
 }
