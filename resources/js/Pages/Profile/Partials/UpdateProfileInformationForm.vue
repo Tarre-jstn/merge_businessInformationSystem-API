@@ -32,9 +32,9 @@ const form = useForm({
             </p>
         </header>
 
-        <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
+        <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6" style="color: #FFFFFF;">
             <div>
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="Name" style="color: #FFFFFF;"/>
 
                 <TextInput
                     id="name"
@@ -50,7 +50,7 @@ const form = useForm({
             </div>
 
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="Email" style="color: #FFFFFF;"/>
 
                 <TextInput
                     id="email"

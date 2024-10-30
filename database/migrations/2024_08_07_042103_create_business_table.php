@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('business_City');
             $table->string('business_Barangay');
             $table->string('business_Address');
-            $table->string('business_Contact_Number');
+            $table->string('business_Phone_Number');
             $table->unsignedBigInteger('business_TIN');
             $table->string('business_Telephone_Number');
             $table->string('business_Facebook')->nullable();

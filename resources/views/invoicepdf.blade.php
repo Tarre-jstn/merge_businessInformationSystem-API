@@ -47,7 +47,7 @@
 			}
 
 			.invoice-box table tr.heading td {
-				background: #8B0000;
+				background: #1F2937;
 				border-bottom: 1px solid #ddd;
 				font-weight: bold;
                 color: #ffffff;
@@ -118,7 +118,7 @@
                         <tr>
                             <!-- Left-aligned content -->
                             <td class="title" style="text-align: left;">
-                                <img src="{{ asset('path_to_logo') }}" style="width:120px" />
+                                <img src="storage/business_logos/{{ $businessImage }}" style="width:140px; height: 140px; border-radius: 50%; object-fit: cover;" />
                             </td>
 
                             <!-- Empty space between the left and right td -->

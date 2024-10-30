@@ -7,6 +7,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoiceItemController;
 use App\Http\Controllers\InvoiceAdditionalController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductNotificationSettingsController;
 use App\Models\InvoiceAdditional;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Models\Business;
 use App\Models\Product;
 use App\Models\Invoice;
+use App\Models\ProductNotificationSettings;
 use App\Http\Controllers\business_info_controller;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\GetIdController;
@@ -41,6 +43,18 @@ Route::get('/all-invoices', function(){
     return Invoice::all();
 });
 
+
+
+Route::get('/productNotif', [ProductNotificationSettingsController::class, 'show']);
+Route::put('/productNotif', [ProductNotificationSettingsController::class, 'updateCounts']);
+
+Route::patch('/products/{id}/sold', [ProductController::class, 'updateSold']);
+Route::patch('/products/{id}/stock', [ProductController::class, 'updateStock']);
+Route::get('/products/{id}/stock', [ProductController::class, 'getStock']);
+
+
+Route::get('/business', [BusinessController::class, 'show']);
+Route::get('/business_info', [BusinessController::class, 'index']);
 Route::get('/business_info', [BusinessController::class, 'showBusiness']);
 Route::post('/website', [WebsiteController::class, 'store']);
 Route::get('/website', [WebsiteController::class, 'info']);
@@ -160,5 +174,4 @@ Route::get('products/print/pdf', [FinanceController::class, 'printProductsPdf'])
 Route::post('products/import/xlsx', [ProductController::class, 'importProductsXlsx']);
 
 Route::get('products/print/export/xlsx', [ProductController::class, 'exportProductsXslx']);
-
 

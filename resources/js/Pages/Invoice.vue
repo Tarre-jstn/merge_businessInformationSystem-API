@@ -92,6 +92,120 @@ const editInvoice = ref({
     customer_OSCA_PWD_ID_No: 0,
   });
 
+//ERROR TRAPPING
+const invoiceIDError = ref('');
+const dateError = ref('');
+const statusError = ref('');
+const ptypeError = ref('');
+const termsError = ref('');
+
+const UpdateinvoiceIDError = ref('');
+const UpdatedateError = ref('');
+const UpdatestatusError = ref('');
+const UpdateptypeError = ref('');
+const UpdatetermsError = ref('');
+
+const validateUpdateInvoiceID = () => {
+    if (!editInvoice.value.invoice_id) {
+        UpdateinvoiceIDError.value = "This field cannot be empty";
+    } else {
+        UpdateinvoiceIDError.value = '';
+    }
+};
+
+const validateUpdateDate = () => {
+    if (!editInvoice.value.date) {
+        UpdatedateError.value = "This field cannot be empty";
+    } else {
+        UpdatedateError.value = '';
+    }
+};
+
+const validateUpdateStatus = () => {
+    if (!editInvoice.value.status) {
+        UpdatestatusError.value = "This field cannot be empty";
+    } else {
+        UpdatestatusError.value = '';
+    }
+};
+
+const validateUpdatePtype = () => {
+    if (!editInvoice.value.payment_Type) {
+        UpdateptypeError.value = "This field cannot be empty";
+    } else {
+        UpdateptypeError.value = '';
+    }
+};
+
+const validateUpdateTerms = () => {
+    if (!editInvoice.value.terms) {
+        UpdatetermsError.value = "This field cannot be empty";
+    } else {
+        UpdatetermsError.value = '';
+    }
+};
+
+
+
+const validateInvoiceID = () => {
+    if (!newInvoice.value.invoice_id) {
+        invoiceIDError.value = "This field cannot be empty";
+    } else {
+        invoiceIDError.value = '';
+    }
+};
+
+const validateDate = () => {
+    if (!newInvoice.value.date) {
+        dateError.value = "This field cannot be empty";
+    } else {
+        dateError.value = '';
+    }
+};
+
+const validateStatus = () => {
+    if (!newInvoice.value.status) {
+        statusError.value = "This field cannot be empty";
+    } else {
+        statusError.value = '';
+    }
+};
+
+const validatePtype = () => {
+    if (!newInvoice.value.payment_Type) {
+        ptypeError.value = "This field cannot be empty";
+    } else {
+        ptypeError.value = '';
+    }
+};
+
+const validateTerms = () => {
+    if (!newInvoice.value.terms) {
+        termsError.value = "This field cannot be empty";
+    } else {
+        termsError.value = '';
+    }
+};
+
+watch(showAddInvoiceModal, (newVal) => {
+    if (newVal) {
+        validateInvoiceID();
+        validateDate(); 
+        validateStatus();
+        validatePtype();
+        validateTerms();
+    }
+});
+watch(showEditInvoiceModal, (newVal) => {
+    if (newVal) {
+        validateUpdateInvoiceID();
+        validateUpdateDate(); 
+        validateUpdateStatus();
+        validateUpdatePtype();
+        validateUpdateTerms();
+    }
+});
+
 //GET INVOICES
 const fetchInvoices = async () => {
     try {
@@ -128,11 +242,17 @@ const filteredInvoices = computed(() => {
     return invoices.value.filter(invoice => {
         const invoiceId = String(invoice.invoice_id).toLowerCase();
         const customerName = String(invoice.customer_Name).toLowerCase();
+        const paymentType = String(invoice.payment_Type).toLowerCase();
+        const status = String(invoice.status).toLowerCase();
         const date = String(invoice.date).toLowerCase();
+        const totalAmountDue = String(invoice.total_Amount_Due).toLowerCase();
         return (
             invoiceId.includes(searchTerm) ||
             customerName.includes(searchTerm) ||
-            date.includes(searchTerm)
+            date.includes(searchTerm) ||
+            paymentType.includes(searchTerm) ||
+            status.includes(searchTerm) ||
+            totalAmountDue.includes(searchTerm)
         );
     });
 });
@@ -142,6 +262,16 @@ const filteredInvoices = computed(() => {
 
 //ADD INVOICES
 const addInvoice = async () => {
+    validateInvoiceID();
+    validateDate(); 
+    validateStatus();
+    validatePtype();
+    validateTerms();
+    if (invoiceIDError.value || dateError.value || statusError.value || ptypeError.value || termsError.value) {
+        alert('Please correct the errors before adding an Invoice.');
+        return;
+    }
+
     try {
         // Create FormData and send request to create the invoice
         const formData = new FormData();
@@ -169,6 +299,7 @@ const addInvoice = async () => {
 
         // Fetch updated list of invoices
         fetchInvoices();
+        
         // Send the new invoice item
         //await addInvoiceItem(newInvoiceItem.value); // Call addInvoiceItem with the single item
 
@@ -210,13 +341,13 @@ const filteredProducts = (query) => {
 
 const textItemFields = ref([
   { 
-    image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', total_amount: '', areFieldsEnabled: false, isSearching: false, product_id:'', seniorPWD_discountable:'no' }
+    product_id:'', sold:'', image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', stock:'', total_amount: '', areFieldsEnabled: false, isSearching: false, seniorPWD_discountable:'no' }
 ]);// Start with one pair of text fields
 
 // Method to add a new pair of text fields
 const addItemTextField = () => {
   textItemFields.value.push({
-    image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', total_amount: '', isSearching: false, product_id:'', seniorPWD_discountable:'no'
+    product_id:'', sold:'',  image:'', searchProductQuery: '', on_sale: 'no', amount: '', quantity: '', stock:'', total_amount: '', isSearching: false, seniorPWD_discountable:'no'
   });
   newInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
 };
@@ -227,45 +358,72 @@ const removeItemTextField = (index) => {
 };
 const selectProduct = (product, index) => {
   // Assign the selected product's details to the corresponding text field
+  textItemFields.value[index].product_id = product.id;
   textItemFields.value[index].image = product.image;
   textItemFields.value[index].searchProductQuery = product.name;
   textItemFields.value[index].on_sale = product.on_sale;
   // Hide the search results (clear the search query)
   textItemFields.value[index].amount = product.price;
   textItemFields.value[index].areFieldsEnabled = true;
+  textItemFields.value[index].stock = product.stock;
+  textItemFields.value[index].sold = product.sold;
   textItemFields.value[index].isSearching = false; // Hide the search results 
-  textItemFields.value[index].product_id = product.id;
-  console.log('Selected Product Image:', textItemFields.value[index].product_id)
+
+  console.log('Selected Product ID:', textItemFields.value[index].product_id)
   console.log('Selected Product Image:', textItemFields.value[index].image)
 };
 
 const addInvoiceItem = async () => {
     try {
-        for (let field of textItemFields.value) {
-            if(field.searchProductQuery.trim() !== ''){
-            const formData = new FormData();
-            formData.append('invoice_system_id', invoiceSystemId)
-            formData.append('product_id', field.product_id);
-            formData.append('product_name', field.searchProductQuery);
-            formData.append('product_price', field.amount)
-            formData.append('on_sale', field.on_sale);
-            formData.append('seniorPWD_discountable', field.seniorPWD_discountable);
-            formData.append('on_sale_price', field.amount);
-            formData.append('quantity', field.quantity);
-            formData.append('final_price', field.total_amount);
 
-            await axios.post('/api/invoice_item', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
+            for (let field of textItemFields.value) {
+                if (field.quantity <= field.stock) {
+                    if (field.searchProductQuery.trim() !== '') {
+                        const formData = new FormData();
+                        formData.append('invoice_system_id', invoiceSystemId);
+                        formData.append('product_id', field.product_id);
+                        formData.append('product_name', field.searchProductQuery);
+                        formData.append('product_price', field.amount);
+                        formData.append('on_sale', field.on_sale);
+                        formData.append('seniorPWD_discountable', field.seniorPWD_discountable);
+                        formData.append('on_sale_price', field.amount);
+                        formData.append('quantity', field.quantity);
+                        formData.append('final_price', field.total_amount);
+
+                        try {
+                            // First, post the invoice item
+                            await axios.post('/api/invoice_item', formData, {
+                                headers: {
+                                    'Content-Type': 'multipart/form-data'
+                                }
+                            });
+
+                            // After posting, update the stock in the database
+                            const newStock = field.stock - field.quantity; // Calculate new stock
+                            await axios.patch(`/api/products/${field.product_id}/stock`, { stock: newStock });
+                            
+                            
+                            const newSold = field.sold + field.quantity; // Calculate new stock
+                            await axios.patch(`/api/products/${field.product_id}/sold`, { sold: newSold });
+
+                            // Optionally, update the field's stock locally if needed
+                            field.stock = newStock;
+                            field.sold = newSold;
+
+                            message.value = "ADDING INVOICE ITEM: Stock updated successfully";
+                        } catch (error) {
+                            console.error("Error updating stock or posting invoice item:", error);
+                        }
+                    } else {
+                        console.log('Skipping empty item description');
+                    }
+                    addInvoiceAdditional();
+                } else {
+                    console.log('PRODUCT QUANTITY IS HIGHER THAN PRODUCT STOCK');
                 }
-            });
-        } else{
-                console.log('Skipping empty item description');
             }
 
-        }
 
-        addInvoiceAdditional();
 
         console.log("Invoice Item added successfully.");
     } catch (error) {
@@ -405,6 +563,8 @@ const addInvoiceComputation = async () => {
         completed.value = true;
         clearAddInvoiceFields();
         console.log('completed value', completed.value);
+
+        fetchInvoices();
 
         showSuccessAddModal.value = true;
         setTimeout(() => {
@@ -707,28 +867,28 @@ const props = defineProps({
 const emit = defineEmits(['financeDeleted', 'editFinance', 'viewFinance'])
 
 const showDeleteModal = ref(false)
-const financeToDelete = ref(null)
+let financeToDelete = 0;
 
-const openDeleteModal = (id) => {
-  financeToDelete.value = id
+const openDeleteModal = (invoice_system_id) => {
+  financeToDelete = invoice_system_id
   showDeleteModal.value = true
 }
 
 const closeDeleteModal = () => {
   showDeleteModal.value = false
-  financeToDelete.value = null
+  financeToDelete = null
 }
 
 const confirmDelete = async () => {
   try {
-    await axios.delete(`/api/finance/${financeToDelete.value}`)
+    await axios.delete(`/api/invoice/${financeToDelete}`)
     closeDeleteModal()
     showSuccessModal.value = true
-    emit('financeDeleted', financeToDelete.value)
+    emit('financeDeleted', financeToDelete)
     setTimeout(() => {
       showSuccessModal.value = false
     }, 1000) // Auto-close after 2 seconds
-    fetchFinances();
+    fetchInvoices();
   } catch (error) {
     console.error("Error deleting finance:", error)
     // You might want to show an error message to the user here
@@ -843,6 +1003,16 @@ const editInvoiceDetails = async (invoice) => {
 
 //----------------------------------------------FOR UPDATING INVOICE------------------------------------------
 const updateInvoice = async () => {
+    validateUpdateInvoiceID();
+    validateUpdateDate();
+    validateUpdateStatus();
+    validateUpdatePtype();
+    validateUpdateTerms();
+
+    if (UpdateinvoiceIDError.value || UpdatedateError.value || UpdatestatusError.value || UpdateptypeError.value || UpdatetermsError.value) {
+        alert('Please correct the errors before updating the Invoice.');
+        return;
+    }
     try {
 
         // Create a FormData object and append the necessary fields
@@ -875,7 +1045,6 @@ const updateInvoice = async () => {
 };
 
 
-
 //----------------------------------------------FOR UPDATING INVOICE ITEMS------------------------------------------
 const filteredUpdateProducts = (query) => {
   if (!query) {
@@ -891,24 +1060,84 @@ const filteredUpdateProducts = (query) => {
     );
   });
 };
+
+
 const selectedInvoiceItems = ref([
   { 
-    image:'', product_name: '', on_sale: 'no', product_price: '', quantity: '', final_price: '', areFieldsEnabled: false, isSearching: false, product_id:'', seniorPWD_discountable:'no' }
+    oldQuantity:'', product_id:'', sold:'', stock: '', image:'', product_name: '', on_sale: 'no', product_price: '', quantity: '', final_price: '', areFieldsEnabled: false, isSearching: false, seniorPWD_discountable:'no' }
 ]);// Start with one pair of text fields
+// const addUpdateItemTextField = () => {
+//     selectedInvoiceItems.value.push({
+//     oldQuantity:'', product_id:'', sold:'', stock: '', image:'', product_name: '', on_sale: 'no', product_price: '', quantity: '', final_price: '', isSearching: false, seniorPWD_discountable:'no'
+//   });
+//   editInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
+// }
+
 const addUpdateItemTextField = () => {
     selectedInvoiceItems.value.push({
-    image:'', product_name: '', on_sale: 'no', product_price: '', quantity: '', final_price: '', isSearching: false, product_id:'', seniorPWD_discountable:'no'
-  });
-  editInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
-}
+        oldQuantity: '',
+        product_id: '',
+        sold: '',
+        stock: '',
+        image: '',
+        product_name: '',
+        on_sale: 'no',
+        product_price: '',
+        quantity: '',
+        final_price: '',
+        isSearching: false,
+        seniorPWD_discountable: 'no',
+        isNew: true // Indicate this is a new item
+    });
+    editInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
+};
+watch(
+  selectedInvoiceItems,
+  async (newItems, oldItems) => {
+    for (let i = 0; i < newItems.length; i++) {
+      const newProductId = newItems[i].product_id;
+      const oldProductId = oldItems[i]?.product_id;
 
+      // Fetch stock only if product_id has changed and is set
+      if (newProductId && newProductId !== oldProductId) {
+        try {
+          const response = await axios.get(`/api/products/${newProductId}/stock`);
+          selectedInvoiceItems.value[i].stock = response.data.stock;
+        } catch (error) {
+          console.error(`Error fetching stock for product ${newProductId}:`, error);
+          selectedInvoiceItems.value[i].stock = 0; // Default if error
+        }
+      }
+    }
+  },
+  { deep: true }
+);
+
+watch(
+  selectedInvoiceItems,
+  (newItems) => {
+    for (let item of newItems) {
+      if (item.oldQuantity === '' && item.quantity !== '') {
+        item.oldQuantity = item.quantity;  // Set oldQuantity only once
+        console.log(`Initial oldQuantity set for product_id ${item.product_id}:`, item.oldQuantity);
+      }
+    }
+  },
+  { deep: true }
+);
+
+const oldStock = ref();
 const removeItemTextField1 = (index) => {
     selectedInvoiceItems.value.splice(index, 1); // Remove the text field pair at the specified index
   console.log('edit remove text field clicked');
   editInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
 };
-const selectUpdateProduct = (product, index) => {
+const selectUpdateProduct = async (product, index) => {
   // Assign the selected product's details to the corresponding text field
+  selectedInvoiceItems.value[index].product_id = product.id;
+  selectedInvoiceItems.value[index].sold = product.sold;
+
+
   selectedInvoiceItems.value[index].image = product.image;
   selectedInvoiceItems.value[index].product_name = product.name;
   selectedInvoiceItems.value[index].on_sale = product.on_sale;
@@ -916,32 +1145,46 @@ const selectUpdateProduct = (product, index) => {
   selectedInvoiceItems.value[index].product_price = product.price;
   selectedInvoiceItems.value[index].areFieldsEnabled = true;
   selectedInvoiceItems.value[index].isSearching = false; // Hide the search results 
-  selectedInvoiceItems.value[index].product_id = product.id;
   selectedInvoiceItems.value[index].quantity = 0;
   selectedInvoiceItems.value[index].final_price = 0;
+  selectedInvoiceItems.value[index].stock = product.stock;
+  selectedInvoiceItems.value[index].oldQuantity = 0;
+
+  oldStock.value = product.stock;
+  try {
+    const response = await axios.get(`/api/products/${product.id}/stock`);
+    selectedInvoiceItems.value[index].stock = response.data.stock;
+  } catch (error) {
+    console.error('Error fetching product stock:', error);
+    selectedInvoiceItems.value[index].stock = 0; // Set default stock if there's an error
+  }
+  console.log('TANG INA ANO BA YUNG PANGALAN MO HAHAHAHA', selectedInvoiceItems.value[index].stock)
 };
 
+
 const updateInvoiceItem = async () => {
-    try {
-        // Send DELETE request to remove all invoice items for the given invoice_system_id
-        await axios.delete(`/api/invoice_item/${editInvoice.value.invoice_system_id}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        });
+  try {
+    // Send DELETE request to remove all invoice items for the given invoice_system_id
+    await axios.delete(`/api/invoice_item/${editInvoice.value.invoice_system_id}`, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      }
+    });
 
-        // Optional: update front-end state to remove the deleted invoice items from the list
-        invoices.value = invoices.value.filter(invoice => invoice.invoice_system_id !== editInvoice.value.invoice_system_id);
+    // Optional: update front-end state to remove the deleted invoice items from the list
+    invoices.value = invoices.value.filter(invoice => invoice.invoice_system_id !== editInvoice.value.invoice_system_id);
 
+    for (let field of selectedInvoiceItems.value) {
+      // Only process new items
 
-        for (let field of selectedInvoiceItems.value) {
-            if(field.product_name.trim() !== ''){
+        if (field.product_name.trim() !== '') {
+          if (field.quantity <= field.stock) {
             const formData = new FormData();
-            formData.append('invoice_system_id', editInvoice.value.invoice_system_id)
+            formData.append('invoice_system_id', editInvoice.value.invoice_system_id);
             formData.append('product_id', field.product_id);
             formData.append('product_name', field.product_name);
-            formData.append('product_price', field.product_price)
+            formData.append('product_price', field.product_price);
             formData.append('on_sale', field.on_sale);
             formData.append('seniorPWD_discountable', field.seniorPWD_discountable);
             formData.append('on_sale_price', field.product_price);
@@ -949,27 +1192,42 @@ const updateInvoiceItem = async () => {
             formData.append('final_price', field.final_price);
 
             await axios.post(`/api/invoice_item/${editInvoice.value.invoice_system_id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
             });
-        } else{
-                console.log('Skipping empty item description');
+            
+            // Update stock and sold values in the products table
+            if (field.isNew) {
+                const newStock = field.stock - field.quantity;
+                await axios.patch(`/api/products/${field.product_id}/stock`, { stock: newStock });
+                
+                const newSold = field.sold + field.quantity;
+                await axios.patch(`/api/products/${field.product_id}/sold`, { sold: newSold });
+
+                field.stock = newStock;
+                field.sold = newSold;
             }
 
+            
+            // message.value = "UPDATING INVOICE ITEM: Stock updated successfully";
+          } else {
+            console.log('Skipping item with insufficient quantity');
+          }
+        } else {
+          console.log('Skipping empty item description');
         }
-
-        updateInvoiceAdditional();
-
-        console.log("Invoice Item added successfully.");
-
-
-        
-        console.log("Invoice Items deleted successfully.");
-    } catch (error) {
-        console.error("Error deleting invoice items:", error);
+      
     }
+
+    updateInvoiceAdditional();
+
+    console.log("Invoice Items deleted successfully.");
+  } catch (error) {
+    console.error("Error updating invoice items:", error);
+  }
 };
+
 
 
 //----------------------------------------------FOR UPDATING INVOICE ADDITIONALS------------------------------------------
@@ -1485,6 +1743,13 @@ const clearFetchInvoicessByDate = async () => {
     invoicesByDate.value = '';
     isDateFiltered.value = false;
 };
+
+
+const clearDates = async () => {
+
+startDatePrint.value = '';
+endDatePrint.value = '';    
+};
 watch([startDate, endDate], async ([newStartDate, newEndDate]) => {
     if (newStartDate && newEndDate) {
         // if(showPrintInvoiceSummaryByDate){
@@ -1548,6 +1813,98 @@ watch([startDatePrint, endDatePrint], (newValues) => {
 const showSuccessAddModal = ref(false);
 const showSuccessModal = ref(false);
 const showSuccessEditModal = ref(false);
+
+
+const sortOrderID = ref('asc'); // Default sort order
+function sortByID() {
+    // Toggle the sort order
+    sortOrderID.value = sortOrderID.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    invoices.value.sort((a, b) => {
+        if (sortOrderID.value === 'asc') {
+            return a.invoice_id - b.invoice_id;
+        } else {
+            return b.invoice_id - a.invoice_id;
+        }
+    });
+}
+const sortOrderName = ref('asc'); // Default sort order
+function sortByName() {
+    // Toggle the sort order
+    sortOrderName.value = sortOrderName.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    invoices.value.sort((a, b) => {
+        if (sortOrderName.value === 'asc') {
+            return a.customer_Name.localeCompare(b.customer_Name);
+        } else {
+            return b.customer_Name.localeCompare(a.customer_Name);
+        }
+    });
+}
+
+const sortOrderPayment = ref('asc'); // Default sort order
+function sortByPayment() {
+    // Toggle the sort order
+    sortOrderPayment.value = sortOrderPayment.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    invoices.value.sort((a, b) => {
+        if (sortOrderPayment.value === 'asc') {
+            return a.payment_Type.localeCompare(b.payment_Type);
+        } else {
+            return b.payment_Type.localeCompare(a.payment_Type);
+        }
+    });
+}
+const sortOrderAmount = ref('asc'); // Default sort order
+function sortByAmount() {
+    // Toggle the sort order
+    sortOrderAmount.value = sortOrderAmount.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    invoices.value.sort((a, b) => {
+        if (sortOrderAmount.value === 'asc') {
+            return a.total_Amount_Due - b.total_Amount_Due;
+        } else {
+            return b.total_Amount_Due - a.total_Amount_Due;
+        }
+    });
+}
+
+const sortOrderStatus = ref('asc'); // Default sort order
+function sortByStatus() {
+    // Toggle the sort order
+    sortOrderStatus.value = sortOrderStatus.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current sort order
+    invoices.value.sort((a, b) => {
+        if (sortOrderStatus.value === 'asc') {
+            return a.status.localeCompare(b.status);
+        } else {
+            return b.status.localeCompare(a.status);
+        }
+    });
+}
+
+const sortOrderDate = ref('asc'); // Default sort order
+function sortByDate() {
+    // Toggle the sort order for Exp. Date
+    sortOrderDate.value = sortOrderDate.value === 'asc' ? 'desc' : 'asc';
+
+    // Sort the products array in-place based on the current expDate sort order
+    invoices.value.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+
+        if (sortOrderDate.value === 'asc') {
+            return dateA - dateB; // Sort ascending by date (earliest first)
+        } else {
+            return dateB - dateA; // Sort descending by date (latest first)
+        }
+    });
+}
 </script>
 
 
@@ -1556,207 +1913,228 @@ const showSuccessEditModal = ref(false);
     <Head title="Home" />
 
     <AuthenticatedLayout>
-        <div class="py-7 ">
-            <div class="max-w-auto mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+        <div class="py-5 h-full ">
+            <div class="max-w-auto h-full mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg h-[86%]">
+                    <div class="p-6 h-full text-gray-900 dark:text-gray-100 flex flex-col">  
+                        <div class="mt-4 mb-8 flex justify-between items-center">
+                            <h2 class="font-semibold text-4xl">List of Invoices</h2>
 
-                    <div class="p-6 text-gray-900 dark:text-gray-100">  
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-2xl font-semibold">List of Invoices</h2>
                             <div class="flex">
-                                <div class="flex w-100">
-                                    
-                                    <div>
-                                        <font-awesome-icon
+                                <div>
+                                    <div class="relative mr-6 w-96">
+                                    <font-awesome-icon
                                         :icon="['fas', 'magnifying-glass']"
-                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                        class="absolute left-3 top-1/2 transform -translate-y-1/2 text-white"
                                     />
-                                        <input
-                                            v-model="searchQuery"
-                                            type="text"
-                                            placeholder="Search by ID, Customer, or Date"
-                                            class="pl-10 pr-5 py-4 border rounded-md dark:bg-gray-700 dark:text-gray-300 w-full h-10"
-                                        />
+                                    <input
+                                        v-model="searchQuery"
+                                        type="text"
+                                        placeholder="Search by id, customer, payment, status, or date, ..."
+                                        class="pl-10 pr-4 py-2 w-full bg-gray-700 text-white placeholder-gray-300 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
                                     </div>
-
-                                    <div class="items-center flex ml-10 text-white">
-                                        <div class="mr-2 text-xs">Filter by Date:</div>    
-                                            <input id="startDate" class="text-black text-sm" type="date" v-model="startDate" />
-                                        <div class="mx-2 text-xs"> To </div>
-                                            <input id="endDate" class="text-black text-sm mr-2" type="date" v-model="endDate" />
-                                        <button @click="clearFetchInvoicessByDate" class="text-xs bg-stone-600 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
-                                    </div>
-
                                 </div>
                             </div>
                         </div>
 
-                        <div class="overflow-auto" style="height: 500px">
-                            <table class="min-w-full bg-white dark:bg-gray-800">
-                                <thead class="sticky">   
-                                <!-- HEADER FOR INVOICES -->
-                                    <tr class="sticky">
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">ID No.</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Customer Name</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Payment Type</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Total Amount</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Status</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Date</th>
-                                        <th class="sticky px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
-                                    </tr>
-                                </thead>
-                                <!-- FOR SHOWING OF INVOICES -->
-                                    <tbody>
-                                    <tr v-if="filteredInvoices.length === 0 || (invoicesByDate.length === 0 && isDateFiltered)">
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="10">No invoice available.</td>
-                                    </tr>
+                        <div class="flex-grow overflow-hidden border sm:rounded-lg border-gray-900" >
+                            <div class="overflow-x-auto h-full">
+                                <table class="min-w-full">
+                                    <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">   
+                                    <!-- HEADER FOR INVOICES -->
+                                        <tr class="sticky">
+                                            
+                                            <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByID">
+                                                <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderID === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                    <span>ID No.</span></div></th>
+                                            <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByName">
+                                                <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderName === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                    <span>Customer Name</span></div></th>
+                                            <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByPayment">
+                                                <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderPayment === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                    <span>Payment Type</span></div></th>
+                                            <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByAmount">
+                                                <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderAmount === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                    <span>Total Amount</span></div></th>
+                                            <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByStatus">
+                                                <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderStatus === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                    <span>Status</span></div></th>
+                                            <th class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-left align-middle cursor-pointer whitespace-nowrap" @click="sortByDate">
+                                                <div class="pr-3 flex justify-center items-center space-x-1"><font-awesome-icon :icon="['fas', 'angle-down']":class="sortOrderDate === 'asc' ? 'rotate-180' : 'rotate-0'"class="ml-2 transition-transform duration-300 ease-in-out" /> 
+                                                    <span>Date</span></div></th>  
+                                            <th class="sticky w-40 px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- FOR SHOWING OF INVOICES -->
+                                        <tbody>
+                                        <tr v-if="filteredInvoices.length === 0 || (invoicesByDate.length === 0 && isDateFiltered)">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700" colspan="10">No invoice available.</td>
+                                        </tr>
 
 
-                                    <tr class = "text-center" v-for="invoice in invoicesByDate" :key="invoice.invoice_id" v-if="isDateFiltered">
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
-                                        <td class="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <div class="w-60">
+                                        <tr class = "text-center" v-for="invoice in invoicesByDate" :key="invoice.invoice_id" v-if="isDateFiltered">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
+                                            <td class="items-center justify-center py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <div class="w-full">
 
-                                                <span :class="{
-                                                    'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
-                                                    'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
-                                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
-                                                }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
-                                                {{  invoice.payment_Type === 'cash' ? 'Cash' : 
-                                                    invoice.payment_Type === 'check' ? 'Check' : 
-                                                    invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
-                                                    invoice.payment_Type  }}</span>
-                                            </div>
+                                                    <span :class="{
+                                                        'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
+                                                        'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
+                                                        'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
+                                                    }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
+                                                    {{  invoice.payment_Type === 'cash' ? 'Cash' : 
+                                                        invoice.payment_Type === 'check' ? 'Check' : 
+                                                        invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
+                                                        invoice.payment_Type  }}</span>
+                                                </div>
 
-                                            </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                                </td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ roundToTwoDecimals(invoice.total_Amount_Due)  }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
 
-                                            <div>
-                                                <span :class="{
-                                                    'text-sm bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
-                                                    'text-sm bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
-                                                    'text-sm bg-orange-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
-                                                    'text-sm bg-orange-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
-                                                    'text-sm bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
-                                                }">
-                                                <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                {{invoice.status === 'paid' ? 'Paid' : 
-                                                     invoice.status === 'unpaid' ? 'Unpaid' : 
-                                                     invoice.status === 'partially paid' ? 'Partially Paid' : 
-                                                     invoice.status === 'pending refund' ? 'Pending Refund' : 
-                                                     invoice.status === 'refunded' ? 'Refunded' : 
-                                                     invoice.status }}</span>
-                                            </div>
-
-                                        </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
-                                        <td class="flex gap-1 items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="bg-yellow-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="viewInvoiceDetails(invoice)" class="bg-blue-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
-                                            </button>
-                                            <button @click="openDeleteModal(invoice.invoice_system_id)" class="bg-red-500 text-white px-2 py-1 rounded-full">
-                                            <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
-                                            </button>
-                                        </td>
-                                    </tr>
-
-                                    <tr class = "text-center" v-for="invoice in filteredInvoices" :key="invoice.invoice_id" v-if="!isDateFiltered">
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
-                                        <td class="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <div class="w-60">
-
-                                                <span :class="{
-                                                    'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
-                                                    'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
-                                                    'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
-                                                }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
-                                                {{  invoice.payment_Type === 'cash' ? 'Cash' : 
-                                                    invoice.payment_Type === 'check' ? 'Check' : 
-                                                    invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
-                                                    invoice.payment_Type  }}</span>
-                                            </div>
+                                                <div class="flex items-center justify-center w-full">
+                                                    
+                                                    <span :class="{
+                                                        'text-sm bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
+                                                        'text-sm bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
+                                                        'text-sm bg-amber-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
+                                                        'text-sm bg-amber-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
+                                                        'text-sm bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
+                                                    }">
+                                                    <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    {{invoice.status === 'paid' ? 'Paid' : 
+                                                        invoice.status === 'unpaid' ? 'Unpaid' : 
+                                                        invoice.status === 'partially paid' ? 'Partially Paid' : 
+                                                        invoice.status === 'pending refund' ? 'Pending Refund' : 
+                                                        invoice.status === 'refunded' ? 'Refunded' : 
+                                                        invoice.status }}</span>
+                                                </div>
 
                                             </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
+                                            <td class="items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                                </button>
+                                                <button @click="viewInvoiceDetails(invoice)" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
+                                                </button>
+                                                <button @click="openDeleteModal(invoice.invoice_system_id)" class="hover:bg-red-600 transition hover:scale-105 ease-in-out duration-150 bg-red-500 text-white px-2 py-1 rounded-full">
+                                                <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
+                                                </button>
+                                            </td>
+                                        </tr>
 
-                                            <div>
-                                                <span :class="{
-                                                    'bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
-                                                    'bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
-                                                    'bg-orange-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
-                                                    'bg-orange-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
-                                                    'bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
-                                                }">
-                                                <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
-                                                <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
-                                                {{invoice.status === 'paid' ? 'Paid' : 
-                                                     invoice.status === 'unpaid' ? 'Unpaid' : 
-                                                     invoice.status === 'partially paid' ? 'Partially Paid' : 
-                                                     invoice.status === 'pending refund' ? 'Pending Refund' : 
-                                                     invoice.status === 'refunded' ? 'Refunded' : 
-                                                     invoice.status }}</span>
+                                        <tr class = "text-center" v-for="invoice in filteredInvoices" :key="invoice.invoice_id" v-if="!isDateFiltered">
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.invoice_id }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.customer_Name }}</td>
+                                            <td class="items-center justify-center py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <div class=" w-full">
 
-                                            </div>
+                                                    <span :class="{
+                                                        'bg-green-800 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'cash',
+                                                        'bg-blue-900 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'check',
+                                                        'bg-yellow-700 text-white py-1 px-3 rounded-full': invoice.payment_Type === 'online transaction',
+                                                    }"><font-awesome-icon v-if="invoice.payment_Type === 'cash'" icon="fa-solid fa-money-bill" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'check'" icon="fa-solid fa-clipboard" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.payment_Type === 'online transaction'" icon="fa-solid fa-globe" size="sm" class="mr-1" />
+                                                    {{  invoice.payment_Type === 'cash' ? 'Cash' : 
+                                                        invoice.payment_Type === 'check' ? 'Check' : 
+                                                        invoice.payment_Type === 'online transaction' ? 'Online Transaction' : 
+                                                        invoice.payment_Type  }}</span>
+                                                </div>
 
-                                        </td>
-                                        <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
-                                        <td class="flex gap-1 items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                                            <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" class="bg-yellow-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
-                                            </button>
-                                            <button @click="viewInvoiceDetails(invoice)" class="bg-blue-500 text-white px-2 py-1 rounded-full">
-                                                <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
-                                            </button>
-                                            <button @click="openDeleteModal(invoice.invoice_system_id)" class="bg-red-500 text-white px-2 py-1 rounded-full">
-                                            <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                            </table>
+                                                </td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">PHP {{ invoice.total_Amount_Due  }}</td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+
+                                                <div class="flex items-center justify-center w-full">
+                                                    <span :class="{
+                                                        'bg-green-600 text-white py-1 px-3 rounded-full': invoice.status === 'paid',
+                                                        'bg-red-600 text-white py-1 px-3 rounded-full': invoice.status === 'unpaid',
+                                                        'bg-amber-600 shadow-none text-white py-1 px-3 rounded-full shadow-xs': invoice.status === 'pending refund',
+                                                        'bg-amber-600 text-white py-1 px-3 rounded-full': invoice.status === 'partially paid',
+                                                        'bg-green-600 shadow-none text-white py-1 px-3 rounded-full': invoice.status === 'refunded'
+                                                    }">
+                                                    <font-awesome-icon v-if="invoice.status === 'paid'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'unpaid'" icon="fa-solid fa-x" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'partially paid'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'pending refund'" icon="fa-solid fa-bars" size="sm" class="mr-1" />
+                                                    <font-awesome-icon v-if="invoice.status === 'refunded'" icon="fa-solid fa-check" size="sm" class="mr-1" />
+                                                    {{invoice.status === 'paid' ? 'Paid' : 
+                                                        invoice.status === 'unpaid' ? 'Unpaid' : 
+                                                        invoice.status === 'partially paid' ? 'Partially Paid' : 
+                                                        invoice.status === 'pending refund' ? 'Pending Refund' : 
+                                                        invoice.status === 'refunded' ? 'Refunded' : 
+                                                        invoice.status }}</span>
+
+                                                </div>
+
+                                            </td>
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">{{ invoice.date }}</td>
+                                            <td class="items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                                                <button @click="editInvoiceDetails(invoice), currentStepUpdate = 1" 
+                                                    class="hover:bg-yellow-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-yellow-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-pen" size="sm"/>
+                                                </button>
+                                                <button @click="viewInvoiceDetails(invoice)" 
+                                                    class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 mr-1 bg-blue-500 text-white px-2 py-1 rounded-full">
+                                                    <font-awesome-icon icon="fa-solid fa-eye" size="sm"/>
+                                                </button>
+                                                <button @click="openDeleteModal(invoice.invoice_system_id)" 
+                                                    class="hover:bg-red-600 transition hover:scale-105 ease-in-out duration-150 bg-red-500 text-white px-2 py-1 rounded-full">
+                                                <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                </table>
+
+                            </div>
+
                         </div>
                     </div>   
                 </div>
-                <div class="flex justify-end mt-4 mr-10 space-x-4">
-                    <button @click="showAddInvoiceModal = true, currentStepAdd = 1" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Invoice</button>
-                    <button @click="printInvoiceSummaryByDate()" class="bg-gray-500 text-white py-2 px-4 rounded">
-                        <font-awesome-icon icon="fa-solid fa-print" size="sm" />
-                        Print Invoice Summary</button>
-                </div>
 
+                <div class="w-full flex items-center justify-between">
+                    <div class="items-center flex ml-5">
+                        <div class="mr-2 text-xs">Filter by Date:</div>    
+                            <input id="startDate" class="text-black text-sm rounded" type="date" v-model="startDate" />
+                        <div class="mx-2 text-xs"> To </div>
+                            <input id="endDate" class="text-black text-sm rounded" type="date" v-model="endDate" />
+                        <button @click="clearFetchInvoicessByDate" class="text-xs hover:bg-gray-600 transition hover:scale-105 ease-in-out duration-150 bg-gray-500 rounded-lg p-2 text-white ml-2 me-5">Clear</button>
+                    </div>
+
+                    <div class="flex justify-end mt-4 mr-10 space-x-4">
+                        <button @click="showAddInvoiceModal = true, currentStepAdd = 1" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">+ Add Invoice</button>
+                        <button @click="printInvoiceSummaryByDate()" class="hover:bg-gray-600 transition hover:scale-105 ease-in-out duration-150 bg-gray-500 text-white py-2 px-4 rounded">
+                            <font-awesome-icon icon="fa-solid fa-print" size="sm" />
+                            Print Invoice Summary</button>
+                    </div>
+                </div>
             </div>
         </div>
         
 
         <transition name="modal-fade" >
-            <div v-show="showDeleteModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
+            <div v-show="showDeleteModal" @click="closeDeleteModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div  @click.stop  class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-trash" size="8x" style="margin-top:2px; color: red;"/>
                     <h2 class="mt-4 text-xl text-center font-bold mb-2">Confirm Deletion</h2>
-                    <p class="mb-4 text-center">Are you sure you want to delete this finance?</p>
+                    <p class="mb-4 text-center">Are you sure you want to delete this Invoice?</p>
                     <div class="flex justify-center space-x-2">
                         <button @click="closeDeleteModal" class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400">
                             No
                         </button>
-                        <button @click="confirmDelete" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                        <button @click="confirmDelete" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">
                             Yes
                         </button>
                     </div>
@@ -1769,7 +2147,7 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
                     <h2 class="text-xl font-bold mb-4">Success!</h2>
-                    <p class="mb-4">The finance has been successfully deleted.</p>
+                    <p class="mb-4">The Invoice has been successfully deleted.</p>
                 </div>
             </div>
         </transition>
@@ -1780,7 +2158,7 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
                     <h2 class="text-xl font-bold mb-4">Success!</h2>
-                    <p class="mb-4">The Finance Information has been successfully Updated!.</p>
+                    <p class="mb-4">The Invoice Information has been successfully Updated!.</p>
                 </div>
             </div>
         </transition>
@@ -1792,14 +2170,14 @@ const showSuccessEditModal = ref(false);
                 <div class="flex flex-col mx-12 items-center justify-center bg-white p-5 rounded-lg shadow-xl text-center">
                     <font-awesome-icon icon="fa-solid fa-check" size="10x" style="color: green;"/>
                     <h2 class="text-xl font-bold mb-4">Success!</h2>
-                    <p class="mb-4">The Finance Information has been successfully Added!.</p>
+                    <p class="mb-4">The Invoice Information has been successfully Added!.</p>
                 </div>
             </div>
         </transition>
 
         <transition name="modal-fade" >
-            <div v-if="showPrintInvoiceSummaryByDate" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="pop-in bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+            <div v-if="showPrintInvoiceSummaryByDate" @click="showPrintInvoiceSummaryByDate = false"  class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div  @click.stop class="pop-in bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
             <h2 class="text-2xl font-bold text-center mb-6">Print Invoice Summary</h2>
             
             <button 
@@ -1824,39 +2202,49 @@ const showSuccessEditModal = ref(false);
                 </div>
 
                 <div class="space-y-2">
-                <p class="text-sm font-medium text-gray-700">Filter by Date:</p>
-                <div class="flex items-center space-x-2">
-                    <input 
-                    id="startDate" 
-                    v-model="startDatePrint" 
-                    type="date" 
-                    class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                    <span class="text-gray-500">to</span>
-                    <input 
-                    id="endDate" 
-                    v-model="endDatePrint" 
-                    type="date" 
-                    class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
+                    <div class="flex items-center justify-start">
+                        <p class="text-sm font-medium text-gray-700">Filter by Date:</p>
+                        <button 
+                        @click="clearDates" 
+                        class="px-3 py-1 ml-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                        Clear Dates
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <input 
+                        id="startDate" 
+                        v-model="startDatePrint" 
+                        type="date" 
+                        class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <span class="text-gray-500">to</span>
+                        <input 
+                        id="endDate" 
+                        v-model="endDatePrint" 
+                        type="date" 
+                        class="block w-full px-3 py-2 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                    </div>
                 </div>
 
-                <div class="flex flex-col items-center space-y-3">
-
+                <div class="flex items-center justify-center mt-8 mb-8 space-x-2">
+                    <button 
+                    @click="showPrintInvoiceSummaryByDate = false" 
+                    type="button"
+                    class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Cancel
+                </button>
                 <button 
                     @click.prevent="printInvoicesByDate" 
-                    class="w-full max-w-xs px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 max-w-xs px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                     <font-awesome-icon icon="fa-solid fa-print" class="mr-2" />
                     Print Invoice Summary
                 </button>
-                <button 
-                    @click="clearDates" 
-                    class="block max-w-xs px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Clear Dates
-                </button>
+
 
                 </div>
             </div>
@@ -1866,15 +2254,15 @@ const showSuccessEditModal = ref(false);
 
 
         <transition name="modal-fade" >
-            <div v-if="showEditInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
-                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Edit this Invoice</h3>
+            <div v-if="showEditInvoiceModal" @click="showEditInvoiceModal = false"  class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div @click.stop  class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
+                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Edit Invoice</h3>
 
                     <div class="px-12">
                         <p class="font-bold text-9x1 p-5 border inline-block rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 font-medium text-white">Step 1: Invoice and Customer Info</p>
                     </div>
                     <div class="px-12 mb-10">
-                        
+                    
                         <!-- STEP 1: DIV FOR INVOICE AND CUSTOMER DETAILS -->
                         <form @submit.prevent="updateInvoice" class="border-4 border-black rounded-bl-lg rounded-r-lg shadow-lg w-full">
                         <!-- Step 1: Invoice and Customer Details -->
@@ -1882,41 +2270,47 @@ const showSuccessEditModal = ref(false);
                                 <div class="grid grid-cols-3 gap-8 mb-4">
                                     <div>
                                         <label for="invoice_id" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Invoice I.D. No.</label>
-                                        <input type="number" id="invoice_id" v-model="editInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="number" id="invoice_id" v-model="editInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"  @input="validateUpdateInvoiceID" />
+                                        <div v-if="UpdateinvoiceIDError" class="text-red-500 text-sm">{{ UpdateinvoiceIDError }}</div>
                                     </div>
                                     
                                     <div class="">
                                         <label for="date" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Date</label>
-                                        <input type="date" id="date" v-model="editInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="date" id="date" v-model="editInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @input="validateUpdateDate"/>
+                                        <div v-if="UpdatedateError" class="text-red-500 text-sm">{{ UpdatedateError }}</div>
                                     </div>
 
                                     <div class="">
                                         <label for="status" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Status</label>
-                                        <select id="status" v-model="editInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <select id="status" v-model="editInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validateUpdateStatus">
                                             <option value="paid">Paid</option>
                                             <option value="partially paid">Partially Paid</option>
                                             <option value="unpaid">Unpaid</option>
                                             <option value="pending refund">Pending Refund</option>
                                             <option value="refunded">Refunded</option>
-
                                         </select>
+                                        <div v-if="UpdatestatusError" class="text-red-500 text-sm">{{ UpdatestatusError }}</div>
                                     </div>
                                 </div>
                                     
                                 <div class="grid grid-cols-2 gap-8 mb-4">
                                     <div class="">
-                                        <label for="customer_Name" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Name</label>
-                                        <input type="text" id="customer_Name" v-model="editInvoice.customer_Name" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. Juan Dela Cruz"/>
-                                    </div>
-                                
-                                    <div class="">
-                                        <label for="payment_Type" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
-                                        <select id="payment_Type" v-model="editInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <label for="payment_Type" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
+                                        <select id="payment_Type" v-model="editInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validateUpdatePtype">
                                             <option value="cash">Cash</option>
                                             <option value="check">Check</option>
                                             <option value="online transaction">Online Transaction</option>
                                         </select>
+                                        <div v-if="UpdateptypeError" class="text-red-500 text-sm">{{ UpdateptypeError }}</div>
                                     </div>
+                                    <div class="">
+                                        <label for="terms" class=" w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
+                                        <input type="text" id="terms" v-model="editInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days" @input="validateUpdateTerms"/>
+                                        <div v-if="UpdatetermsError" class="text-red-500 text-sm">{{ UpdatetermsError }}</div>
+                                    </div>
+
+                                
+
                                 
 
                                 </div>
@@ -1925,13 +2319,14 @@ const showSuccessEditModal = ref(false);
                                 
                                 <div class="grid grid-cols-2 gap-8 mb-4">
                                     <div class="">
-                                        <label for="customer_Address" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Address</label>
-                                        <input type="text" id="customer_Address" v-model="editInvoice.customer_Address" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="Enter the Customer's Address (Optional)"/>
+                                        <label for="customer_Name" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Name</label>
+                                        <input type="text" id="customer_Name" v-model="editInvoice.customer_Name" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. Juan Dela Cruz"/>
                                     </div>
                                     <div class="">
-                                        <label for="customer_PO_No" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer P.O. Number</label>
-                                        <input type="number" id="customer_PO_No" v-model="editInvoice.customer_PO_No" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <label for="customer_Address" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Address</label>
+                                        <input type="text" id="customer_Address" v-model="editInvoice.customer_Address" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="Enter the Customer's Address (Optional)"/>
                                     </div>
+
                                     
                                 </div>
 
@@ -1948,10 +2343,9 @@ const showSuccessEditModal = ref(false);
 
                                 <div class="grid grid-cols-2  gap-8 mb-4">
                                     <div class="">
-                                        <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
-                                        <input type="text" id="terms" v-model="editInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days"/>
+                                        <label for="customer_PO_No" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer P.O. Number</label>
+                                        <input type="number" id="customer_PO_No" v-model="editInvoice.customer_PO_No" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
                                     </div>
-
                                     <div>
                                         <label for="customer_Business_Style" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Business Style</label>
                                         <input type="text" id="customer_Business_Style" v-model="editInvoice.customer_Business_Style" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. Juan Dela Cruz"/>
@@ -1983,6 +2377,7 @@ const showSuccessEditModal = ref(false);
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Product</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Amount</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Quantity</th>
+                                            <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Stock</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Total Amount</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Action</th>
                                         </tr>
@@ -2006,7 +2401,7 @@ const showSuccessEditModal = ref(false);
                                                     <ul v-if="field.product_name && field.isSearching" class="absolute z-10 w-52 bg-white shadow-lg rounded-lg mt-1 max-h-60 overflow-y-auto">
                                                     <li @click="selectUpdateProduct(product, index)" v-for="product in filteredUpdateProducts(field.product_name)" :key="product.id">
                                                         <img :src="'/storage/' + product.image" alt="Product Image" class="w-5 h-5 object-cover" />
-                                                        {{ product.name }} 
+                                                        {{ product.name }} {{product.price}}
                                                     </li>
                                                 </ul>
 
@@ -2022,16 +2417,20 @@ const showSuccessEditModal = ref(false);
                                                             {{ field.on_sale === 'yes' ? 'Sale' : 'On Sale' }}
                                                         </span>
                                                         <label class="switch px-3">
-                                                            <input  :disabled="!field.areFieldsEnabled" type="checkbox" v-model="field.on_sale" true-value="yes" false-value="no" />
+                                                            <input  :disabled="!field.areFieldsEnabled" disabled type="checkbox" v-model="field.on_sale" true-value="yes" false-value="no" />
                                                             <span class="slider round"></span>
                                                         </label>
                                                     </div>
-                                                    <input  class="no-spinner w-32" type="number" v-model="field.product_price" placeholder="Amount" />
+                                                    <input disabled class="no-spinner w-32" type="number" v-model="field.product_price" placeholder="Amount" />
                                                 </div>
                                             </td>
 
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
-                                                <input  :disabled="!field.areFieldsEnabled" class="text-center no-spinner w-16" type="number" @input="updateTotalProductAmountUpdate(index)" v-model="field.quantity" placeholder="Qty." />
+                                                <input class="text-center no-spinner w-16" type="number" @input="updateTotalProductAmountUpdate(index)" v-model="field.quantity" placeholder="Qty." />
+                                            </td>
+
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
+                                                <input  :disabled="!field.areFieldsEnabled" class="text-center no-spinner w-16" type="number" disabled v-model="field.stock" placeholder="Stock" />
                                             </td>
 
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
@@ -2039,14 +2438,19 @@ const showSuccessEditModal = ref(false);
                                             </td>
 
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
-                                                <button type="button" class="bg-red-500 text-white p-3 rounded-full" @click="removeItemTextField1(index)">
+                                                <button 
+                                                    v-if="field.isNew"
+                                                    type="button" 
+                                                    class="bg-red-500 text-white p-3 rounded-full" 
+                                                    @click="removeItemTextField1(index)"
+                                                >
                                                     <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
                                                 </button>
                                             </td>
                                         </tr>
 
                                         <tr>
-                                            <td colspan="5">
+                                            <td colspan="6">
                                                 <div class="flex items-center justify-center my-6">
                                                     <button type="button" @click="addUpdateItemTextField" class="flex items-center justify-center">
                                                         <font-awesome-icon :icon="['fas', 'plus']" class="w-6 h-6 mr-2" />
@@ -2100,7 +2504,7 @@ const showSuccessEditModal = ref(false);
                                             </td>
 
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
-                                                <button type="button" class="bg-red-500 text-white p-3 rounded-full" @click="removeUpdateAdditionalTextField(index)">
+                                                <button type="button" class="bg-red-500 text-white px-4 py-3 rounded-full" @click="removeUpdateAdditionalTextField(index)">
                                                     <font-awesome-icon icon="fa-solid fa-trash-can" size="sm" />
                                                 </button>
                                             </td>
@@ -2227,9 +2631,9 @@ const showSuccessEditModal = ref(false);
                     </div>
 
 
-                    <div class="flex justify-center mt-6 gap-14">
-                                    <button @click="showEditInvoiceModal = false" type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
-                                    <button @click.prevent="updateInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Receipt</button>
+                    <div class="flex justify-center mt-4 pb-6 gap-8">
+                                    <button @click="showEditInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                    <button @click.prevent="updateInvoiceInformation()" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">Update Invoice</button>
                     </div>
 
             </div>
@@ -2238,8 +2642,8 @@ const showSuccessEditModal = ref(false);
 
         
         <transition name="modal-fade" >
-            <div v-if="showAddInvoiceModal" class="fixed ml-[100px] inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-                <div class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-6xl h-4/5 relative overflow-auto flex flex-col">
+            <div v-if="showAddInvoiceModal" @click="showAddInvoiceModal = false" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                <div @click.stop  class="pop-in bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
                 <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">Add an Invoice</h3>
 
                     <div class="px-12">
@@ -2254,17 +2658,19 @@ const showSuccessEditModal = ref(false);
                                 <div class="grid grid-cols-3 gap-8 mb-4">
                                     <div>
                                         <label for="invoice_id" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Invoice I.D. No.</label>
-                                        <input type="number" id="invoice_id" v-model="newInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="number" id="invoice_id" v-model="newInvoice.invoice_id" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @input="validateInvoiceID"/>
+                                        <div v-if="invoiceIDError" class="text-red-500 text-sm">{{ invoiceIDError }}</div>
                                     </div>
                                     
                                     <div class="">
                                         <label for="date" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Date</label>
-                                        <input type="date" id="date" v-model="newInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input type="date" id="date" v-model="newInvoice.date" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @input="validateDate"/>
+                                        <div v-if="dateError" class="text-red-500 text-sm">{{ dateError }}</div>
                                     </div>
 
                                     <div class="">
                                         <label for="status" class="pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Status</label>
-                                        <select id="status" v-model="newInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
+                                        <select id="status" v-model="newInvoice.status" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validateStatus">
                                             <option value="paid">Paid</option>
                                             <option value="partially paid">Partially Paid</option>
                                             <option value="unpaid">Unpaid</option>
@@ -2272,38 +2678,42 @@ const showSuccessEditModal = ref(false);
                                             <option value="refunded">Refunded</option>
 
                                         </select>
+                                        <div v-if="statusError" class="text-red-500 text-sm">{{ statusError }}</div>
                                     </div>
                                 </div>
                                     
+                                <div class="grid grid-cols-2 gap-8 mb-4">
+
+                                
+                                    <div class="">
+                                        <label for="payment_Type" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
+                                        <select id="payment_Type" v-model="newInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" @change="validatePtype">
+                                            <option value="cash">Cash</option>
+                                            <option value="check">Check</option>
+                                            <option value="online transaction">Online Transaction</option>
+                                        </select>
+                                        <div v-if="ptypeError" class="text-red-500 text-sm">{{ ptypeError }}</div>
+                                    </div>
+                                
+                                    <div class="">
+                                        <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
+                                        <input type="text" id="terms" v-model="newInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days" @input="validateTerms"/>
+                                        <div v-if="termsError" class="text-red-500 text-sm">{{ termsError }}</div>
+                                    </div>
+                                </div> 
+
+
+                                
                                 <div class="grid grid-cols-2 gap-8 mb-4">
                                     <div class="">
                                         <label for="customer_Name" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Name</label>
                                         <input type="text" id="customer_Name" v-model="newInvoice.customer_Name" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. Juan Dela Cruz"/>
                                     </div>
-                                
-                                    <div class="">
-                                        <label for="payment_Type" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
-                                        <select id="payment_Type" v-model="newInvoice.payment_Type" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm">
-                                            <option value="cash">Cash</option>
-                                            <option value="check">Check</option>
-                                            <option value="online transaction">Online Transaction</option>
-                                        </select>
-                                    </div>
-                                
-
-                                </div>
-
-
-                                
-                                <div class="grid grid-cols-2 gap-8 mb-4">
                                     <div class="">
                                         <label for="customer_Address" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Address</label>
                                         <input type="text" id="customer_Address" v-model="newInvoice.customer_Address" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="Enter the Customer's Address (Optional)"/>
                                     </div>
-                                    <div class="">
-                                        <label for="customer_PO_No" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer P.O. Number</label>
-                                        <input type="number" id="customer_PO_No" v-model="newInvoice.customer_PO_No" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
-                                    </div>
+
                                     
                                 </div>
 
@@ -2320,8 +2730,8 @@ const showSuccessEditModal = ref(false);
 
                                 <div class="grid grid-cols-2  gap-8 mb-4">
                                     <div class="">
-                                        <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
-                                        <input type="text" id="terms" v-model="newInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days"/>
+                                        <label for="customer_PO_No" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer P.O. Number</label>
+                                        <input type="number" id="customer_PO_No" v-model="newInvoice.customer_PO_No" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
                                     </div>
 
                                     <div>
@@ -2355,6 +2765,7 @@ const showSuccessEditModal = ref(false);
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Product</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Amount</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Quantity</th>
+                                            <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Stock</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Total Amount</th>
                                             <th class="sticky top-0 px-6 py-3 text-white bg-gray-700">Action</th>
                                         </tr>
@@ -2378,12 +2789,12 @@ const showSuccessEditModal = ref(false);
                                                 <ul v-if="field.searchProductQuery && field.isSearching" class="absolute z-10 w-52 bg-white shadow-lg rounded-lg mt-1 max-h-60 overflow-y-auto">
                                                     <li @click="selectProduct(product, index)" v-for="product in filteredProducts(field.searchProductQuery)" :key="product.id">
                                                         <img :src="'/storage/' + product.image" alt="Product Image" class="w-5 h-5 object-cover" />
-                                                        {{ product.image }} {{ product.name }} {{ product.price }}
+                                                         {{ product.name }} {{ product.price }}
                                                     </li>
                                                 </ul>
                                             </td>
 
-                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
+                                            <td class=" pr-8 py-4 border-b border-gray-200 dark:border-gray-400">
                                                 <div class="flex items-center justify-center">
                                                     <div class="-ml-4 flex items-center justify-between">
                                                         <span class="-ml-20 w-24 text-right text-xs text-gray-400">
@@ -2404,6 +2815,10 @@ const showSuccessEditModal = ref(false);
                                             </td>
 
                                             <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
+                                                <input disabled :disabled="!field.areFieldsEnabled" class="text-center no-spinner w-16" type="number"  v-model="field.stock" placeholder="Stock." />
+                                            </td>
+
+                                            <td class="px-6 py-4 border-b border-gray-200 dark:border-gray-400">
                                                 <input :disabled="!field.areFieldsEnabled" class="text-center no-spinner w-32" type="number" v-model="field.total_amount" placeholder="Total Amount" />
                                             </td>
 
@@ -2415,7 +2830,7 @@ const showSuccessEditModal = ref(false);
                                         </tr>
 
                                         <tr>
-                                            <td colspan="5">
+                                            <td colspan="6">
                                                 <div class="flex items-center justify-center my-6">
                                                     <button type="button" @click="addItemTextField" class="flex items-center justify-center">
                                                         <font-awesome-icon :icon="['fas', 'plus']" class="w-6 h-6 mr-2" />
@@ -2594,9 +3009,9 @@ const showSuccessEditModal = ref(false);
 
                     </div>
 
-                    <div class="flex justify-center mt-6 gap-6">
-                                    <button @click="showAddInvoiceModal = false" type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
-                                    <button @click.prevent="addInvoiceInformation()" class="bg-blue-500 text-white py-2 px-4 rounded">Save Receipt</button>
+                    <div class="flex justify-center mt-4 pb-6 gap-4">
+                                    <button @click="showAddInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Cancel</button>
+                                    <button @click.prevent="addInvoiceInformation()" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">Save Invoice</button>
                     </div>
 
                 </div>
@@ -2605,12 +3020,12 @@ const showSuccessEditModal = ref(false);
 
 
         <transition name="modal-fade" >
-            <div v-if="showViewInvoiceModal" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-            <div class=" bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
-                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">View this Invoice</h3>
+            <div v-if="showViewInvoiceModal" @click="showViewInvoiceModal = false" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+            <div  @click.stop class=" bg-white p-4 rounded-lg shadow-lg w-full max-w-7xl h-4/5 relative overflow-auto flex flex-col">
+                <h3 style="font-size: 64px;" class="text-lg font-semibold text-center mt-12 mb-10">View Invoice</h3>
 
                 <div class="flex justify-center items-center">
-                    <button @click="printInvoice()" class="w-44 bg-blue-500 text-white px-2 py-1 rounded-full">
+                    <button @click="printInvoice()" class="w-44 hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white px-2 py-1 rounded-full">
                             <font-awesome-icon icon="fa-solid fa-print" size="sm"/>
                             <span class="text-lg"> Print Invoice</span>
                     </button>
@@ -2651,10 +3066,7 @@ const showSuccessEditModal = ref(false);
                                 </div>
                                     
                                 <div class="grid grid-cols-2 gap-8 mb-4">
-                                    <div class="">
-                                        <label for="customer_Name" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Name</label>
-                                        <input disabled type="text" id="customer_Name" v-model="selectedInvoice.customer_Name" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. Juan Dela Cruz"/>
-                                    </div>
+
                                 
                                     <div class="">
                                         <label for="payment_Type" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Payment Type</label>
@@ -2664,21 +3076,25 @@ const showSuccessEditModal = ref(false);
                                             <option value="online transaction">Online Transaction</option>
                                         </select>
                                     </div>
-                                
+                                    <div class="">
+                                        <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
+                                        <input disabled type="text" id="terms" v-model="selectedInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days"/>
+                                    </div>
 
                                 </div>
 
 
                                 
                                 <div class="grid grid-cols-2 gap-8 mb-4">
+                                    <div class="">
+                                        <label for="customer_Name" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Name</label>
+                                        <input disabled type="text" id="customer_Name" v-model="selectedInvoice.customer_Name" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. Juan Dela Cruz"/>
+                                    </div>
                                     <div class="mb-4">
                                         <label for="customer_Address" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer Address</label>
                                         <input disabled type="text" id="customer_Address" v-model="selectedInvoice.customer_Address" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="Enter the Customer's Address (Optional)"/>
                                     </div>
-                                    <div class="">
-                                        <label for="customer_PO_No" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer P.O. Number</label>
-                                        <input disabled type="number" id="customer_PO_No" v-model="selectedInvoice.customer_PO_No" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
-                                    </div>
+
                                     
                                 </div>
 
@@ -2695,8 +3111,8 @@ const showSuccessEditModal = ref(false);
 
                                 <div class="grid grid-cols-2  gap-8 mb-4">
                                     <div class="">
-                                        <label for="terms" class=" w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Terms</label>
-                                        <input disabled type="text" id="terms" v-model="selectedInvoice.terms" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm" placeholder="e.g. 30 days"/>
+                                        <label for="customer_PO_No" class="w-56 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline-block text-sm font-medium text-white">Customer P.O. Number</label>
+                                        <input disabled type="number" id="customer_PO_No" v-model="selectedInvoice.customer_PO_No" class="block w-full border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
                                     </div>
 
                                     <div>
@@ -2933,7 +3349,7 @@ const showSuccessEditModal = ref(false);
 
                                     <div class="mb-2">
                                         <label for="tax" class="w-44 pl-4 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 block text-sm font-medium text-white">Tax</label>
-                                        <input disabled ref="tax" type="number" id="tax" v-model="selectedInvoiceComputation.tax" class="w-full block border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
+                                        <input disabled ref="tax" type="number" id="tax" v-wsmodel="selectedInvoiceComputation.tax" class="w-full block border-gray-300 rounded-bl-md rounded-r-md shadow-sm"/>
                                     </div>
 
                                 </div>
@@ -2943,8 +3359,8 @@ const showSuccessEditModal = ref(false);
 
                     </div>
 
-                    <div class="flex justify-center mt-6 gap-14">
-                                    <button @click="showViewInvoiceModal = false" type="button" class="bg-gray-500 text-white py-2 px-4 rounded">Cancel</button>
+                    <div class="flex justify-center mt-4 pb-6 gap-8">
+                                    <button @click="showViewInvoiceModal = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500  ">Cancel</button>
                     </div>
 
             </div>

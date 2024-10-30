@@ -10,18 +10,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Events\BusinessNameUpdated;
-
+use Illuminate\Support\Facades\Auth;
 
 class BusinessController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
     public function index()
-{
-    $Business = Business::where('user_id', auth()->id())->first(); 
-    return response()->json($Business);
-}
+    {
+        $business = Business::where('user_id', Auth::id())->first();
+        
+        if ($business) {
+            Log::info("Business data fetched successfully", ['business_id' => $business->business_id]);
+            return response()->json($business);
+        } else {
+            Log::info("No business found for user", ['user_id' => Auth::id()]);
+            return response()->json(['message' => 'No business found'], 404);
+        }
+    }
+        /**
+     * Display the specified resource.
+     */
+    public function show(Request $request, Business $Business)
+    {
+        return $Business->all();
+    }
 
 
     /**
@@ -38,7 +53,7 @@ class BusinessController extends Controller
             'business_City' => 'required|string|max:255',
             'business_Barangay' => 'required|string|max:255',
             'business_Address' => 'required|string|max:255',
-            'business_Contact_Number' => 'required|string|max:255',
+            'business_Phone_Number' => 'required|string|max:255',
             'business_TIN'=> 'required|numeric',
             'business_Telephone_Number' => 'required|string|max:255',
             'business_Facebook' => 'nullable|string|max:255',
@@ -71,7 +86,7 @@ class BusinessController extends Controller
                     'business_City' => $request->business_City,
                     'business_Barangay' => $request->business_Barangay,
                     'business_Address' => $request->business_Address,
-                    'business_Contact_Number' => $request->business_Contact_Number,
+                    'business_Phone_Number' => $request->business_Phone_Number,
                     'business_TIN'=> $request->business_TIN,
                     'business_Telephone_Number' => $request->business_Telephone_Number,
                     'business_Facebook' => $request->business_Facebook,
@@ -90,114 +105,101 @@ class BusinessController extends Controller
     }
 }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Request $request, Business $Business)
-    {
-        return $Business->all();
-    }
+
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'business_Name' => 'required|string|max:255',
-            'business_Email' => 'required|string|lowercase|email|max:255',
-            'business_Province' => 'required|string|max:255',
-            'business_City' => 'required|string|max:255',
-            'business_Barangay' => 'required|string|max:255',
-            'business_Address' => 'required|string|max:255',
-            'business_Contact_Number' => 'required|string|max:255',
-            'business_Telephone_Number' => 'required|string|max:255',
-            'business_Facebook' => 'nullable|string|max:255',
-            'business_X' => 'nullable|string|max:255',
-            'business_Instagram' => 'nullable|string|max:255',
-            'business_Tiktok' => 'nullable|string|max:255'
-        ]);
-        
-        $business = Business::findOrFail($id);
-        $oldData = $business->toArray();
-        $oldName = $business->business_Name;
-        $oldImage = $business->business_image;
+        public function update(Request $request, $id)
+        {
+            $request->validate([
+                'business_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'business_Name' => 'required|string|max:255',
+                'business_Email' => 'required|string|lowercase|email|max:255',
+                'business_Province' => 'required|string|max:255',
+                'business_City' => 'required|string|max:255',
+                'business_Barangay' => 'required|string|max:255',
+                'business_Address' => 'required|string|max:255',
+                'business_Phone_Number' => 'required|string|max:255',
+                'business_Telephone_Number' => 'required|string|max:255',
+                'business_Facebook' => 'nullable|string|max:255',
+                'business_X' => 'nullable|string|max:255',
+                'business_Instagram' => 'nullable|string|max:255',
+                'business_Tiktok' => 'nullable|string|max:255'
+            ]);
+            
+            $business = Business::findOrFail($id);
+            $oldData = $business->toArray();
+            $oldName = $business->business_Name;
+            $oldImage = $business->business_image;
 
-        $changes = [];
-        $ignoreImageChange = false; // New flag to ignore specific image changes
+            $changes = [];
+            $ignoreImageChange = false; // New flag to ignore specific image changes
 
-        $oldData = $business->toArray();
-        $oldName = $business->business_Name;
-        $oldImage = $business->business_image;
+            if ($request->hasFile('business_image')) {
+                $image = $request->file('business_image');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
 
-        $changes = [];
-        $ignoreImageChange = false; // New flag to ignore specific image changes
+                // Move the old image to the archive if it exists, regardless of the replacement image
+                if ($oldImage && $oldImage !== 'default_logo.png' && $oldImage !== null) {
+                    $oldImagePath = 'public/business_logos/' . $oldImage;
+                    if (Storage::exists($oldImagePath)) {
+                        Storage::move($oldImagePath, 'public/business_logos/archive/' . $oldImage);
+                    }
+                }
 
-        if ($request->hasFile('business_image')) {
-            $image = $request->file('business_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
+                // Store the new image
+                $image->storeAs('public/business_logos', $imageName);
+                $business->business_image = $imageName;
 
-            // Move the old image to the archive if it exists, regardless of the replacement image
-            if ($oldImage && $oldImage !== 'default_logo.png' && $oldImage !== null) {
-                $oldImagePath = 'public/business_logos/' . $oldImage;
-                if (Storage::exists($oldImagePath)) {
-                    Storage::move($oldImagePath, 'public/business_logos/archive/' . $oldImage);
+                // Track the change only if the old image was not default or null
+                if ($oldImage !== 'default_logo.png' && $oldImage !== null) {
+                    $changes['business_image'] = ['old' => $oldImage, 'new' => $imageName];
+                } else {
+                    $ignoreImageChange = true;
                 }
             }
 
-            // Store the new image
-            $image->storeAs('public/business_logos', $imageName);
-            $business->business_image = $imageName;
+            $oldAddress = "{$oldData['business_Address']}, {$oldData['business_Barangay']}, {$oldData['business_City']}, {$oldData['business_Province']}";
+            $newAddress = "{$request->input('business_Address')}, {$request->input('business_Barangay')}, {$request->input('business_City')}, {$request->input('business_Province')}";
 
-            // Track the change only if the old image was not default or null
-            if ($oldImage !== 'default_logo.png' && $oldImage !== null) {
-                $changes['business_image'] = ['old' => $oldImage, 'new' => $imageName];
+            if ($oldAddress !== $newAddress) {
+                $changes['business_Address'] = ['old' => $oldAddress, 'new' => $newAddress];
+                // Update address fields in the model
+                $business->business_Address = $request->input('business_Address');
+                $business->business_Barangay = $request->input('business_Barangay');
+                $business->business_City = $request->input('business_City');
+                $business->business_Province = $request->input('business_Province');
+            }
+
+            if ($oldName !== $request->input('business_Name')) {
+                $changes['business_Name'] = ['old' => $oldName, 'new' => $request->input('business_Name')];
+                $business->business_Name = $request->input('business_Name');
+            }
+
+            // Similar comparison for address and other fields...
+            $fieldsToCheck = [
+                'business_Phone_Number', 'business_Telephone_Number', 'business_Email',
+                'business_Facebook', 'business_X', 'business_Instagram', 'business_Tiktok',
+            ];
+            
+            foreach ($fieldsToCheck as $field) {
+                if ($oldData[$field] !== $request->input($field)) {
+                    $changes[$field] = ['old' => $oldData[$field], 'new' => $request->input($field)];
+                    $business->{$field} = $request->input($field);
+                }
+            }
+
+            if (!empty($changes)) {
+                Log::info('Event dispatching...');
+                event(new BusinessNameUpdated($business, $oldName, $business->business_Name, $changes, $oldImage, $ignoreImageChange));
             } else {
-                $ignoreImageChange = true;
+                Log::info('No changes detected, event not triggered');
             }
+
+            $business->save();
+            return response()->json(['success' => true]);
         }
-
-        $oldAddress = "{$oldData['business_Address']}, {$oldData['business_Barangay']}, {$oldData['business_City']}, {$oldData['business_Province']}";
-        $newAddress = "{$request->input('business_Address')}, {$request->input('business_Barangay')}, {$request->input('business_City')}, {$request->input('business_Province')}";
-
-        if ($oldAddress !== $newAddress) {
-            $changes['business_Address'] = ['old' => $oldAddress, 'new' => $newAddress];
-            // Update address fields in the model
-            $business->business_Address = $request->input('business_Address');
-            $business->business_Barangay = $request->input('business_Barangay');
-            $business->business_City = $request->input('business_City');
-            $business->business_Province = $request->input('business_Province');
-        }
-
-        if ($oldName !== $request->input('business_Name')) {
-            $changes['business_Name'] = ['old' => $oldName, 'new' => $request->input('business_Name')];
-            $business->business_Name = $request->input('business_Name');
-        }
-
-        // Similar comparison for address and other fields...
-        $fieldsToCheck = [
-            'business_Contact_Number', 'business_Telephone_Number', 'business_Email',
-            'business_Facebook', 'business_X', 'business_Instagram', 'business_Tiktok',
-        ];
-
-        foreach ($fieldsToCheck as $field) {
-            if ($oldData[$field] !== $request->input($field)) {
-                $changes[$field] = ['old' => $oldData[$field], 'new' => $request->input($field)];
-                $business->{$field} = $request->input($field);
-            }
-        }
-
-        if (!empty($changes)) {
-            Log::info('Event dispatching...');
-            event(new BusinessNameUpdated($business, $oldName, $business->business_Name, $changes, $oldImage, $ignoreImageChange));
-        } else {
-            Log::info('No changes detected, event not triggered');
-        }
-
-        $business->save();
-        return response()->json(['success' => true]);
-    }
 
     /**
      * Remove the specified resource from storage.

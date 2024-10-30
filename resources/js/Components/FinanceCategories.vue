@@ -59,13 +59,14 @@ const closeModal = () => {
 const saveFinanceCategories = async () => {
         closeModal();
 };
+fetchFinanceCategories();
 </script>
 
 <template>
 
 
-    <div class="fixed inset-0 flex items-center justify-center z-50">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+    <div @click="closeModal" class="fixed inset-0 flex items-center justify-center z-50">
+        <div  @click.stop class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
             <h2 class="text-2xl text-center align-middle font-semibold mb-4">Categories</h2>
             <div class="mb-4">
                 <h3 class="pl-2 p-1 border rounded-t-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 inline text-md text-white font-semibold">Finance Categories</h3>
@@ -79,9 +80,16 @@ const saveFinanceCategories = async () => {
                             class="ml-2 text-red-500">x</button>
                     </div>
                 </div>
-                <div class="flex justify-between">
-                    <button @click="addFinanceCategory" class="bg-blue-500 text-white py-2 px-4 rounded">+ Add Category</button>
-                    <button @click="closeModal" style="background-color:#059669" class=" text-white py-2 px-4 rounded mr-2">Ok</button>
+                <div class="flex justify-center items-center space-x-2">
+                    <button 
+                    @click="closeModal" 
+                    type="button"
+                    class="px-4 py-2 block text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:scale-105 duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                    Cancel
+                </button>
+                    <button @click="addFinanceCategory" class="hover:bg-blue-600 transition hover:scale-105 ease-in-out duration-150 bg-blue-500 text-white py-2 px-4 rounded">+ Add Category</button>
+
                 </div>
 
             </div>

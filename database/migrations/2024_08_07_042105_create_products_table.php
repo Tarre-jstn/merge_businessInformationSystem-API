@@ -17,13 +17,12 @@ return new class extends Migration
             $table->enum('on_sale', ['yes','no'])->default('no');
             $table->decimal('on_sale_price', 8, 2)->default(0);
             $table->enum('featured', ['true','false'])->default('false');
-            $table->enum('seniorPWD_discountable', ['yes','no'])->default('no');
             $table->id();
             $table->string('name');
             $table->string('brand');
             $table->decimal('price', 8, 2);
             $table->string('category');
-            $table->integer('stock');
+            $table->integer('stock')->default(0);
             $table->integer('sold')->default(0);
             $table->string('status');
             $table->text('description');
@@ -31,6 +30,20 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->timestamps();
         });
+
+
+        Schema::create('product_notification_settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('stock_expDate')->unique(); // Ensure 'category' is unique
+            $table->integer('count')->unique(); // Ensure 'category' is unique
+            $table->timestamps();
+        });
+
+        DB::table('product_notification_settings')->insert([
+            ['stock_expDate' => 'stock', 'count' => 10, 'created_at' => now(), 'updated_at' => now()],
+            ['stock_expDate' => 'expDate', 'count' => 7, 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
     }
 
     /**
@@ -39,5 +52,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('products');
+        Schema::dropIfExists('product_notification_settings');
     }
 };
