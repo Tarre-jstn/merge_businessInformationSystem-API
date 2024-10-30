@@ -71,12 +71,15 @@ const validateName = () => {
 const validateEmail = () => {
     if (!business.value.email) {
         emailError.value = "This field cannot be empty";
-    } else if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(business.value.email)) {
+    } else if (/[A-Z]/.test(business.value.email)) {
+        emailError.value = "Email must be in lowercase only";
+    } else if (!/^[\w.-]+@[a-z\d.-]+\.[a-z]{2,}$/.test(business.value.email)) {
         emailError.value = "Please enter a valid email format";
     } else {
         emailError.value = '';
     }
 };
+
 
 const validateAddress = () => {
     addressError.value = business.value.address ? '' : "This field cannot be empty";
@@ -220,12 +223,14 @@ const onProfilePictureChange = (event) => {
 
 // Handle business update
 const updateBusiness = async () => {
+    // Run validations
     validateName();
     validateEmail();
     validateAddress();
     validatePhone();
     validateTelephone();
 
+    // Check if any errors exist
     if (nameError.value || emailError.value || addressError.value || phoneError.value || telephoneError.value) {
         showToast("Please correct the errors before updating the business profile.", "error");
         return;
@@ -236,12 +241,13 @@ const updateBusiness = async () => {
         return;
     }
 
+    // Prepare form data
     const formData = new FormData();
     formData.append('business_Name', business.value.name.trim());
     formData.append('business_Email', business.value.email.trim());
-    formData.append('business_Province', business.value.province);
-    formData.append('business_City', business.value.city);
-    formData.append('business_Barangay', business.value.barangay);
+    formData.append('business_Province', business.value.province || '');
+    formData.append('business_City', business.value.city || '');
+    formData.append('business_Barangay', business.value.barangay || '');
     formData.append('business_Address', business.value.address.trim());
 
     formData.append('business_Phone_Number', business.value.phone.trim() || '');
@@ -251,11 +257,12 @@ const updateBusiness = async () => {
     formData.append('business_Instagram', business.value.instagram || '');
     formData.append('business_Tiktok', business.value.tiktok || '');
 
-
+    // Conditionally add image
     if (business.value.image instanceof File) {
         formData.append('business_image', business.value.image);
     }
 
+    // Send the update request
     try {
         const response = await axios.post(`/api/Business/${business.value.business_id}`, formData, {
             headers: {
@@ -270,14 +277,20 @@ const updateBusiness = async () => {
                 window.location.reload();
             }, 2000);  
         } else {
-            showToast("Business ID is missing", "error");
-            return; 
+            showToast("An error occurred while updating", "error");
         }
     } catch (error) {
-        showToast("Business ID is missing", "error");
-        return; 
+    if (error.response && error.response.data.errors) {
+        console.error("Validation errors:", error.response.data.errors);
+        showToast("Please fix validation errors.", "error");
+    } else {
+        console.error("Error updating business profile:", error);
+        showToast("Failed to update business profile", "error");
     }
+}
+
 };
+
 
 
 
