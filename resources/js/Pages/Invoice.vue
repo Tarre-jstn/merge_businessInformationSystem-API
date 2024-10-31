@@ -1091,15 +1091,15 @@ const addUpdateItemTextField = () => {
     });
     editInvoiceComputation.value.Less_SC_PWD_Discount_Percent = 0;
 };
+
 watch(
   selectedInvoiceItems,
-  async (newItems, oldItems) => {
+  async (newItems) => {
     for (let i = 0; i < newItems.length; i++) {
       const newProductId = newItems[i].product_id;
-      const oldProductId = oldItems[i]?.product_id;
 
-      // Fetch stock only if product_id has changed and is set
-      if (newProductId && newProductId !== oldProductId) {
+      // Fetch stock if product_id is set
+      if (newProductId) {
         try {
           const response = await axios.get(`/api/products/${newProductId}/stock`);
           selectedInvoiceItems.value[i].stock = response.data.stock;
